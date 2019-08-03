@@ -15,9 +15,7 @@ Including another URLconf
 """
 from django.urls import path
 from app.api.views import index
-from app.api.views import User
 
 urlpatterns = [
     path('api/index', index),
-    path('api/index1', User()),
 ]
