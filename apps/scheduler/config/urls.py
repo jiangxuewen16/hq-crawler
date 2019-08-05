@@ -14,10 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from app.api.views import index
-from app.api.views import User
+from apps.api.views import index
 
 urlpatterns = [
     path('api/index', index),
-    path('api/index1', User()),
 ]
