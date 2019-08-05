@@ -2,17 +2,17 @@ from core.lib.base_view import BaseView
 from core.lib.route import Route
 
 
-@Route.route(path='api/home/')
-class Home(BaseView):
+@Route.route(path='api/user')
+class User(BaseView):
 
-    @Route.route(path='index')
+    @Route.route(path='/user/index')
     def index(self):
         return self.response(self.requestParam)
 
-    @Route.route(path='home/1')
+    @Route.route(path='/user/home/1')
     def home(self):
-        return self.response({'a': 1})
+        return self.response({'a': 2})
 
-    @Route.route(path='home')
+    @Route.route(path='/user/home/')
     def home1(self):
         return self.response(self.requestParam)
