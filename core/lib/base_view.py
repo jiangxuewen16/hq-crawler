@@ -4,13 +4,12 @@ from operator import methodcaller
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
 from django.views import View
-from types import MethodType, FunctionType
+
+from core.lib.route import Route
 
 
 class BaseView(View):
-    requestParam: dict
-
-    ROUTER: dict = {}
+    requestParam: dict  # 请求数据
 
     def init(self):
         self.requestParam = json.loads(self.request.body)
@@ -22,10 +21,10 @@ class BaseView(View):
     def post(self, request: WSGIRequest):
         # print(dir(self.request))
         self.init()
-
-        print(BaseView.ROUTER[request.path_info])
-        print(BaseView.ROUTER)
-        return methodcaller(BaseView.ROUTER[request.path_info])(self)  # 自调方法
+        print(f'{self.__class__.__module__}.{self.__class__.__qualname__}')
+        print(Route.ROUTER[request.path_info])
+        print(Route.classRoute)
+        return methodcaller(Route.ROUTER[request.path_info].func_name)(self)  # 自调方法
 
     """
     get 处理
@@ -37,25 +36,3 @@ class BaseView(View):
     @classmethod
     def response(cls, data: dict, contentType: str = 'application/json') -> HttpResponse:
         return HttpResponse(json.dumps(data), contentType)
-
-    @classmethod
-    def route(cls, path):
-        def my_decorator(func):
-            # 类的路由
-            if not isinstance(func, FunctionType):
-                return func
-
-            # 方法路由
-            print(func.__name__, ':', BaseView.ROUTER)
-            if func.__name__ in BaseView.ROUTER:
-                raise BaseException('路由已经存在')
-
-            BaseView.ROUTER[path] = func.__name__
-            print(func.__name__, ':', BaseView.ROUTER)
-
-            def wrapper(self, *args, **kwargs):
-                return func(self, *args, **kwargs)
-
-            return wrapper
-
-        return my_decorator
