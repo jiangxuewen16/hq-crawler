@@ -15,7 +15,7 @@ Including another URLconf
 """
 import importlib
 
-from core.lib.task import *
+from core.lib.task import *  # 引入定时任务核心代码
 from django.contrib import admin
 from django.urls import path, re_path
 

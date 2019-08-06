@@ -1,6 +1,6 @@
 from django_apscheduler.jobstores import register_job
 
-from apps.scheduler.task.common import scheduler
+from core.lib.task import scheduler
 
 """
 设置定时任务，选择方式为interval，时间间隔为10s
