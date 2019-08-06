@@ -1,4 +1,4 @@
-from core.lib.base_view import BaseView
+from core.lib.view import BaseView
 from core.lib.route import Route
 
 

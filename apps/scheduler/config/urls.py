@@ -15,5 +15,8 @@ Including another URLconf
 """
 from django.urls import path
 
+#from apps.scheduler.task import common
+
 urlpatterns = [
+    #path('', common)
 ]

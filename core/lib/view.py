@@ -14,7 +14,13 @@ class BaseView(View):
     request_param: dict = {}  # 请求数据
 
     def __init(self):
-        self.request_param = json.loads(self.request.body)
+        request = json.loads(self.request.body)
+        print(type(request))
+        self.request_param = request['data']
+        self.version = request['head']['version']
+        self.time = request['head']['time']
+        self.token = request['head']['token']
+        self.platform = request['head']['platform']
 
     """
     post 处理

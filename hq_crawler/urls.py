@@ -15,6 +15,7 @@ Including another URLconf
 """
 import importlib
 
+from core.lib.task import *
 from django.contrib import admin
 from django.urls import path, re_path
 
@@ -25,13 +26,16 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 ]
 
+"""
+注册注解路由
+"""
 routeKeyList: list = []
-for classItem in Route.classRoute:
+for classItem in Route.classRoute:  # 类路由
     module = importlib.import_module(classItem.module)
     routeClass = getattr(module, classItem.class_name)
-    for routeItem in Route.ROUTER:
-        if routeItem.module + routeItem.class_name == classItem.module + classItem.class_name:
-            path = classItem.path + routeItem.path
+    for routeItem in Route.ROUTER:  # 方法路由
+        if routeItem.module + routeItem.class_name == classItem.module + classItem.class_name:  # 是不是同一个类
+            path = classItem.path + routeItem.path  # 路由路径
             if path in Route.routeList:
                 exceptionStr = f'路由重复：{routeItem.module + routeItem.class_name} -> {routeItem.func_name}, 路径：{path}'
                 raise Exception(exceptionStr)
@@ -41,4 +45,4 @@ for classItem in Route.classRoute:
             urlpatterns.append(re_path(r'^' + classItem.path, routeClass.as_view())),
             routeKeyList.append(classItem.path)
 
-print('总路由', urlpatterns)
+print('总路由:', urlpatterns)

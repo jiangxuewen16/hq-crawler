@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_apscheduler',  # 定时执行任务
+
 ]
 
 MIDDLEWARE = [
@@ -122,5 +123,9 @@ STATIC_URL = '/static/'
 """
 下面是项目自定义配置
 """
-# 这里放每个应用的视图包，自动加载
+
+# 这里放每个应用的视图包，自动加载，主要用于自定路径路由注册
 auto_import_module('apps.api.views')
+
+# 定时任务业务包，定时任务写到这里
+TASK_WORK_PACKAGE = 'apps.scheduler.task'
