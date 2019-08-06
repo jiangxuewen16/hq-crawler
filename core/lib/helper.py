@@ -27,7 +27,8 @@ def get_module():
     return modname(globals())
 
 
-def auto_import_module(moduleName, maxLevel=2):
+# 自动import指定模块的所有包
+def auto_import_module(moduleName: str, maxLevel=2):
     maxLevel -= 1
     if maxLevel <= 0:
         return
@@ -36,4 +37,4 @@ def auto_import_module(moduleName, maxLevel=2):
         if ispkg:
             auto_import_module(moduleName + '.' + name)
         importlib.import_module(moduleName + '.' + name)
-        print("{0} name: {1:12}, is_sub_package: {2}".format(filefiner, name, ispkg))
+        # print("{0} name: {1:12}, is_sub_package: {2}".format(filefiner, name, ispkg))
