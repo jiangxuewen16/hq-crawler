@@ -24,6 +24,7 @@ from core.lib.route import Route
 urlpatterns = [
     # re_path(r'^api/', include('apps.api.config.urls')),
     path('admin/', admin.site.urls),
+    #path('', scheduler)
 ]
 
 """
