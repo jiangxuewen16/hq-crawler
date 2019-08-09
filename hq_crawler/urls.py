@@ -26,7 +26,7 @@ from core.lib.route import Route
 """
 启动某些应用
 """
-deploy_scrapy()  # 执行部署scrapy到scrapyd中
+deploy_scrapy()  # 执行部署scrapy项目到scrapyd中
 
 """
 引入定时任务核心代码
