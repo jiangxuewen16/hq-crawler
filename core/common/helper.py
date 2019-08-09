@@ -3,6 +3,10 @@ import os
 import pkgutil
 import sys
 
+from scrapyd_api import ScrapydAPI
+
+from hq_crawler import settings
+
 """
 获取当前模块
 """
@@ -38,3 +42,14 @@ def auto_import_module(moduleName: str, maxLevel=2):
             auto_import_module(moduleName + '.' + name)
         importlib.import_module(moduleName + '.' + name)
         # print("{0} name: {1:12}, is_sub_package: {2}".format(filefiner, name, ispkg))
+
+
+"""
+获取scrapyd api客户端
+"""
+
+
+def get_scrapyd_cli() -> ScrapydAPI:
+    return ScrapydAPI(settings.SCRAPYD_URL)
+
+

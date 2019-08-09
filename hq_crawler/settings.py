@@ -16,7 +16,7 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from django.urls import include
 
-from core.lib.helper import auto_import_module
+from core.common.helper import auto_import_module
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -125,7 +125,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+# 项目目录路径
 STATIC_URL = '/static/'
+SEP = os.sep
 
 """
 惠趣项目配置（api、task）
@@ -141,7 +143,9 @@ TASK_WORK_PACKAGE = 'apps.scheduler.task'
 """
 惠趣采集项目配置
 """
+SPIDER_PATH = f'{BASE_DIR}/spiders/'
 spiderConf = configparser.ConfigParser()
-spiderConf.read('./spiders/scrapy.cfg', encoding="utf-8")
+spiderConf.read(f'{BASE_DIR}/spiders/scrapy.cfg', encoding="utf-8")
 
 SCRAPYD_URL = spiderConf.get('deploy', 'url')  # scrapyd地址
+SCRAPY_PROJECT = spiderConf.get('deploy', 'project')  # scrapyd地址

@@ -1,14 +1,18 @@
 from collections import namedtuple
 from types import FunctionType
 
+"""
+注解路由核心类
+"""
+
 
 class Route:
     routeViewPath = namedtuple('classPath', 'path module class_name func_name')  # 类方法-具名元组(路由路径 模块 类名 执行的方法名)
     classRouteTuple = namedtuple('classRoute', 'module class_name path')  # 类路由元祖(模块 类名 路由路径)
 
     ROUTER: list = []  # 路由与路由装饰器的映射
-    classRoute: list = []   # 类路由
-    routeList: dict = {}      # 路由对方法的映射
+    classRoute: list = []  # 类路由
+    routeList: dict = {}  # 路由对方法的映射
 
     @classmethod
     def route(cls, path):

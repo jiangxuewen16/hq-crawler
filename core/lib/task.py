@@ -1,7 +1,7 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from django_apscheduler.jobstores import DjangoJobStore, register_events
 
-from core.lib import helper
+from core.common import helper
 from hq_crawler import settings
 
 scheduler = BackgroundScheduler()

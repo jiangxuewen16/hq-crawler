@@ -9,6 +9,10 @@ from django.views import View
 from core.common.service_code import ServiceCode
 from core.lib.route import Route
 
+"""
+基础view类型
+"""
+
 
 class BaseView(View):
     request_param: dict = {}  # 请求数据

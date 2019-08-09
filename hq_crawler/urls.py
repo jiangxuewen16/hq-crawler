@@ -14,19 +14,32 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 import importlib
+import os
 
 from django.contrib import admin
 from django.urls import path, re_path
+
+from core.lib.start import deploy_scrapy
 from hq_crawler import settings
 from core.lib.route import Route
 
+"""
+启动某些应用
+"""
+deploy_scrapy()  # 执行部署scrapy到scrapyd中
+
+"""
+引入定时任务核心代码
+"""
 if settings.TASK_WORK_PACKAGE:
     from core.lib.task import *  # 引入定时任务核心代码
 
+"""
+django 路由配置
+"""
 urlpatterns = [
     # re_path(r'^api/', include('apps.api.config.urls')),
     path('admin/', admin.site.urls),
-    # path('', scheduler)
 ]
 
 """
