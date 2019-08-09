@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
+import configparser
 import importlib
 import os
 
@@ -127,6 +128,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 """
+惠趣项目配置（api、task）
 下面是项目自定义配置
 """
 
@@ -135,3 +137,11 @@ auto_import_module('apps.api.views')
 
 # 定时任务业务包，定时任务写到这里
 TASK_WORK_PACKAGE = 'apps.scheduler.task'
+
+"""
+惠趣采集项目配置
+"""
+spiderConf = configparser.ConfigParser()
+spiderConf.read('./spiders/scrapy.cfg', encoding="utf-8")
+
+SCRAPYD_URL = spiderConf.get('deploy', 'url')  # scrapyd地址

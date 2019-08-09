@@ -5,6 +5,7 @@ import scrapy
 携程
 """
 
+
 class CtripSpider(scrapy.Spider):
     name = 'ctrip'
     allowed_domains = ['https://www.ctrip.com']

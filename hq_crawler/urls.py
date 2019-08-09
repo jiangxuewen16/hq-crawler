@@ -15,16 +15,18 @@ Including another URLconf
 """
 import importlib
 
-from core.lib.task import *  # 引入定时任务核心代码
 from django.contrib import admin
 from django.urls import path, re_path
-
+from hq_crawler import settings
 from core.lib.route import Route
+
+if settings.TASK_WORK_PACKAGE:
+    from core.lib.task import *  # 引入定时任务核心代码
 
 urlpatterns = [
     # re_path(r'^api/', include('apps.api.config.urls')),
     path('admin/', admin.site.urls),
-    #path('', scheduler)
+    # path('', scheduler)
 ]
 
 """
