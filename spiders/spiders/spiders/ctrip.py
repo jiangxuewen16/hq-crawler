@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from core.lib import spider
+from spiders.spider import BaseSpider
 
 """
 携程
 """
 
 
-class CtripSpider(spider.BaseSpider):
+class CtripSpider(BaseSpider):
     name = 'ctrip'
     allowed_domains = ['https://www.ctrip.com']
     start_urls = ['http://https://www.ctrip.com/']

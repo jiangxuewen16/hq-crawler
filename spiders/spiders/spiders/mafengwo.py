@@ -3,7 +3,7 @@ import scrapy
 from scrapy import Request
 from scrapy.http import HtmlResponse
 
-from models.spot.spot import Spot
+from spiders.items.spot.spot import Spot
 
 """
 马蜂窝
@@ -34,7 +34,10 @@ class MafengwoSpotSpider(scrapy.Spider):
     start_urls = ['https://www.mafengwo.cn/poi/339.html']
 
     def parse(self, response: HtmlResponse):
+        # spot = SpidersItem()
+        # spot['name'] = 'fsagwaffafewgesgsahshsdds'
         spot = Spot()
+        #spot.id = 12234
         spot.spot_name = response.xpath('/html/body/div[2]/div[2]/div/div[3]/h1/text()').extract_first()
         spot.desc = response.xpath('/html/body/div[2]/div[3]/div[2]/div[1]/text()').extract_first()
         spot.tel = response.xpath('/html/body/div[2]/div[3]/div[2]/ul/li[1]/div[2]/text()').extract_first()

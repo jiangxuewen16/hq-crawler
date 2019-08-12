@@ -1,7 +1,6 @@
 from collections import namedtuple
 
 import mongoengine
-import scrapy
 from bson import ObjectId
 from scrapy.item import BaseItem
 
@@ -10,8 +9,6 @@ name_id_map = namedtuple('name_id_map', 'name id')
 """
 景区信息
 """
-MONGO_CONNECT = mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017')  # 连接mongodb
-
 
 class Spot(BaseItem, mongoengine.Document):
     pk = 1

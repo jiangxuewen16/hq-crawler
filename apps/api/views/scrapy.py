@@ -15,8 +15,8 @@ class Scrapy(BaseView):
 
     @Route.route(path='schedule')
     def schedule(self):
-        return self.success({'sd': get_scrapyd_cli().schedule('hq_spider', 'hq')})
+        return self.success({'sd': get_scrapyd_cli().schedule('spiders', 'mafengwo_spot')})
 
     @Route.route(path='del/project')
-    def schedule(self):
-        return self.success({'sd': get_scrapyd_cli().delete_project('hq_spider')})
+    def del_project(self):
+        return self.success({'sd': get_scrapyd_cli().delete_project('hq-spiders')})
