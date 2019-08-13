@@ -1,7 +1,6 @@
 from collections import namedtuple
 
 import mongoengine
-import scrapy
 from bson import ObjectId
 from scrapy.item import BaseItem
 
@@ -27,15 +26,3 @@ class Spot(BaseItem, mongoengine.Document):
     open_time = mongoengine.StringField(max_length=100)
     create_at = mongoengine.DateTimeField(null=True)
     update_at = mongoengine.DateTimeField(null=True)
-    # id = scrapy.Field()
-    # spot_id = scrapy.Field()
-    # ota_id_map = scrapy.Field()
-    # spot_name = scrapy.Field()
-    # desc = scrapy.Field()
-    # tel = scrapy.Field()
-    # website = scrapy.Field()
-    # traffic = scrapy.Field()
-    # ticket_num = scrapy.Field()
-    # open_time = scrapy.Field()
-    # create_at = scrapy.Field()
-    # update_at = scrapy.Field()

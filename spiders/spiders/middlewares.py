@@ -6,9 +6,11 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 import random
 
-from scrapy import signals
-from scrapy.downloadermiddlewares.useragent import UserAgentMiddleware
+from scrapy import signals, Request
 from fake_useragent import UserAgent
+from scrapy.http import TextResponse, Response
+
+from spiders.core.response import ResponseHandleType
 
 
 class SpidersSpiderMiddleware(object):
@@ -123,3 +125,12 @@ class RandomUserAgentMiddlware(object):
 
     def process_request(self, request, spider):
         request.headers.setdefault("User-Agent", self.ua.random)
+
+
+class HandleDataTypeDownloaderMiddleware(object):
+    def process_response(self, request: Request, response: Response, spider):
+        contentType = response.headers['Content-Type'].decode('utf-8')
+        if ResponseHandleType.JS.value in contentType.lower():
+            print(response.body)
+            print('========', response.text)
+        return response

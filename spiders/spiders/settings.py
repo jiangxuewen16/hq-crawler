@@ -57,6 +57,7 @@ ROBOTSTXT_OBEY = False
 DOWNLOADER_MIDDLEWARES = {
     'spiders.middlewares.RandomUserAgentMiddlware': 333,  # 随机User-Agent
     # 'spiders.middlewares.SpidersDownloaderMiddleware': 542,
+    # 'spiders.middlewares.HandleDataTypeDownloaderMiddleware': 542,
 }
 
 # Enable or disable extensions
@@ -94,3 +95,10 @@ ITEM_PIPELINES = {
 
 import mongoengine
 mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017')  # 连接mongodb
+
+"""
+引入django配置
+"""
+# sys.path.append(os.path.dirname(os.path.abspath('.')))
+# Do not forget the change iCrawler part based on your project name
+# os.environ['DJANGO_SETTINGS_MODULE'] = 'hq_crawler.settings'

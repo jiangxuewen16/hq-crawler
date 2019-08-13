@@ -10,9 +10,10 @@ name_id_map = namedtuple('name_id_map', 'name id')
 景区信息
 """
 
+
 class Spot(BaseItem, mongoengine.Document):
-    pk = 1
-    id = ObjectId()
+    pk = 1  # 必须定义
+    id = ObjectId()  # 必须定义
     spot_id = mongoengine.IntField()
     ota_id_map = mongoengine.DictField()  # ota名称与id的映射
     spot_name = mongoengine.StringField(max_length=50)
@@ -22,17 +23,28 @@ class Spot(BaseItem, mongoengine.Document):
     traffic = mongoengine.StringField(max_length=2000)
     ticket_num = mongoengine.IntField()
     open_time = mongoengine.StringField(max_length=100)
+    comment_num = mongoengine.IntField()
+
     create_at = mongoengine.DateTimeField(null=True)
     update_at = mongoengine.DateTimeField(null=True)
-    # id = scrapy.Field()
-    # spot_id = scrapy.Field()
-    # ota_id_map = scrapy.Field()
-    # spot_name = scrapy.Field()
-    # desc = scrapy.Field()
-    # tel = scrapy.Field()
-    # website = scrapy.Field()
-    # traffic = scrapy.Field()
-    # ticket_num = scrapy.Field()
-    # open_time = scrapy.Field()
-    # create_at = scrapy.Field()
-    # update_at = scrapy.Field()
+
+
+class SpotComment(BaseItem, mongoengine.Document):
+    pk = 1  # 必须定义
+    id = ObjectId()  # 必须定义
+
+    ota_type = mongoengine.IntField()
+    u_id = mongoengine.IntField()
+    u_avatar = mongoengine.StringField(max_length=500)
+    u_space = mongoengine.StringField(max_length=50)
+    u_level = mongoengine.StringField(max_length=10)
+    u_name = mongoengine.StringField(max_length=50)
+
+    c_id = mongoengine.IntField()
+    c_score = mongoengine.IntField()
+    c_useful_num = mongoengine.IntField()
+    c_content = mongoengine.StringField(max_length=2000)
+    c_img = mongoengine.ListField()
+    c_from = mongoengine.StringField(max_length=50)
+
+    create_at = mongoengine.DateTimeField(null=True)
