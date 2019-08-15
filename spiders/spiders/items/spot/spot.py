@@ -15,7 +15,7 @@ class Spot(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
     spot_id = mongoengine.IntField()
-    ota_id_map = mongoengine.DictField()  # ota名称与id的映射
+    ota_spot_id = mongoengine.DictField()  # ota名称与id的映射
     spot_name = mongoengine.StringField(max_length=50)
     desc = mongoengine.StringField(max_length=10000)
     tel = mongoengine.StringField(max_length=50)
@@ -33,7 +33,10 @@ class SpotComment(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
 
-    ota_type = mongoengine.IntField()
+    page = mongoengine.StringField(max_length=20)
+
+    ota_id = mongoengine.IntField()
+    ota_spot_id = mongoengine.IntField()
     u_id = mongoengine.IntField()
     u_avatar = mongoengine.StringField(max_length=500)
     u_space = mongoengine.StringField(max_length=50)
@@ -47,4 +50,4 @@ class SpotComment(BaseItem, mongoengine.Document):
     c_img = mongoengine.ListField()
     c_from = mongoengine.StringField(max_length=50)
 
-    create_at = mongoengine.DateTimeField(null=True)
+    create_at = mongoengine.StringField(max_length=50)

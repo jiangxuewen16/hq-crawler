@@ -10,7 +10,7 @@ from scrapy import signals, Request
 from fake_useragent import UserAgent
 from scrapy.http import TextResponse, Response
 
-from spiders.core.response import ResponseHandleType
+from spiders.common.response import ResponseHandleType
 
 
 class SpidersSpiderMiddleware(object):

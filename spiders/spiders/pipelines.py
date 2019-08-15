@@ -8,10 +8,8 @@ import mongoengine
 from scrapy.exceptions import DropItem
 
 
-
 class SpidersPipeline(object):
     def process_item(self, item, spider):
-        print(22222223333333334444444444455555555555555)
         return item
 
 
@@ -33,5 +31,4 @@ class MongoDBPipeline(object):
         pass
 
     def process_item(self, item, spider):
-        print(22222223333333334444444444455555555555555)
-        item.save(force_insert=False, validate=False, clean=True,)
+        item.save(force_insert=False, validate=False, clean=True, )
