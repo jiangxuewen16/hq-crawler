@@ -14,6 +14,8 @@ name_id_map = namedtuple('name_id_map', 'name id')
 class Spot(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
+
+    ota_id = mongoengine.IntField()
     spot_id = mongoengine.IntField()
     ota_spot_id = mongoengine.DictField()  # ota名称与id的映射
     spot_name = mongoengine.StringField(max_length=50)
@@ -33,16 +35,16 @@ class SpotComment(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
 
-    page = mongoengine.StringField(max_length=20)
-
     ota_id = mongoengine.IntField()
     ota_spot_id = mongoengine.IntField()
     u_id = mongoengine.IntField()
     u_avatar = mongoengine.StringField(max_length=500)
-    u_space = mongoengine.StringField(max_length=50)
+    u_url = mongoengine.StringField(max_length=50)
     u_level = mongoengine.StringField(max_length=10)
     u_name = mongoengine.StringField(max_length=50)
+    u_avg_price = mongoengine.DecimalField()
 
+    c_tag = mongoengine.DictField()
     c_id = mongoengine.IntField()
     c_score = mongoengine.IntField()
     c_useful_num = mongoengine.IntField()

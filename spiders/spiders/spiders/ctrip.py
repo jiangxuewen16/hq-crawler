@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from spiders.spider import BaseSpider
+import time
 
-"""
-携程
-"""
+timestamp = int(1565587838420/1000)
 
+# 转换成localtime
+time_local = time.localtime(int(1565587838420/1000))
+a = time.strftime("%Y-%m-%d %H:%M:%S", time_local)
+print(a)
 
-class CtripSpider(BaseSpider):
-    name = 'ctrip'
-    allowed_domains = ['https://www.ctrip.com']
-    start_urls = ['http://https://www.ctrip.com/']
-
-    def parse(self, response):
-        self.logger.debug(response.text)

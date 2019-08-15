@@ -32,8 +32,11 @@ class MafengwoSpotSpider(scrapy.Spider):
 
     def parse(self, response: HtmlResponse):
         spot_data = Spot()
+
         # spot_data.spot_id = ???
         # spot_data.ota_spot_id = ???
+
+        spot_data.ota_id = OTA.OtaCode.MAFENGWO.value.id
         spot_data.spot_name = response.xpath('/html/body/div[2]/div[2]/div/div[3]/h1/text()').extract_first()
         spot_data.desc = response.xpath('/html/body/div[2]/div[3]/div[2]/div[1]/text()').extract_first()
         spot_data.tel = response.xpath('/html/body/div[2]/div[3]/div[2]/ul/li[1]/div[2]/text()').extract_first()
@@ -101,9 +104,8 @@ class MafengwoCommentSpider(scrapy.Spider):
             spot_comment = spot.SpotComment()
             spot_comment.ota_id = OTA.OtaCode.MAFENGWO.value.id
             spot_comment.ota_spot_id = response.meta['ota_spot_id']
-            spot_comment.page = str(response.meta['page'])
-            spot_comment.u_space = item.css('.avatar::attr(href)').extract_first()
-            spot_comment.u_id = int(spot_comment.u_space.lstrip('/u/').rstrip('.html'))
+            spot_comment.u_url = item.css('.avatar::attr(href)').extract_first()
+            spot_comment.u_id = int(spot_comment.u_url.lstrip('/u/').rstrip('.html'))
 
             spot_comment.u_avatar = item.css('.avatar img::attr(src)').extract_first()
             spot_comment.u_level = item.css('.level::text').extract_first()
