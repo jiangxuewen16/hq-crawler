@@ -6,6 +6,7 @@ import scrapy
 from scrapy import Request
 from scrapy.http import HtmlResponse
 
+from spiders.common import OTA
 from spiders.items.spot import spot
 
 
@@ -50,8 +51,11 @@ class MeituanCommentSpider(scrapy.Spider):
         json_data = json.loads(response_str)
 
         for item in json_data['comments']:
-            print('====================',item)
+            print('====================', item)
             spot_comment = spot.SpotComment()
+
+            spot_comment.ota_id = OTA.OtaCode.MAFENGWO.value.id
+            spot_comment.ota_spot_id = response.meta['ota_spot_id']
 
             spot_comment.u_name = item['userName']
             spot_comment.u_avatar = item['userUrl']
@@ -63,5 +67,3 @@ class MeituanCommentSpider(scrapy.Spider):
 
             time_local = time.localtime(int(1565587838420 / 1000))
             spot_comment.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time_local)
-
-
