@@ -14,6 +14,7 @@ class MeituanSpider(scrapy.Spider):
     name = 'meituan'
     allowed_domains = ['www.meituan.com']
     start_urls = ['https://www.meituan.com/']
+    ota_spot_ids = OTA.OtaSpotIdMap.get_ota_spot_list(OTA.OtaCode.MEITUAN)  # ota 景区id列表
 
     def parse(self, response):
         pass
@@ -32,15 +33,25 @@ class MeituanSpotSpider(scrapy.Spider):
 class MeituanCommentSpider(scrapy.Spider):
     name = 'meituan_comment'
     allowed_domains = ['https://www.meituan.com']
-    ota_spot_ids = [1515791]
-    offset = 0
+
+    total_num = 0  # 总评论
     page_size = 100  # 默认爬取每页100条
     base_url = r'https://www.meituan.com/ptapi/poi/getcomment?id={spot_id}&offset={offset}&pageSize={page_size}&mode=0&starRange=&userId=&sortType=0'
-    start_urls = ['https://www.meituan.com/zhoubianyou/1515791/']
+    start_urls = [
+        'https://www.meituan.com/ptapi/poi/getcomment?id=1515791&offset=0&pageSize=1&mode=0&starRange=&userId=&sortType=0']
 
     def parse(self, response: HtmlResponse):
-        # 爬取下一个景区的数据
-        for ota_spot_id in self.ota_spot_ids:
+
+        # 爬取景区列表数据
+        for ota_spot_id in MeituanSpider.ota_spot_ids:
+            # 更新景区的评论数量
+            url = self.start_urls[0]
+            yield Request(url=url, callback=self.parse_count, dont_filter=True,
+                          meta={'offset': 0, 'ota_spot_id': ota_spot_id})
+
+            # todo:增量爬取
+
+            # 爬取景区的所有评论
             start_offset = 0
             url = self.base_url.format(spot_id=ota_spot_id, offset=start_offset, page_size=self.page_size)
             yield Request(url=url, callback=self.parse_page, dont_filter=True,
@@ -51,19 +62,33 @@ class MeituanCommentSpider(scrapy.Spider):
         json_data = json.loads(response_str)
 
         for item in json_data['comments']:
-            print('====================', item)
             spot_comment = spot.SpotComment()
 
             spot_comment.ota_id = OTA.OtaCode.MAFENGWO.value.id
             spot_comment.ota_spot_id = response.meta['ota_spot_id']
+            spot_comment.goods_name = item['menu']
+            spot_comment.goods_id = item['did']
 
             spot_comment.u_name = item['userName']
             spot_comment.u_avatar = item['userUrl']
             spot_comment.u_avg_price = item['avgPrice']
             spot_comment.u_avg_price = item['avgPrice']
+            spot_comment.u_level = item['userLevel']
 
+            spot_comment.c_id = item['reviewId']
             spot_comment.c_content = item['comment']
+            spot_comment.c_score = item['star'] / 10
             spot_comment.c_img = [img['url'] for img in item['picUrls']]
 
             time_local = time.localtime(int(1565587838420 / 1000))
             spot_comment.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time_local)
+
+            spot_comment.c_useful_num = item['zanCnt']
+            spot_comment.c_reply_num = item['replyCnt']
+            spot_comment.c_from = '美团网'
+
+    def parse_count(self, response: HtmlResponse):
+        response_str = response.body.decode('utf-8')
+        json_data = json.loads(response_str)
+        spot.Spot.objects(ota_id=OTA.OtaCode.MEITUAN.value.id, ota_spot_id=response.meta['ota_spot_id']).update(
+            set__comment_num=json_data['total'])
