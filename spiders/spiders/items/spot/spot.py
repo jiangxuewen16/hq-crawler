@@ -16,9 +16,11 @@ class Spot(BaseItem, mongoengine.Document):
     id = ObjectId()  # 必须定义
 
     ota_id = mongoengine.IntField()  # OTA 定义的id
-    spot_id = mongoengine.IntField()    # 景区id
+    spot_id = mongoengine.IntField()  # 景区id
     ota_spot_id = mongoengine.DictField()  # ota名称与id的映射
     spot_name = mongoengine.StringField(max_length=50)
+    spot_score = mongoengine.FloatField()  # ota平台景区评分
+    avg_price = mongoengine.FloatField()  # 景区的平均消费
     desc = mongoengine.StringField(max_length=10000)
     tel = mongoengine.StringField(max_length=50)
     website = mongoengine.StringField(max_length=50)
@@ -26,6 +28,7 @@ class Spot(BaseItem, mongoengine.Document):
     ticket_num = mongoengine.IntField()
     open_time = mongoengine.StringField(max_length=100)
     comment_num = mongoengine.IntField()
+    addr = mongoengine.StringField(max_length=100)
 
     create_at = mongoengine.DateTimeField(null=True)
     update_at = mongoengine.DateTimeField(null=True)
@@ -49,7 +52,7 @@ class SpotComment(BaseItem, mongoengine.Document):
 
     c_tag = mongoengine.DictField()  # tag列表
     c_id = mongoengine.IntField()  # 评论id
-    c_score = mongoengine.IntField()  # 评分
+    c_score = mongoengine.FloatField()  # 评分
     c_useful_num = mongoengine.IntField()  # 赞数量
     c_reply_num = mongoengine.IntField()  # 回复数量
     c_content = mongoengine.StringField(max_length=2000)  # 评论内容

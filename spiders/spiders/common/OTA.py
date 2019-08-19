@@ -1,9 +1,9 @@
 from collections import namedtuple
 from enum import Enum, unique
 
-ota = namedtuple('ota_info', 'name id')     # ota 定义 id
+ota = namedtuple('ota_info', 'name id')  # ota 定义 id
 
-sp_map = namedtuple('sp_map', 'ota ota_spot_id')    # ota平台景区id
+sp_map = namedtuple('sp_map', 'ota ota_spot_id')  # ota平台景区id
 
 """
 ota的id定义
@@ -30,9 +30,9 @@ class OtaSpotIdMap(Enum):
                   sp_map(OtaCode.MAFENGWO, 339),
                   sp_map(OtaCode.MEITUAN, 1515791)]
 
-    SHI_NIU_ZAI = [sp_map(OtaCode.HUIQULX, 10002),
-                   sp_map(OtaCode.MAFENGWO, 5427075),
-                   sp_map(OtaCode.MEITUAN, 0)]
+    SHI_NIU_ZHAI = [sp_map(OtaCode.HUIQULX, 10002),
+                    sp_map(OtaCode.MAFENGWO, 5427075),
+                    sp_map(OtaCode.MEITUAN, 30067)]
 
     @classmethod
     def get_ota_spot_id(cls, spot_name: str, ota_code: OtaCode) -> int:

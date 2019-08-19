@@ -154,7 +154,7 @@ class MafengwoCommentSpider(scrapy.Spider):
             spot_comment.u_name = item.css('.name::text').extract_first()
 
             score = item.css('.s-star::attr(class)').extract_first()
-            spot_comment.c_score = score.split()[1][-1]
+            spot_comment.c_score = float(score.split()[1][-1])
 
             spot_comment.c_useful_num = item.css('.useful-num::text').extract_first()
             spot_comment.c_content = item.css('.rev-txt::text').extract_first()
