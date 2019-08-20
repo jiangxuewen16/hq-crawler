@@ -122,8 +122,10 @@ class MeituanCommentSpider(scrapy.Spider):
         ota_spot_id = response.meta['ota_spot_id']
         new_total = json_data['total']
         spot_info = spot.Spot.objects(ota_id=OTA.OtaCode.MEITUAN.value.id, ota_spot_id=ota_spot_id)
-        comment_num = spot_info.comment_num if spot_info and spot_info.comment_num else 0  # 已有的评论数量
+        # comment_num = spot_info.comment_num if spot_info and spot_info.comment_num else 0  # 已有的评论数量
         spot_info.update(set__comment_num=new_total)
+
+        comment_num = spot.SpotComment.objects(ota_id=OTA.OtaCode.MEITUAN.value.id, ota_spot_id=ota_spot_id).count()
 
         new_num = new_total - comment_num
         if new_num == 0:  # 没有新评论的情况下不需要做任何处理
@@ -136,6 +138,7 @@ class MeituanCommentSpider(scrapy.Spider):
 
         # 爬取景区的所有评论
         start_offset = 0
+        print('=========增量爬取参数=========', ota_spot_id, new_total, comment_num, max_offset)
         url = self.base_url.format(spot_id=ota_spot_id, offset=start_offset, page_size=page_size)
 
         yield Request(url=url, callback=self.parse_page, dont_filter=True,
