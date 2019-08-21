@@ -17,6 +17,7 @@ class OtaCode(Enum):
     CTRIP = ota('携程', 10002)
     FLIGGY = ota('飞猪', 10003)
     MEITUAN = ota('美团', 10004)
+    LVMAMA = ota('驴妈妈', 10005)
 
 
 """
@@ -28,11 +29,14 @@ class OtaCode(Enum):
 class OtaSpotIdMap(Enum):
     SHI_YAN_HU = [sp_map(OtaCode.HUIQULX, 10001),
                   sp_map(OtaCode.MAFENGWO, 339),
-                  sp_map(OtaCode.MEITUAN, 1515791)]
+                  sp_map(OtaCode.MEITUAN, 1515791),
+                  sp_map(OtaCode.LVMAMA, 100025)
+                  ]
 
     SHI_NIU_ZHAI = [sp_map(OtaCode.HUIQULX, 10002),
                     sp_map(OtaCode.MAFENGWO, 5427075),
-                    sp_map(OtaCode.MEITUAN, 30067)]
+                    sp_map(OtaCode.MEITUAN, 30067),
+                    sp_map(OtaCode.LVMAMA, 103113)]
 
     @classmethod
     def get_ota_spot_id(cls, spot_name: str, ota_code: OtaCode) -> int:

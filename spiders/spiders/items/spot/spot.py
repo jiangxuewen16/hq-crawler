@@ -29,6 +29,7 @@ class Spot(BaseItem, mongoengine.Document):
     open_time = mongoengine.StringField(max_length=100)
     comment_num = mongoengine.IntField()
     addr = mongoengine.StringField(max_length=100)
+    spot_favorable = mongoengine.StringField(max_length=100)  # 好评率
 
     create_at = mongoengine.DateTimeField(null=True)
     update_at = mongoengine.DateTimeField(null=True)
