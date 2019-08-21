@@ -67,7 +67,7 @@ class MeituanCommentSpider(scrapy.Spider):
         # 爬取景区列表数据
         for ota_spot_id in MeituanSpider.ota_spot_ids:
             # 更新景区的评论数量
-            url = self.start_urls[0]
+            url = self.base_url.format(spot_id=ota_spot_id, offset=0, page_size=1)
             yield Request(url=url, callback=self.parse_count, dont_filter=True,
                           meta={'offset': 0, 'ota_spot_id': ota_spot_id})
 
@@ -128,7 +128,7 @@ class MeituanCommentSpider(scrapy.Spider):
         comment_num = spot.SpotComment.objects(ota_id=OTA.OtaCode.MEITUAN.value.id, ota_spot_id=ota_spot_id).count()
 
         new_num = new_total - comment_num
-        if new_num == 0:  # 没有新评论的情况下不需要做任何处理
+        if new_num <= 0:  # 没有新评论的情况下不需要做任何处理
             return
 
         max_offset = new_num - 1  # 最大能偏移的数量
