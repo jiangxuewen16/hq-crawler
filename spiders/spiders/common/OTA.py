@@ -27,6 +27,7 @@ class OtaCode(Enum):
 
 @unique
 class OtaSpotIdMap(Enum):
+    # 石燕湖
     SHI_YAN_HU = [sp_map(OtaCode.HUIQULX, 10001),
                   sp_map(OtaCode.MAFENGWO, 339),
                   sp_map(OtaCode.MEITUAN, 1515791),
@@ -34,6 +35,7 @@ class OtaSpotIdMap(Enum):
                   sp_map(OtaCode.FLIGGY, [556487712203, 598531650805, 600223581229])
                   ]
 
+    # 石牛寨
     SHI_NIU_ZHAI = [sp_map(OtaCode.HUIQULX, 10002),
                     sp_map(OtaCode.MAFENGWO, 5427075),
                     sp_map(OtaCode.MEITUAN, 30067),
