@@ -30,13 +30,16 @@ class OtaSpotIdMap(Enum):
     SHI_YAN_HU = [sp_map(OtaCode.HUIQULX, 10001),
                   sp_map(OtaCode.MAFENGWO, 339),
                   sp_map(OtaCode.MEITUAN, 1515791),
-                  sp_map(OtaCode.LVMAMA, 100025)
+                  sp_map(OtaCode.LVMAMA, 100025),
+                  sp_map(OtaCode.FLIGGY, [556487712203, 598531650805, 600223581229])
                   ]
 
     SHI_NIU_ZHAI = [sp_map(OtaCode.HUIQULX, 10002),
                     sp_map(OtaCode.MAFENGWO, 5427075),
                     sp_map(OtaCode.MEITUAN, 30067),
-                    sp_map(OtaCode.LVMAMA, 103113)]
+                    sp_map(OtaCode.LVMAMA, 103113),
+                    sp_map(OtaCode.FLIGGY, [588794344226, 556745581062, 589094123107, 596577545337, 596343512896])
+                    ]
 
     @classmethod
     def get_ota_spot_id(cls, spot_name: str, ota_code: OtaCode) -> int:
