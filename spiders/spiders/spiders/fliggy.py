@@ -79,8 +79,6 @@ class FliggyCommentSpider(scrapy.Spider):
 
         count_page = math.ceil(new_num / page_size)
         page_no = page_no + 1
-        print(new_num)
-        print(page_no)
         if count_page > page_no:
             url = self.base_url.format(ota_spot_id=ota_spot_id, page_no=page_no, page_size=page_size)
             yield Request(url=url, callback=self.parse_page, dont_filter=True,
