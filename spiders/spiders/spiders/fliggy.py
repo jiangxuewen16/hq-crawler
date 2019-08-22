@@ -62,6 +62,8 @@ class FliggyCommentSpider(scrapy.Spider):
         page_size = response.meta['page_size']
         new_num = response.meta['new_num']
         comment = json_data['module']['rateList']['rateCellList']
+        if comment is None:
+            return
         for item in comment:
             spot_comment = spot.SpotComment()
             spot_comment.ota_id = OTA.OtaCode.FLIGGY.value.id
@@ -81,8 +83,12 @@ class FliggyCommentSpider(scrapy.Spider):
         page_no = page_no + 1
         if count_page > page_no:
             url = self.base_url.format(ota_spot_id=ota_spot_id, page_no=page_no, page_size=page_size)
-            yield Request(url=url, callback=self.parse_page, dont_filter=True,
-                          meta={'ota_spot_id': ota_spot_id, 'page_no': page_no, 'page_size': page_size, 'new_num': new_num})
+            headers = {
+                'referer': FliggySpotSpider.base_url.format(ota_spot_id=ota_spot_id)
+            }
+            yield Request(url=url, callback=self.parse_page, dont_filter=True, headers=headers,
+                          meta={'ota_spot_id': ota_spot_id, 'page_no': page_no, 'page_size': page_size,
+                                'new_num': new_num})
 
     def parse_count(self, response: HtmlResponse):
         response_str = response.body.decode('utf-8')
@@ -91,15 +97,17 @@ class FliggyCommentSpider(scrapy.Spider):
         page_no = response.meta['page_no']
         page_size = response.meta['page_size']
         new_total = json_data['module']['rateList']['total']
-        spot_info = spot.Spot.objects(ota_id=OTA.OtaCode.FLIGGY.value.id, ota_spot_id=ota_spot_id)
-        spot_info.update(set__comment_num=new_total)
-
         comment_num = spot.SpotComment.objects(ota_id=OTA.OtaCode.FLIGGY.value.id, ota_spot_id=ota_spot_id).count()
 
         new_num = new_total - comment_num
+        print('=========增量爬取参数=========', ota_spot_id, new_total, comment_num, page_no)
         if new_num == 0:  # 没有新评论的情况下不需要做任何处理
             return
+
         # 爬取景区的所有评论
         url = self.base_url.format(ota_spot_id=ota_spot_id, page_no=page_no, page_size=page_size)
-        yield Request(url=url, callback=self.parse_page, dont_filter=True,
+        headers = {
+            'referer': FliggySpotSpider.base_url.format(ota_spot_id=ota_spot_id)
+        }
+        yield Request(url=url, callback=self.parse_page, dont_filter=True, headers=headers,
                       meta={'ota_spot_id': ota_spot_id, 'page_no': page_no, 'page_size': page_size, 'new_num': new_num})
