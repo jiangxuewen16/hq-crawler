@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import time
 
 import math
 import scrapy
@@ -40,9 +41,9 @@ class FliggyCommentSpider(scrapy.Spider):
 
     total_num = 0  # 总评论
     page_size = 20  # 默认爬取每页20条
-    base_url = r'https://traveldetail.fliggy.com/async/queryRateList.do?id={ota_spot_id}&tagId=:0&pageNo={page_no}&sort=0&pageSize={page_size}'
+    base_url = r'https://traveldetail.fliggy.com/async/queryRateList.do?id={ota_spot_id}&tagId=:0&pageNo={page_no}&sort=1&pageSize={page_size}'
     start_urls = [
-        'https://traveldetail.fliggy.com/async/queryRateList.do?id={ota_spot_id}&tagId=:0&pageNo=1&sort=0&pageSize=1'
+        'https://traveldetail.fliggy.com/async/queryRateList.do?id={ota_spot_id}&tagId=:0&pageNo=1&sort=1&pageSize=1'
     ]
 
     def parse(self, response):
@@ -62,6 +63,7 @@ class FliggyCommentSpider(scrapy.Spider):
         page_size = response.meta['page_size']
         new_num = response.meta['new_num']
         comment = json_data['module']['rateList']['rateCellList']
+        count_page = math.ceil(new_num / page_size)
         if comment is None:
             return
         for item in comment:
@@ -78,10 +80,11 @@ class FliggyCommentSpider(scrapy.Spider):
             spot_comment.c_reply_content = item['reply']
             spot_comment.c_from = '飞猪'
             yield spot_comment
-
-        count_page = math.ceil(new_num / page_size)
+        time.sleep(1)
         page_no = page_no + 1
-        if count_page > page_no:
+        if count_page >= page_no:
+            if count_page == page_no:
+                page_size = new_num % page_size
             url = self.base_url.format(ota_spot_id=ota_spot_id, page_no=page_no, page_size=page_size)
             headers = {
                 'referer': FliggySpotSpider.base_url.format(ota_spot_id=ota_spot_id)
@@ -101,10 +104,11 @@ class FliggyCommentSpider(scrapy.Spider):
 
         new_num = new_total - comment_num
         print('=========增量爬取参数=========', ota_spot_id, new_total, comment_num, page_no)
-        if new_num == 0:  # 没有新评论的情况下不需要做任何处理
+        if new_num <= 0:  # 没有新评论的情况下不需要做任何处理
             return
-
         # 爬取景区的所有评论
+        if new_num <= page_size:
+            page_size = new_num
         url = self.base_url.format(ota_spot_id=ota_spot_id, page_no=page_no, page_size=page_size)
         headers = {
             'referer': FliggySpotSpider.base_url.format(ota_spot_id=ota_spot_id)
