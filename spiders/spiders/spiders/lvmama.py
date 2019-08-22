@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 import time
-import urllib.parse
-
 
 import scrapy
 from scrapy import Request, Selector
@@ -11,7 +9,6 @@ from scrapy.http import HtmlResponse
 from spiders.common import OTA
 from spiders.items.spot import spot
 from spiders.items.spot.spot import Spot
-
 
 
 class LvmamaSpider(scrapy.Spider):
@@ -81,66 +78,114 @@ class LvmamaCommentSpider(scrapy.Spider):
 
         # 爬取下一个景区的数据
         for ota_spot_id in LvmamaSpider.ota_spot_ids:
-            # 获取景区的总评论数
-            spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.LVMAMA.value.id,
-                                          ota_spot_id=ota_spot_id).first()
-            start_page = 1 # 开始页数
 
-            url = self.base_url.format(ota_spot_id=ota_spot_id, currentPage=start_page, totalCount=spot_data.comment_num)
-            yield Request(url=url, callback=self.parse_page, dont_filter=True,
-                          meta={'ota_spot_id': ota_spot_id, 'currentPage': start_page,
-                                'totalCount': spot_data.comment_num})
+            # 更新景区的评论数量 增量爬取
+            url = self.comment_num_url.format(ota_spot_id=str(ota_spot_id))
+            yield Request(url=url, callback=self.parse_count, dont_filter=True,
+                          meta={'offset': 0, 'ota_spot_id': ota_spot_id})
+            # 爬取所有的
+            # url = self.base_url.format(ota_spot_id=ota_spot_id, currentPage=start_page,
+            #                            totalCount=spot_data.comment_num)
+            # page_total = spot_data.comment_num % 10  # 共有多少页
+            # if page_total != 0:
+            #     page_total = 1 + spot_data.comment_num / 10
+            # else:
+            #     page_total = spot_data.comment_num / 10
+            # yield Request(url=url, callback=self.parse_page, dont_filter=True,
+            #               meta={'ota_spot_id': ota_spot_id, 'page_size': page_total, 'max_offset': spot_data.comment_num,
+            #                     'now_offset': 1, 'now_size': 1})
 
     def parse_page(self, response: HtmlResponse):
+
+        now_offset = response.meta['now_offset']  # 当前查询数量
+        now_size = response.meta['now_size']  # 当前查询页数
+        max_offset = response.meta['max_offset']  # 最大查询数量
+        page_size = response.meta['page_size']  # 最大查询页数
+
         items = response.css('.comment-li')
+        page_num = response.css('.nextpage::attr(href)').extract_first()
+
         for item in items:
-            print(item.css('.ufeed-content::text').extract()[1].strip())
+            if int(now_offset) > int(max_offset):
+                break
+            now_offset += 1
+            c_id = item.css('.com-answer-submit::attr(data-cid)').extract_first()  # 评论id
+            spot_comment = spot.SpotComment.objects(ota_id=OTA.OtaCode.LVMAMA.value.id,
+                                                    ota_spot_id=response.meta['ota_spot_id'],
+                                                    c_id=c_id).first()
+            # 存在不需要新增
+            if spot_comment:
+                continue
+            spot_comment = spot.SpotComment()
+            spot_comment.c_id = c_id  # 评论id
 
-        return
+            spot_comment.ota_id = OTA.OtaCode.LVMAMA.value.id
+            spot_comment.ota_spot_id = response.meta['ota_spot_id']
+            spot_comment.u_name = item.css('.com-userinfo a::text').extract()[2]
+            spot_comment.c_tag = item.css('.ufeed-item em::text').extract()
 
-        # 获取编码
-        charset = response.encoding
-        # 获取网页内容
-        content = response.text
-        # 先根据原编码转化为字节bytes，转化为utf-8字符串str
-        content = content.encode(charset).decode('utf-8')
-        comment_list = content.find_all(class_='comment-li')
-        # 遍历新闻，获取每条的详细信息
-        for comment in comment_list:
-            star = comment.find(class_='ufeed-level').i.get('data-level')
-            print(star)
+            score = item.css('.ufeed-item i::text').extract()
+            score_num = 0
+            score_total = 0
+            for score_rs in score:
+                score_total += float(score_rs[0:1])
+                score_num += 1
+            if score_num == 0:
+                spot_comment.c_score = 0
+            else:
+                spot_comment.c_score = score_total / score_num
+            useful_reply_num = item.css('.com-userinfo a em::text').extract()
+            spot_comment.c_useful_num = useful_reply_num[0]
+            spot_comment.c_reply_num = useful_reply_num[1]
+            spot_comment.c_content = item.css('.ufeed-content::text').extract()[1].strip()
+            spot_comment.c_img = item.css('.compic-small ul li img::attr(src)').extract()
+            spot_comment.c_from = item.css('.com-userinfo span::text').extract_first()
+            spot_comment.create_at = item.css('.com-userinfo em::text').extract()[2]
+            spot_comment.goods_name = item.css('.com-proTit::text').extract_first()
+            yield spot_comment
 
-        return
+        page_num = response.css('.nextpage::attr(href)').extract_first()
 
+        page_num = page_num.split('(', 1)[1].rstrip(');').replace("'", '"').replace("{", '{"').replace(":", '":') .replace(',', ',"')  # 下一页
+        json_data = json.loads(page_num)
+        page = json_data['currentPage']
+        if page and now_size < page_size:
+            now_size += 1
+            url = self.base_url.format(ota_spot_id=response.meta['ota_spot_id'], currentPage=page,
+                                       totalCount=json_data['totalCount'])  # 下一页参数
 
-
+            yield Request(url=url, callback=self.parse_page, dont_filter=True, meta=dict(ota_spot_id=response.
+                                                                                         meta['ota_spot_id'],
+                                                                                         page_size=page_size,
+                                                                                         max_offset=max_offset,
+                                                                                         now_offset=now_offset,
+                                                                                         now_size=now_size))
 
     def parse_count(self, response: HtmlResponse):
         ota_spot_id = response.meta['ota_spot_id']
-        comment_num = spot.SpotComment.objects(ota_id=OTA.OtaCode.LVMAMA.value.id, ota_spot_id=ota_spot_id).count()
-        new_total = float(
+        new_total = int(
             response.xpath('//*[@id="comments"]/div[2]/div[1]/div/div[1]/em[2]/a/text()').extract_first())
-        new_num = new_total - comment_num
+        totalCount = spot.SpotComment.objects(ota_id=OTA.OtaCode.LVMAMA.value.id, ota_spot_id=ota_spot_id).count()  # 当前已有评论数
+        new_num = new_total - totalCount  # 新增评论数
 
-        # if new_num == 0:  # 没有新评论的情况下不需要做任何处理
-        #     return
+        if new_num == 0:  # 没有新评论的情况下不需要做任何处理
+            return
 
-        # max_offset = new_num - 1  # 最大能偏移的数量
-        # page_size = self.page_size
-        # if new_num < self.page_size:  # 新增的评论数量小于默认爬取的最大数量，则用新增的数量作为爬取数量
-        #     page_size = new_num
+        if new_num < 10:
+            page_total = 1
+        else:
+            page_total = new_num % 10  # 新增评论页
 
+            if page_total != 0:
+                page_total = 1 + (new_num-page_total) / 10
+            else:
+                page_total = new_num / 10
+        page_total = int(page_total)
         # 爬取景区的所有评论
+
         start_page = 1
-        start_offset = 0
-        print('=========增量爬取参数=========', ota_spot_id, new_total, comment_num, 1)
-        post_data = {
-            'type': all, 'currentPage': start_page, 'totalCount': new_num, 'placeId': ota_spot_id,
-            'productId': '', 'placeIdType': 'PLACE', 'isPicture': '', 'isBest': '', 'isPOI': 'Y', 'isELong': 'N'}
-        post_data_encode = urllib.parse.urlencode(post_data)
-        url = self.base_url
-        headers = {
-            'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' }
-        yield Request(method='POST', headers=headers, body=post_data_encode, url=url, callback=self.parse_page, dont_filter=True,
-                      meta={'offset': start_offset, 'max_offset': 1, 'ota_spot_id': ota_spot_id,
-                            'page_size': 1})
+        print('=========增量爬取参数=========', ota_spot_id, new_total, new_num, start_page)
+        url = self.base_url.format(ota_spot_id=ota_spot_id, currentPage=start_page, totalCount=new_num)
+        yield Request(url=url, callback=self.parse_page, dont_filter=True,
+                      meta={'ota_spot_id': ota_spot_id, 'page_size': page_total, 'max_offset': new_num,
+                            'now_offset': 1, 'now_size': 1})
