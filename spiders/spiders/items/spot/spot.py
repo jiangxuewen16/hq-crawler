@@ -62,3 +62,35 @@ class SpotComment(BaseItem, mongoengine.Document):
     c_from = mongoengine.StringField(max_length=50)  # 评论来源
 
     create_at = mongoengine.StringField(max_length=50)  # 评论创建时间
+
+
+class SpotCity(BaseItem, mongoengine.Document):
+    pk = 1  # 必须定义
+    id = ObjectId()  # 必须定义
+
+    city_id = mongoengine.IntField()  # 城市id
+    city_pinyin = mongoengine.StringField(max_length=200)  # 城市名称拼音
+    city_name = mongoengine.StringField(max_length=100)  # 城市名称
+
+    ota_id = mongoengine.IntField()  # ota 的 id @see spiders.common.OTA
+    ota_spot_id = mongoengine.IntField()  # ota 景区id
+
+    s_name = mongoengine.StringField(max_length=100)  # 商品名称
+    s_notes = mongoengine.DictField()  # 景区须知
+    s_desc = mongoengine.DictField()  # 景区简介
+    s_level = mongoengine.StringField(max_length=20)  # 景区级别
+
+    s_img = mongoengine.StringField(max_length=250)  # 景区封面图
+    s_score = mongoengine.FloatField()  # 景区评分
+    s_comment_num = mongoengine.IntField()  # 评价数量
+    s_sale_num = mongoengine.IntField()  # 销量
+
+    s_ticket_num = mongoengine.IntField()  # 门票数量
+    s_ticket = mongoengine.DictField()  # 门票列表
+    # s_ticket_hotel = mongoengine.DictField()  # 门票+酒店列表
+    s_addr = mongoengine.StringField(max_length=500)  # 地区名称
+    lat = mongoengine.FloatField()  # 经度
+    lng = mongoengine.FloatField()  # 纬度
+
+    create_at = mongoengine.DateTimeField()  # 创建时间
+    update_at = mongoengine.DateTimeField()  # 更新时间
