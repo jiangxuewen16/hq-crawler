@@ -22,6 +22,8 @@ class MafengwoSpider(scrapy.Spider):
     start_urls = ['https://www.mafengwo.cn/poi/339.html']
     ota_spot_ids = OTA.OtaSpotIdMap.get_ota_spot_list(OTA.OtaCode.MAFENGWO)  # ota 景区id列表
 
+    base_score_url = r'https://m.mafengwo.cn/poi/comment_{spot_ota_id}.html'
+
     @classmethod
     def build_headers(cls, referer: str) -> dict:
         return {
@@ -70,7 +72,7 @@ class MafengwoSpotSpider(scrapy.Spider):
 
         spot_data.ota_id = OTA.OtaCode.MAFENGWO.value.id
         spot_data.spot_name = response.xpath('/html/body/div[2]/div[2]/div/div[3]/h1/text()').extract_first()
-        spot_data.desc = response.xpath('/html/body/div[2]/div[3]/div[2]/div[1]/text()').extract_first()
+        spot_data.desc = response.xpath('/html/body/div[2]/div[3]/div[2]/div[1]/text()').extract_first().strip()
         spot_data.tel = response.xpath('/html/body/div[2]/div[3]/div[2]/ul/li[1]/div[2]/text()').extract_first()
         spot_data.traffic = response.xpath('/html/body/div[2]/div[3]/div[2]/dl[1]/dd/div[1]/text()').extract_first()
         spot_data.ticket_num = 1
@@ -111,6 +113,11 @@ class MafengwoCommentSpider(scrapy.Spider):
     def parse(self, response: HtmlResponse):
         # 爬取下一个景区的数据
         for ota_spot_id in MafengwoSpider.ota_spot_ids:
+            # 更新景区评分
+            url = MafengwoSpider.base_score_url.format(spot_ota_id=ota_spot_id)
+            yield Request(url=url, callback=self.set_spot_score, dont_filter=True,
+                          meta={'ota_spot_id': ota_spot_id})
+
             # 更新景区的评论数量
             url = self.base_referer.format(ota_spot_id=str(ota_spot_id))
             yield Request(url=url, callback=self.parse_count, dont_filter=True,
@@ -186,3 +193,12 @@ class MafengwoCommentSpider(scrapy.Spider):
         spot.Spot.objects(ota_id=OTA.OtaCode.MAFENGWO.value.id,
                           ota_spot_id=response.meta['ota_spot_id']).update(
             set__comment_num=comment_count)
+
+    # 更新景区评分
+    def set_spot_score(self, response: HtmlResponse):
+        score = response.xpath('/html/body/div[2]/section[1]/div[1]/div[1]/div[1]/strong/text()').extract_first()
+        spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.MAFENGWO.value.id,
+                                      ota_spot_id=response.meta['ota_spot_id']).first()
+        spot_data.spot_score = float(score)
+
+        yield spot_data
