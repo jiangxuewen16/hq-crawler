@@ -289,7 +289,7 @@ class MeituanCitySpot(scrapy.Spider):
 
         spot_city.s_img = data['detail_basic']['poiBasicInfo']['poiInfo']['frontImg'].replace('w.h', '1080.0')
         spot_city.s_name = data['detail_basic']['poiBasicInfo']['poiInfo']['name']
-        spot_city.s_notes = data['info']['data']['poiInfo']['noticeTab']
+        spot_city.s_notes = data['info']['data']['tabContents']['noticeTab']
         spot_city.s_desc = data['info']['data']['tabContents']['descTab']
         spot_city.s_level = data['detail_basic']['poiBasicInfo']['poiInfo']['tourPlaceStar']
         spot_city.s_score = float(data['detail_comment']['data']['avgscore'])
