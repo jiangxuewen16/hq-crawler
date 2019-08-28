@@ -26,12 +26,14 @@ from core.lib.route import Route
 """
 启动某些应用
 """
-deploy_scrapy()  # 执行部署scrapy项目到scrapyd中
+if settings.SPIDER_START:
+    deploy_scrapy()  # 执行部署scrapy项目到scrapyd中
+
 
 """
 引入定时任务核心代码
 """
-if settings.TASK_WORK_PACKAGE:
+if settings.SCHEDULER_START:
     from core.lib.task import *  # 引入定时任务核心代码
 
 """

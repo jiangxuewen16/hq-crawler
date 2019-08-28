@@ -138,16 +138,21 @@ SEP = os.sep
 """
 
 # 这里放每个应用的视图包，自动加载，主要用于自定路径路由注册
-auto_import_module('apps.api.views')
+auto_import_module('apps.api.views')        # view包，业务代码写到此包中
 
+"""
+定时调度任务业务包
+"""
+SCHEDULER_START = False     # 是否开启调度任务
 # 定时任务业务包，定时任务写到这里
 TASK_WORK_PACKAGE = 'apps.scheduler.task'
 
 """
 惠趣采集项目配置
 """
-SPIDER_PATH = f'{BASE_DIR}/spiders/'
-spiderConf = configparser.ConfigParser()
+SPIDER_START = False        # 是否开启采集项目
+SPIDER_PATH = f'{BASE_DIR}/spiders/'        # 爬虫项目目录
+spiderConf = configparser.ConfigParser()    # 爬虫项目配置
 spiderConf.read(f'{BASE_DIR}/spiders/scrapy.cfg', encoding="utf-8")
 
 SCRAPYD_URL = spiderConf.get('deploy', 'url')  # scrapyd地址
