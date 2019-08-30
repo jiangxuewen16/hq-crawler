@@ -34,10 +34,25 @@ class spot_comment_helper:
             {
                 '$match': {
                     'create_at': {
-                        '$gte': '2020-08-30'
-                    },
+                        '$gte': '2018-12-04',
+                        '$lt': '2018-12-05'
+                    }
+                }
+            },
+            {'$group':
+                 {'_id': {'c_score': '$c_score'},
+                  'count': {'$sum': 1}
+                  }
+             }]
+        spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
+        return get_three_type(spot_city_s)
+
+    def yesterday_comment(self):
+        pipeline = [
+            {
+                '$match': {
                     'create_at': {
-                        '$lt': str(datetime.date.today())
+                        '$gte': '2019-01-30'
                     }
                 }
             },
