@@ -63,6 +63,12 @@ class SpotComment(BaseItem, mongoengine.Document):
 
     create_at = mongoengine.StringField(max_length=50)  # 评论创建时间
 
+    def keys(self):
+        return ('c_id', 'c_score', 'c_useful_num', 'c_content', 'c_img', 'c_from', 'create_at')
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
 
 class SpotCity(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
