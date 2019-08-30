@@ -4,6 +4,10 @@ import platform
 from core.common.helper import get_scrapyd_cli
 from hq_crawler import settings
 
+"""
+注册分布式爬虫到自定服务器
+"""
+
 
 def deploy_scrapy(scrapyd_deploy: str = ''):
     scrapyd_project_list = get_scrapyd_cli().list_projects()

@@ -56,8 +56,8 @@ ROBOTSTXT_OBEY = False
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     'spiders.middlewares.RandomUserAgentMiddlware': 333,  # 随机User-Agent
+    # 'spiders.middlewares.ProxyMiddleware': 334,  # 随机ip代理
     # 'spiders.middlewares.SpidersDownloaderMiddleware': 542,
-    # 'spiders.middlewares.HandleDataTypeDownloaderMiddleware': 542,
 }
 
 # Enable or disable extensions
@@ -69,7 +69,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'spiders.pipelines.MongoDBPipeline': 300,
+    'spiders.pipelines.MongoDBPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -93,7 +93,11 @@ ITEM_PIPELINES = {
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
+
+PROXIES = ['118.126.105.239:8008', '106.15.39.21:8008', '193.112.181.35:8008']
+
 import mongoengine
+
 mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017')  # 连接mongodb
 
 """

@@ -127,10 +127,21 @@ class RandomUserAgentMiddlware(object):
         request.headers.setdefault("User-Agent", self.ua.random)
 
 
-class HandleDataTypeDownloaderMiddleware(object):
-    def process_response(self, request: Request, response: Response, spider):
-        contentType = response.headers['Content-Type'].decode('utf-8')
-        if ResponseHandleType.JS.value in contentType.lower():
-            print(response.body)
-            print('========', response.text)
-        return response
+"""
+设置ip代理（随机）
+"""
+
+
+class ProxyMiddleware(object):
+    base_proxy_url = r'http://{ip}'
+
+    def __init__(self, ip):
+        self.ip = ip
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(ip=crawler.settings.get('PROXIES'))
+
+    def process_request(self, request, spider):
+        ip = random.choice(self.ip)
+        request.meta['proxy'] = self.base_proxy_url.format(ip=ip)
