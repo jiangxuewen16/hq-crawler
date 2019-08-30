@@ -12,7 +12,7 @@ def get_three_type(spot_city_s):
     for m in L:
         score = m['_id']['c_score']
         count = m['count']
-        if score <= 3:
+        if score == False:
             count_down = count + count_down
         else:
             count_up = count + count_up
@@ -29,7 +29,7 @@ def get_yesterday(self):
 
 class spot_comment_helper:
 
-    def today_comment(self):
+    def today_total_comment(self):
         pipeline = [
             {
                 '$match': {
@@ -40,14 +40,18 @@ class spot_comment_helper:
                 }
             },
             {'$group':
-                 {'_id': {'c_score': '$c_score'},
+                 {'_id': {'c_score': {'$gt': ['$c_score', 3]}},
                   'count': {'$sum': 1}
                   }
              }]
         spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
+        # L = []
+        # for p in spot_city_s:
+        #     L.append(dict(p))
+        # return L
         return get_three_type(spot_city_s)
 
-    def yesterday_comment(self):
+    def yesterday_total_comment(self):
         pipeline = [
             {
                 '$match': {
@@ -57,9 +61,38 @@ class spot_comment_helper:
                 }
             },
             {'$group':
-                 {'_id': {'c_score': '$c_score'},
+                 {'_id': {'c_score': {'$gt': ['$c_score', 3]}},
                   'count': {'$sum': 1}
                   }
              }]
         spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
+        # L = []
+        # for p in spot_city_s:
+        #     L.append(dict(p))
+        # return L
         return get_three_type(spot_city_s)
+
+    def today_spot_commet(self):
+        pipeline = [
+            {
+                '$match': {
+                    'create_at': {
+                        '$gte': '2017-12-04',
+                        '$lt': '2018-12-05'
+                    }
+                }
+            },
+            {'$group':
+                 {'_id': {'c_score': {'$gt': ['$c_score', 3]}, 'ota_spot_id': '$ota_spot_id'},
+                  'count': {'$sum': 1}
+                  }
+             }]
+        spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p))
+
+        return L
+
+    def yesterday_spot_comment(self):
+        return 2

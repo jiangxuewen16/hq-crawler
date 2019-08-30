@@ -27,9 +27,13 @@ class PublicOpinion(BaseView):
     # 字典化 多条记录
     @Route.route(path='/many_comment')
     def many_comment(self):
-        today_data = spot_comment_helper.today_comment(self)
-        yesterday_data = spot_comment_helper.yesterday_comment(self)
-        M = {'today': today_data, 'get_yesterday': yesterday_data}
+        today_total_comment = spot_comment_helper.today_total_comment(self)
+        yesterday_total_comment = spot_comment_helper.yesterday_total_comment(self)
+
+        today_spot_commet = spot_comment_helper.today_spot_commet(self)
+        yesterday_spot_comment = spot_comment_helper.yesterday_spot_comment(self)
+
+        M = {'today_total_comment': today_total_comment, 'yesterday_total_comment': yesterday_total_comment,'today_spot_commet':today_spot_commet,'yesterday_spot_comment':yesterday_spot_comment}
         return self.success(M)
 
     # 获取当前时间
