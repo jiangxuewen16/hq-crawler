@@ -1,7 +1,4 @@
 import datetime
-import json
-
-from django.http import HttpResponse, JsonResponse
 
 from apps.api.common.helper import spot_comment_helper, get_yesterday
 from core.lib.view import BaseView
@@ -16,11 +13,11 @@ class PublicOpinion(BaseView):
     @Route.route(path='/index')
     def index(self):
         spot_city = spot.Spot.objects(ota_spot_id=5427075).first()
-        print(spot_city.spot_name)
-        return self.success(spot_city.spot_name)
+        print(spot_city.list_indexes())
+        return self.success(spot_city.to_json())
 
     # 字典化 一条记录
-    @Route.route(path='/one_comment')
+    @Route.route(path='/one/comment')
     def summary_comment(self):
         spot_city_s = spot.SpotComment.objects(c_score=5).first()
         # return self.success(spot_city_s.to_json())

@@ -156,17 +156,20 @@ class MeituanCommentSpider(scrapy.Spider):
 class MeituanCitySpot(scrapy.Spider):
     name = 'meituan_city_spot'
     allowed_domains = ['www.meituan.com', 'i.meituan.com', 'itrip.meituan.com']
-    # base_page_url = r'http://i.meituan.com/{city_pinyin}/all/?cid=162&sid=solds&cateType=poi&stid_b=3'  # 景区列表页
-    base_page_url = r'http://i.meituan.com/select/{city_pinyin}/page_1.html?cid=162&bid=-1&sid=solds&p={page}&ciid=70&bizType=area&csp=&stid_b=_b2&cateType=poi&nocount=true'  # 景区列表页
+    # 景区列表页
+    base_page_url = r'http://i.meituan.com/select/{area_pinyin}/page_1.html?cid=162&bid=-1&sid=solds&p={page}&ciid=70&bizType=area&csp=&stid_b=_b2&cateType=poi&nocount=true'
 
     # 景区详情信息链接
     # base_detail_url = r'https://i.meituan.com/awp/h5/lvyou/poi/detail/index.html?poiId={ota_spot_id}'  # 景区详情
 
+    # 景区商户信息->商品
     # base_detail_business_url = r'https://itrip.meituan.com/volga/api/v3/trip/poi/business/info/{ota_spot_id}?poiId={ota_spot_id}&source=mt&client=wap&uuid=87F297BEE697EA1CC2805C4C97A33BC991B2EC50D3FF74ED5E959E34BE3C9441&cityId=70&feclient=lvyou_wap&platform=6&partner=11&originUrl=https%3A%2F%2Fi.meituan.com%2Fawp%2Fh5%2Flvyou%2Fpoi%2Fdetail%2Findex.html%3FpoiId%3D{ota_spot_id}&_token={token}'  # 景区商品信息
     base_detail_business_url = r'https://itrip.meituan.com/volga/api/v3/trip/poi/business/info/{ota_spot_id}?poiId={ota_spot_id}&_token={token}'
 
+    # 景区基本信息
     base_detail_basic_url = r'https://itrip.meituan.com/volga/api/v3/trip/poi/basic/info/{ota_spot_id}?poiId={ota_spot_id}&_token={token}'  # 景区信息
 
+    # 景区评论
     # base_detail_comment_url = r'https://itrip.meituan.com/volga/api/v1/trip/poi/comment/{ota_spot_id}?poiId={ota_spot_id}&source=mt&client=wap&uuid=87F297BEE697EA1CC2805C4C97A33BC991B2EC50D3FF74ED5E959E34BE3C9441&cityId=70&feclient=lvyou_wap&filter=all&noempty=0&offset=0&limit=2&platform=5&partner=11&originUrl=https%3A%2F%2Fi.meituan.com%2Fawp%2Fh5%2Flvyou%2Fpoi%2Fdetail%2Findex.html%3FpoiId%3D{ota_spot_id}&_token={token}'
     base_detail_comment_url = r'https://itrip.meituan.com/volga/api/v1/trip/poi/comment/{ota_spot_id}?poiId={ota_spot_id}&filter=all&noempty=0&offset=0&limit=0&_token={token}'
 
@@ -174,6 +177,7 @@ class MeituanCitySpot(scrapy.Spider):
 
     start_urls = ['https://i.meituan.com/index/changecity']  # 获取美团地区列表
 
+    # 原始加密的token
     token = 'eJxVj1trg0AQhf%2FLPC97c3e9gBShUCz0oWLyEvJg46JLvaGrtZT%2B90wgoRQGzsw3h8PMD8x5DYngnAtJYLMzJCAopwYI%2BAU32pgoViZWUYyGyz%2BmeRAS%2BJiPz5CchJCaSBWY8w0VSE5BqEkk5Jn8dVJh3Rw5GqD1floSxhztrfNrNdDL2LPqa2KtZt32Pa5sGh2rra9cx9xQ2522vu%2BekOZ1qgWPBFcKbwXM7EvMRP28a3VX%2F5jf8Dn0Lq4ZsLOve3lo8ix7abLiPU3h9wpoBEnU'
     base_detail_referer_url = 'https://i.meituan.com/awp/h5/lvyou/poi/detail/index.html?poiId={ota_spot_id}'
 
@@ -183,17 +187,17 @@ class MeituanCitySpot(scrapy.Spider):
         for city_list in letter_city_list:
             city_list = city_list.css('li')
             for city in city_list:
-                city_pinyin = city.css('a::attr(data-citypinyin)').extract_first()
-                city_name = city.css('a::text').extract_first()
-                if not city_pinyin:
+                area_pinyin = city.css('a::attr(data-citypinyin)').extract_first()
+                area_name = city.css('a::text').extract_first()
+                if area_name == '更多»':
                     continue
+
                 # 抓取地区的景区列表
                 page = 1
-                url = self.base_page_url.format(city_pinyin=city_pinyin, page=page)
+                url = self.base_page_url.format(area_pinyin=area_pinyin, page=page)
+                print('=' * 20, '爬取的地址：', url)
                 yield Request(url=url, callback=self.parse_page, dont_filter=True,
-                              meta={'city_pinyin': city_pinyin, 'city_name': city_name, 'page': page})
-
-                asyncio.sleep(30)      # 防止被 被爬取的服务器认为是dos攻击
+                              meta={'area_pinyin': area_pinyin, 'area_name': area_name, 'page': page})
 
         # city_pinyin = 'changsha'
         # city_name = '长沙'
@@ -208,8 +212,8 @@ class MeituanCitySpot(scrapy.Spider):
     """
 
     def parse_page(self, response: HtmlResponse):
-        city_pinyin = response.meta['city_pinyin']
-        city_name = response.meta['city_name']
+        area_pinyin = response.meta['area_pinyin']
+        area_name = response.meta['area_name']
         page = response.meta['page']
 
         items = response.css('div#deals dl[gaevent="common/poilist"]')
@@ -224,13 +228,13 @@ class MeituanCitySpot(scrapy.Spider):
             # 爬取美团：详情-景区信息
             url = self.base_detail_basic_url.format(ota_spot_id=ota_spot_id, token=token)
             yield Request(url=url, callback=self.spot_detail_basic, dont_filter=True,
-                          meta={'ota_spot_id': ota_spot_id, 'city_name': city_name, 'city_pinyin': city_pinyin,
+                          meta={'ota_spot_id': ota_spot_id, 'area_name': area_name, 'area_pinyin': area_pinyin,
                                 'token': token})
 
         page += 1
-        url = self.base_page_url.format(city_pinyin=city_pinyin, page=page)
+        url = self.base_page_url.format(area_pinyin=area_pinyin, page=page)
         yield Request(url=url, callback=self.parse_page, dont_filter=True,
-                      meta={'city_pinyin': city_pinyin, 'city_name': city_name, 'page': page})
+                      meta={'area_pinyin': area_pinyin, 'area_name': area_name, 'page': page})
 
     """
     爬取美团：详情-景区信息
@@ -238,15 +242,15 @@ class MeituanCitySpot(scrapy.Spider):
 
     def spot_detail_basic(self, response: HtmlResponse):
         ota_spot_id = response.meta['ota_spot_id']
-        city_pinyin = response.meta['city_pinyin']
-        # city_name = response.meta['city_name']
+        area_pinyin = response.meta['area_pinyin']
+        area_name = response.meta['area_name']
         token = response.meta['token']
         response_data = json.loads(response.body.decode('utf-8'))
 
         # 爬取美团：详情-商品（商户）信息
         url = self.base_detail_business_url.format(ota_spot_id=ota_spot_id, token=token)
         yield Request(url=url, callback=self.spot_detail_business, dont_filter=True,
-                      meta={'ota_spot_id': ota_spot_id, 'city_pinyin': city_pinyin,
+                      meta={'ota_spot_id': ota_spot_id, 'area_pinyin': area_pinyin,  'area_name': area_name,
                             'token': token, 'data': {'detail_basic': response_data}})
 
     """
@@ -255,8 +259,8 @@ class MeituanCitySpot(scrapy.Spider):
 
     def spot_detail_business(self, response: HtmlResponse):
         ota_spot_id = response.meta['ota_spot_id']
-        city_pinyin = response.meta['city_pinyin']
-        # city_name = response.meta['city_name']
+        area_pinyin = response.meta['area_pinyin']
+        area_name = response.meta['area_name']
         token = response.meta['token']
         data = response.meta['data']
 
@@ -266,7 +270,7 @@ class MeituanCitySpot(scrapy.Spider):
         # 爬取美团：详情-评论信息
         url = self.base_detail_comment_url.format(ota_spot_id=ota_spot_id, token=token)
         yield Request(url=url, callback=self.spot_detail_comment, dont_filter=True,
-                      meta={'ota_spot_id': ota_spot_id, 'city_pinyin': city_pinyin,
+                      meta={'ota_spot_id': ota_spot_id, 'area_pinyin': area_pinyin,  'area_name': area_name,
                             'token': token, 'data': data})
 
     """
@@ -275,9 +279,8 @@ class MeituanCitySpot(scrapy.Spider):
 
     def spot_detail_comment(self, response: HtmlResponse):
         ota_spot_id = response.meta['ota_spot_id']
-        city_pinyin = response.meta['city_pinyin']
-        # city_name = response.meta['city_name']
-        # token = response.meta['token']
+        area_pinyin = response.meta['area_pinyin']
+        area_name = response.meta['area_name']
         data = response.meta['data']
         response_data = json.loads(response.body.decode('utf-8'))
         data['detail_comment'] = response_data
@@ -286,7 +289,7 @@ class MeituanCitySpot(scrapy.Spider):
 
         url = self.base_detail_info_url.format(ota_spot_id=ota_spot_id, city_id=city_id)
         yield Request(url=url, callback=self.spot_detail_info, dont_filter=True,
-                      meta={'ota_spot_id': ota_spot_id, 'city_pinyin': city_pinyin, 'data': data})
+                      meta={'ota_spot_id': ota_spot_id, 'area_pinyin': area_pinyin, 'area_name': area_name, 'data': data})
 
     """
     抓取 景区详情 （预订须知 景点介绍）
@@ -294,7 +297,8 @@ class MeituanCitySpot(scrapy.Spider):
 
     def spot_detail_info(self, response: HtmlResponse):
         ota_spot_id = response.meta['ota_spot_id']
-        city_pinyin = response.meta['city_pinyin']
+        area_pinyin = response.meta['area_pinyin']
+        area_name = response.meta['area_name']
         data = response.meta['data']
         response_data = json.loads(response.body.decode('utf-8'))
         data['detail_info'] = response_data
@@ -305,7 +309,8 @@ class MeituanCitySpot(scrapy.Spider):
         spot_city.ota_id = OTA.OtaCode.MEITUAN.value.id
 
         spot_city.city_id = data['detail_basic']['poiBasicInfo']['poiInfo']['cityId']
-        spot_city.city_pinyin = city_pinyin
+        spot_city.area_pinyin = area_pinyin
+        spot_city.area_name = area_name
         spot_city.city_name = data['detail_basic']['poiBasicInfo']['poiInfo']['cityName']
 
         spot_city.s_img = data['detail_basic']['poiBasicInfo']['poiInfo']['frontImg'].replace('w.h', '1080.0')
@@ -339,7 +344,7 @@ class MeituanCitySpot(scrapy.Spider):
         spot_city.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
         yield spot_city
-        print('=' * 20, spot_city.city_id, spot_city.city_name, spot_city.city_pinyin, spot_city.s_name)
+        print('=' * 20, '爬取的景区：', spot_city.city_id, spot_city.city_name, spot_city.area_name, spot_city.area_pinyin, spot_city.s_name)
 
     """
     编码美团token
@@ -353,7 +358,6 @@ class MeituanCitySpot(scrapy.Spider):
         token_dict['ts'] = ts
         token_dict['cts'] = ts + 100 * 1000
         token_dict['bI'] = cls.base_detail_referer_url.format(ota_spot_id=ota_spot_id)
-        print('=' * 15, token_dict)
         encode = str(token_dict).encode()  # 二进制编码
         compress = zlib.compress(encode)  # 二进制压缩
         b_encode = base64.b64encode(compress)  # base64编码

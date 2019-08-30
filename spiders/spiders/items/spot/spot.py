@@ -63,19 +63,14 @@ class SpotComment(BaseItem, mongoengine.Document):
 
     create_at = mongoengine.StringField(max_length=50)  # 评论创建时间
 
-    def keys(self):
-        return ('c_id', 'c_score', 'c_useful_num', 'c_content', 'c_img', 'c_from', 'create_at')
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
 
 class SpotCity(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
 
     city_id = mongoengine.IntField()  # 城市id
-    city_pinyin = mongoengine.StringField(max_length=200)  # 城市名称拼音
+    area_pinyin = mongoengine.StringField(max_length=200)  # 城市名称拼音
+    area_name = mongoengine.StringField(max_length=100)  # 城市名称拼音
     city_name = mongoengine.StringField(max_length=100)  # 城市名称
 
     ota_id = mongoengine.IntField()  # ota 的 id @see spiders.common.OTA

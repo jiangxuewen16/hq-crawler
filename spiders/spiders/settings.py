@@ -29,7 +29,7 @@ ROBOTSTXT_OBEY = False
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-# DOWNLOAD_DELAY = 3
+DOWNLOAD_DELAY = 1
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
 # CONCURRENT_REQUESTS_PER_IP = 16
@@ -56,7 +56,7 @@ ROBOTSTXT_OBEY = False
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     'spiders.middlewares.RandomUserAgentMiddlware': 333,  # 随机User-Agent
-    # 'spiders.middlewares.ProxyMiddleware': 334,  # 随机ip代理
+    'spiders.middlewares.ProxyMiddleware': 334,  # 随机ip代理
     # 'spiders.middlewares.SpidersDownloaderMiddleware': 542,
 }
 
@@ -93,12 +93,15 @@ ITEM_PIPELINES = {
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
+# 禁用cookie
+COOKIES_ENABLES = False
 
-PROXIES = ['118.126.105.239:8008', '106.15.39.21:8008', '193.112.181.35:8008']
+# 代理ip列表
+PROXIES = ['118.126.105.239:8008', '106.15.39.21:8008', '193.112.181.35:8008', '120.78.153.88:8008']
 
+# 连接mongodb
 import mongoengine
-
-mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017')  # 连接mongodb
+mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017')
 
 """
 引入django配置
