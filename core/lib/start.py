@@ -41,3 +41,7 @@ def deploy_scrapy(scrapyd_deploy: str = ''):
 
 def project_env():
     env_dist = os.environ
+    current_env = 'develop'
+    if 'APP_ENV' in env_dist:
+        current_env = env_dist['APP_ENV']
+

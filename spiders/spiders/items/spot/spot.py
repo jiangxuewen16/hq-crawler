@@ -4,7 +4,7 @@ import mongoengine
 from bson import ObjectId
 from scrapy.item import BaseItem
 
-name_id_map = namedtuple('name_id_map', 'name id')
+# name_id_map = namedtuple('name_id_map', 'name id')
 
 """
 景区信息
