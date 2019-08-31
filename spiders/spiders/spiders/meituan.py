@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import asyncio
 import base64
 import json
 import time

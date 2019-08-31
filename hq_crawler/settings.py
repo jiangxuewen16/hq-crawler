@@ -152,8 +152,4 @@ TASK_WORK_PACKAGE = 'apps.scheduler.task'
 """
 SPIDER_START = False        # 是否开启采集项目
 SPIDER_PATH = f'{BASE_DIR}/spiders/'        # 爬虫项目目录
-spiderConf = configparser.ConfigParser()    # 爬虫项目配置
-spiderConf.read(f'{BASE_DIR}/spiders/scrapy.cfg', encoding="utf-8")
 
-SCRAPYD_URL = spiderConf.get('deploy', 'url')  # scrapyd地址
-SCRAPY_PROJECT = spiderConf.get('deploy', 'project')  # scrapyd地址
