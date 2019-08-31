@@ -77,7 +77,7 @@ class spot_comment_helper:
             {
                 '$match': {
                     'create_at': {
-                        '$gte': '2017-12-04',
+                        '$gte': '2018-12-04',
                         '$lt': '2018-12-05'
                     }
                 }
@@ -95,4 +95,47 @@ class spot_comment_helper:
         return L
 
     def yesterday_spot_comment(self):
-        return 2
+        pipeline = [
+            {
+                '$match': {
+                    'create_at': {
+                        '$gte': '2019-01-30'
+                    }
+                }
+            },
+            {'$group':
+                 {'_id': {'c_score': {'$gt': ['$c_score', 3]}, 'ota_spot_id': '$ota_spot_id'},
+                  'count': {'$sum': 1}
+                  }
+             }]
+        spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p))
+
+        return L
+
+    def last_spot_comment(self):
+        pipeline = [{
+            '$group': {
+                '_id': {
+                    'ota_id': '$ota_id',
+                    'ota_spot_id': '$ota_spot_id'
+                },
+                'time': {
+                    '$last': '$create_at'
+                },
+                'c_score': {
+                    '$last': '$c_score'
+                }
+            }
+        }, {
+            '$sort': {
+                'create_at': - 1
+            }
+        }]
+        spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p))
+        return L

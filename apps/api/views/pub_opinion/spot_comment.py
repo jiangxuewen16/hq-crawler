@@ -25,7 +25,7 @@ class PublicOpinion(BaseView):
         # return JsonResponse(dict(spot_city_s), safe=False)
 
     # 字典化 多条记录
-    @Route.route(path='/many_comment')
+    @Route.route(path='/index/comment')
     def many_comment(self):
         today_total_comment = spot_comment_helper.today_total_comment(self)
         yesterday_total_comment = spot_comment_helper.yesterday_total_comment(self)
@@ -33,8 +33,10 @@ class PublicOpinion(BaseView):
         today_spot_commet = spot_comment_helper.today_spot_commet(self)
         yesterday_spot_comment = spot_comment_helper.yesterday_spot_comment(self)
 
-        M = {'today_total_comment': today_total_comment, 'yesterday_total_comment': yesterday_total_comment,'today_spot_commet':today_spot_commet,'yesterday_spot_comment':yesterday_spot_comment}
-        return self.success(M)
+        last_spot_comment = spot_comment_helper.last_spot_comment(self)
+        index_comment = {'today_total_comment': today_total_comment, 'yesterday_total_comment': yesterday_total_comment,
+             'today_spot_commet': today_spot_commet, 'yesterday_spot_comment': yesterday_spot_comment,'last_spot_comment':last_spot_comment}
+        return self.success(index_comment)
 
     # 获取当前时间
     @Route.route(path='/now_time')
