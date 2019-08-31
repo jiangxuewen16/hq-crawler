@@ -28,8 +28,8 @@ def get_yesterday(self):
 
 
 class spot_comment_helper:
-
-    def today_total_comment(self):
+    @classmethod
+    def today_total_comment(cls):
         pipeline = [
             {
                 '$match': {
@@ -51,7 +51,8 @@ class spot_comment_helper:
         # return L
         return get_three_type(spot_city_s)
 
-    def yesterday_total_comment(self):
+    @classmethod
+    def yesterday_total_comment(cls):
         pipeline = [
             {
                 '$match': {
@@ -72,7 +73,8 @@ class spot_comment_helper:
         # return L
         return get_three_type(spot_city_s)
 
-    def today_spot_commet(self):
+    @classmethod
+    def today_spot_comment(cls):
         pipeline = [
             {
                 '$match': {
@@ -94,7 +96,8 @@ class spot_comment_helper:
 
         return L
 
-    def yesterday_spot_comment(self):
+    @classmethod
+    def yesterday_spot_comment(cls):
         pipeline = [
             {
                 '$match': {
@@ -115,7 +118,8 @@ class spot_comment_helper:
 
         return L
 
-    def last_spot_comment(self):
+    @classmethod
+    def last_spot_comment(cls):
         pipeline = [{
             '$group': {
                 '_id': {
