@@ -309,6 +309,7 @@ class MeituanCitySpot(scrapy.Spider):
         # 不存在数据则新增数据,增量爬取
         if not spot_city:
             spot_city = spot.SpotCity()
+            spot_city.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
         spot_city.ota_spot_id = ota_spot_id
         spot_city.ota_id = OTA.OtaCode.MEITUAN.value.id
@@ -346,7 +347,7 @@ class MeituanCitySpot(scrapy.Spider):
                     else:
                         spot_city.s_sale_num += int(ticket_item['newSoldsString'][2:].strip('+'))
 
-        spot_city.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        spot_city.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
         yield spot_city
         print('=' * 20, '爬取的景区：', spot_city.city_id, spot_city.city_name, spot_city.area_name, spot_city.area_pinyin,
