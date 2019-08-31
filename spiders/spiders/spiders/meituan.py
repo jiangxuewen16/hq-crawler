@@ -250,7 +250,7 @@ class MeituanCitySpot(scrapy.Spider):
         # 爬取美团：详情-商品（商户）信息
         url = self.base_detail_business_url.format(ota_spot_id=ota_spot_id, token=token)
         yield Request(url=url, callback=self.spot_detail_business, dont_filter=True,
-                      meta={'ota_spot_id': ota_spot_id, 'area_pinyin': area_pinyin,  'area_name': area_name,
+                      meta={'ota_spot_id': ota_spot_id, 'area_pinyin': area_pinyin, 'area_name': area_name,
                             'token': token, 'data': {'detail_basic': response_data}})
 
     """
@@ -270,7 +270,7 @@ class MeituanCitySpot(scrapy.Spider):
         # 爬取美团：详情-评论信息
         url = self.base_detail_comment_url.format(ota_spot_id=ota_spot_id, token=token)
         yield Request(url=url, callback=self.spot_detail_comment, dont_filter=True,
-                      meta={'ota_spot_id': ota_spot_id, 'area_pinyin': area_pinyin,  'area_name': area_name,
+                      meta={'ota_spot_id': ota_spot_id, 'area_pinyin': area_pinyin, 'area_name': area_name,
                             'token': token, 'data': data})
 
     """
@@ -289,7 +289,8 @@ class MeituanCitySpot(scrapy.Spider):
 
         url = self.base_detail_info_url.format(ota_spot_id=ota_spot_id, city_id=city_id)
         yield Request(url=url, callback=self.spot_detail_info, dont_filter=True,
-                      meta={'ota_spot_id': ota_spot_id, 'area_pinyin': area_pinyin, 'area_name': area_name, 'data': data})
+                      meta={'ota_spot_id': ota_spot_id, 'area_pinyin': area_pinyin, 'area_name': area_name,
+                            'data': data})
 
     """
     抓取 景区详情 （预订须知 景点介绍）
@@ -303,7 +304,11 @@ class MeituanCitySpot(scrapy.Spider):
         response_data = json.loads(response.body.decode('utf-8'))
         data['detail_info'] = response_data
 
-        spot_city = spot.SpotCity()
+        spot_city = spot.SpotCity.objects(ota_id=OTA.OtaCode.MEITUAN.value.id,
+                                          ota_spot_id=response.meta['ota_spot_id']).first()
+        # 不存在数据则新增数据,增量爬取
+        if not spot_city:
+            spot_city = spot.SpotCity()
 
         spot_city.ota_spot_id = ota_spot_id
         spot_city.ota_id = OTA.OtaCode.MEITUAN.value.id
@@ -344,7 +349,8 @@ class MeituanCitySpot(scrapy.Spider):
         spot_city.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
         yield spot_city
-        print('=' * 20, '爬取的景区：', spot_city.city_id, spot_city.city_name, spot_city.area_name, spot_city.area_pinyin, spot_city.s_name)
+        print('=' * 20, '爬取的景区：', spot_city.city_id, spot_city.city_name, spot_city.area_name, spot_city.area_pinyin,
+              spot_city.s_name)
 
     """
     编码美团token
