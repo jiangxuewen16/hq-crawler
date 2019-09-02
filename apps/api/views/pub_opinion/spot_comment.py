@@ -1,6 +1,6 @@
 import datetime
 
-from apps.api.common.helper import spot_comment_helper, get_yesterday
+from apps.api.model.spot import SpotComment, get_yesterday
 from core.lib.view import BaseView
 from core.lib.route import Route
 from spiders.items.spot import spot
@@ -24,20 +24,22 @@ class PublicOpinion(BaseView):
         return self.success(dict(spot_city_s))
         # return JsonResponse(dict(spot_city_s), safe=False)
 
-    # 字典化 多条记录
+    # 首页 舆情系统首页 接口
     @Route.route(path='/index/comment')
     def many_comment(self):
-        today_total_comment = spot_comment_helper.today_total_comment()
-        yesterday_total_comment = spot_comment_helper.yesterday_total_comment()
+        today_total_comment = SpotComment.today_total_comment()
+        yesterday_total_comment = SpotComment.yesterday_total_comment()
 
-        today_spot_comment = spot_comment_helper.today_spot_comment()
-        yesterday_spot_comment = spot_comment_helper.yesterday_spot_comment()
+        today_spot_comment = SpotComment.today_spot_comment()
+        yesterday_spot_comment = SpotComment.yesterday_spot_comment()
 
-        last_spot_comment = spot_comment_helper.last_spot_comment()
+        last_spot_comment = SpotComment.last_spot_comment()
         index_comment = {'today_total_comment': today_total_comment, 'yesterday_total_comment': yesterday_total_comment,
                          'today_spot_comment': today_spot_comment, 'yesterday_spot_comment': yesterday_spot_comment,
                          'last_spot_comment': last_spot_comment}
         return self.success(index_comment)
+
+    # 评论数据 统计接口
 
     # 获取当前时间
     @Route.route(path='/now_time')
