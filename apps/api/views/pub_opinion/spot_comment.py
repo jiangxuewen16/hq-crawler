@@ -46,6 +46,7 @@ class PublicOpinion(BaseView):
         count_comment = SpotComment.count_comment()
         return self.success(count_comment)
 
+    # 评价列表接口
     @Route.route(path='/list/comment')
     def list_comment(self):
         list_comment = SpotComment.list_comment()
