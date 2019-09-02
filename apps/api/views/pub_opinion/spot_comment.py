@@ -1,6 +1,7 @@
 import datetime
 
-from apps.api.model.spot import SpotComment, get_yesterday
+from apps.api.common import helper
+from apps.api.model.spot import SpotComment
 from core.lib.view import BaseView
 from core.lib.route import Route
 from spiders.items.spot import spot
@@ -46,4 +47,4 @@ class PublicOpinion(BaseView):
     def now_time(self):
         now_time = datetime.date.today()
         print(str(now_time))
-        return self.success(str(get_yesterday(self)))
+        return self.success(helper.get_yesterday())

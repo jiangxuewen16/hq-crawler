@@ -1,5 +1,4 @@
-# from spiders.items.spot.spot import Spot
-import datetime
+from spiders.items.spot.spot import Spot
 
 from spiders.items.spot import spot
 
@@ -21,15 +20,8 @@ def get_three_type(spot_city_s):
     return K
 
 
-def get_yesterday(self):
-    today = datetime.date.today()
-    one_day = datetime.timedelta(days=1)
-    yesterday = today - one_day
-    return yesterday
-
-
-# class SpotModel(Spot):
-#     pass
+class SpotModel(Spot):
+    pass
 
 
 class SpotComment:
@@ -50,11 +42,11 @@ class SpotComment:
                   }
              }]
         spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
-        # L = []
-        # for p in spot_city_s:
-        #     L.append(dict(p))
-        # return L
-        return get_three_type(spot_city_s)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p))
+        return L
+        # return get_three_type(spot_city_s)
 
     @classmethod
     def yesterday_total_comment(cls):
@@ -72,11 +64,11 @@ class SpotComment:
                   }
              }]
         spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
-        # L = []
-        # for p in spot_city_s:
-        #     L.append(dict(p))
-        # return L
-        return get_three_type(spot_city_s)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p))
+        return L
+        # return get_three_type(spot_city_s)
 
     @classmethod
     def today_spot_comment(cls):
