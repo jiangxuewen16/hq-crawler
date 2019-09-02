@@ -27,7 +27,7 @@ class PublicOpinion(BaseView):
 
     # 首页 舆情系统首页 接口
     @Route.route(path='/index/comment')
-    def many_comment(self):
+    def index_comment(self):
         today_total_comment = SpotComment.today_total_comment()
         yesterday_total_comment = SpotComment.yesterday_total_comment()
 
@@ -41,6 +41,10 @@ class PublicOpinion(BaseView):
         return self.success(index_comment)
 
     # 评论数据 统计接口
+    @Route.route(path='/count/comment')
+    def count_comment(self):
+        count_comment = SpotComment.count_comment()
+        return self.success(count_comment)
 
     # 获取当前时间
     @Route.route(path='/now_time')

@@ -141,38 +141,44 @@ class SpotComment:
             L.append(dict(p))
         return L
 
-# 评论数据统计
-# db.spot_comment.aggregate([
-#     {
-#         $match: {
-#                 create_at: {
-#                     $gte: '2018-11-24'
-#                 }
-#         }
-#     },
-# 		{
-#         $match: {
-#                 ota_spot_id: {
-#                     $eq: 62931
-#                 },
-# 								ota_id: {
-#                     $eq: 10002
-#                 }
-#         }
-#     },
-# 		{
-#         $group: {
-#             _id: {
-#                 c_score: { $gt: [ "$c_score", 3 ] },
-# 								ota_spot_id:"$ota_spot_id",
-# 								ota_id:"$ota_id"
-#             },
-#             'count': {
-#                 '$sum': 1
-#             }
-#         }
-#     }
-# ])
+    @classmethod
+    def count_comment(cls):
+        pipeline = [
+            {
+                '$match': {
+                    'create_at': {
+                        '$gte': '2018-11-24'
+                    }
+                }
+            },
+            {
+                '$match': {
+                    'ota_spot_id': {
+                        '$eq': 62931
+                    },
+                    'ota_id': {
+                        '$eq': 10002
+                    }
+                }
+            },
+            {
+                '$group': {
+                    '_id': {
+                        'c_score': {'$gt': ['$c_score', 3]},
+                        'ota_spot_id': '$ota_spot_id',
+                        'ota_id': '$ota_id'
+                    },
+                    'count': {
+                        '$sum': 1
+                    }
+                }
+            }
+        ]
+        spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p))
+        return L
 
 # 评论列表
 # db.spot_comment.find(
@@ -183,4 +189,4 @@ class SpotComment:
 #         $lte: 5
 #     }
 # }
-# ).sort({"create_at":-1}).skip(0).limit(5);
+# ).sort({'create_at':-1}).skip(0).limit(5);
