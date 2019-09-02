@@ -1,4 +1,4 @@
-from spiders.items.spot.spot import Spot
+# from spiders.items.spot.spot import Spot
 
 from spiders.items.spot import spot
 
@@ -20,8 +20,8 @@ def get_three_type(spot_city_s):
     return K
 
 
-class SpotModel(Spot):
-    pass
+# class SpotModel(Spot):
+#     pass
 
 
 class SpotComment:
