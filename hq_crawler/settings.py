@@ -23,8 +23,7 @@ from core.common.helper import auto_import_module
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-sys.path.insert(0, os.path.join(BASE_DIR, "spiders"))
-#print('x'*30, sys.path)
+sys.path.insert(0, os.path.join(BASE_DIR, "spiders"))       # 引入依赖包
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -84,19 +83,19 @@ WSGI_APPLICATION = 'hq_crawler.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        # 'ENGINE': 'django.db.backends.mysql',
-        # 'NAME': 'spider',
-        # 'USER': 'root',
-        # 'HOST': '127.0.0.1',
-        # 'PASSWORD': '123456',
-        # 'PORT': 3306,
-        # 'OPTIONS': {'charset': 'utf8mb4'},
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#         # 'ENGINE': 'django.db.backends.mysql',
+#         # 'NAME': 'spider',
+#         # 'USER': 'root',
+#         # 'HOST': '127.0.0.1',
+#         # 'PASSWORD': '123456',
+#         # 'PORT': 3306,
+#         # 'OPTIONS': {'charset': 'utf8mb4'},
+#     }
+# }
 MONGO_CONNECT = mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017')  # 连接mongodb
 
 # Password validation
