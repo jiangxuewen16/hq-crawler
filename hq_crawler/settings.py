@@ -14,12 +14,17 @@ import importlib
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import sys
+
 import mongoengine
 from django.urls import include
 
 from core.common.helper import auto_import_module
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+sys.path.insert(0, os.path.join(BASE_DIR, "spiders"))
+#print('x'*30, sys.path)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -138,18 +143,17 @@ SEP = os.sep
 """
 
 # 这里放每个应用的视图包，自动加载，主要用于自定路径路由注册
-auto_import_module('apps.api.views')        # view包，业务代码写到此包中
+auto_import_module('apps.api.views')  # view包，业务代码写到此包中
 
 """
 定时调度任务业务包
 """
-SCHEDULER_START = False     # 是否开启调度任务
+SCHEDULER_START = False  # 是否开启调度任务
 # 定时任务业务包，定时任务写到这里
 TASK_WORK_PACKAGE = 'apps.scheduler.task'
 
 """
 惠趣采集项目配置
 """
-SPIDER_START = False        # 是否开启采集项目
-SPIDER_PATH = f'{BASE_DIR}/spiders/'        # 爬虫项目目录
-
+SPIDER_START = False  # 是否开启采集项目
+SPIDER_PATH = f'{BASE_DIR}/spiders/'  # 爬虫项目目录
