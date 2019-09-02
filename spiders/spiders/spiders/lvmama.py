@@ -42,7 +42,7 @@ class LvmamaSpotSpider(scrapy.Spider):
         if not spot_data:
             spot_data = Spot()
 
-        spot_data.spot_id = OTA.OtaSpotIdMap.get_ota_spot_id(OTA.OtaSpotIdMap.SHI_YAN_HU.name, OTA.OtaCode.HUIQULX)
+        # spot_data.spot_id = OTA.OtaSpotIdMap.get_ota_spot_id(OTA.OtaSpotIdMap.SHI_YAN_HU.name, OTA.OtaCode.HUIQULX)
         spot_data.ota_id = OTA.OtaCode.LVMAMA.value.id
         spot_data.ota_spot_id = response.meta['ota_spot_id']
         spot_data.spot_name = response.xpath('//body/div[4]/div/div[2]/div/div/h1/text()').extract_first()

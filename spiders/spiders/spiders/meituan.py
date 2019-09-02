@@ -96,7 +96,6 @@ class MeituanCommentSpider(scrapy.Spider):
             spot_comment.u_name = item['userName']
             spot_comment.u_avatar = item['userUrl']
             spot_comment.u_avg_price = item['avgPrice']
-            spot_comment.u_avg_price = item['avgPrice']
             spot_comment.u_level = item['userLevel']
 
             spot_comment.c_id = item['reviewId']

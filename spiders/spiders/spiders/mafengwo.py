@@ -67,7 +67,7 @@ class MafengwoSpotSpider(scrapy.Spider):
         if not spot_data:
             spot_data = Spot()
 
-        spot_data.spot_id = OTA.OtaSpotIdMap.get_ota_spot_id(OTA.OtaSpotIdMap.SHI_YAN_HU.name, OTA.OtaCode.HUIQULX)
+        # spot_data.spot_id = OTA.OtaSpotIdMap.get_ota_spot_id(OTA.OtaSpotIdMap.SHI_YAN_HU.name, OTA.OtaCode.HUIQULX)       这里没什么用，到时候给及其学习来做匹配
         spot_data.ota_spot_id = response.meta['ota_spot_id']
 
         spot_data.ota_id = OTA.OtaCode.MAFENGWO.value.id

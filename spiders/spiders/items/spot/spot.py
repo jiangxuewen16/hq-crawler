@@ -17,6 +17,7 @@ class Spot(BaseItem, mongoengine.Document):
 
     ota_id = mongoengine.IntField()  # OTA 定义的id
     spot_id = mongoengine.IntField()  # 景区id
+    spot_img = mongoengine.ListField()  # 景区图片
     ota_spot_id = mongoengine.DictField()  # ota名称与id的映射
     spot_name = mongoengine.StringField(max_length=50)
     spot_score = mongoengine.FloatField()  # ota平台景区评分
