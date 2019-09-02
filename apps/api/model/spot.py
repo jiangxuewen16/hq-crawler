@@ -180,13 +180,34 @@ class SpotComment:
             L.append(dict(p))
         return L
 
-# 评论列表
-# db.spot_comment.find(
-# {
-# 	ota_id:10002,
-# 	c_score:{
-#         $gt: 3,
-#         $lte: 5
-#     }
-# }
-# ).sort({'create_at':-1}).skip(0).limit(5);
+    @classmethod
+    def list_comment(cls):
+        pipeline = [
+            {
+                '$sort': {"create_at": -1}
+            },
+            {
+                '$skip': 0
+            },
+            {
+                '$limit': 5
+            },
+            {
+                '$match': {
+                    'c_score': {
+                        '$gt': 3,
+                        '$lte': 5
+                    }
+                }
+            },
+            {
+                '$project': {
+                    '_id': 0
+                }
+            }
+        ]
+        spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p))
+        return L

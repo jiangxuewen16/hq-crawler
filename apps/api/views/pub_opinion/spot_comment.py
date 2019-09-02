@@ -46,6 +46,11 @@ class PublicOpinion(BaseView):
         count_comment = SpotComment.count_comment()
         return self.success(count_comment)
 
+    @Route.route(path='/list/comment')
+    def list_comment(self):
+        list_comment = SpotComment.list_comment()
+        return self.success(list_comment)
+
     # 获取当前时间
     @Route.route(path='/now_time')
     def now_time(self):
