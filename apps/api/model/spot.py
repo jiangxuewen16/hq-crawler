@@ -74,6 +74,20 @@ class SpotComment:
     def today_spot_comment(cls):
         pipeline = [
             {
+                '$lookup': {
+                    'from': "spot",
+                    'localField': "uid",
+                    'foreignField': "uid",
+                    'as': "spot"
+                }
+            },
+            {
+                '$unwind': {
+                    'path': "$spot",
+                    'preserveNullAndEmptyArrays': True
+                }
+            },
+            {
                 '$match': {
                     'create_at': {
                         '$gte': '2018-12-04',
@@ -82,7 +96,7 @@ class SpotComment:
                 }
             },
             {'$group':
-                 {'_id': {'c_score': {'$gt': ['$c_score', 3]}, 'ota_spot_id': '$ota_spot_id'},
+                 {'_id': {'c_score': {'$gt': ['$c_score', 3]}, 'spot_name': '$spot.spot_name'},
                   'count': {'$sum': 1}
                   }
              }]
@@ -97,6 +111,20 @@ class SpotComment:
     def yesterday_spot_comment(cls):
         pipeline = [
             {
+                '$lookup': {
+                    'from': "spot",
+                    'localField': "uid",
+                    'foreignField': "uid",
+                    'as': "spot"
+                }
+            },
+            {
+                '$unwind': {
+                    'path': "$spot",
+                    'preserveNullAndEmptyArrays': True
+                }
+            },
+            {
                 '$match': {
                     'create_at': {
                         '$gte': '2019-01-30'
@@ -104,7 +132,7 @@ class SpotComment:
                 }
             },
             {'$group':
-                 {'_id': {'c_score': {'$gt': ['$c_score', 3]}, 'ota_spot_id': '$ota_spot_id'},
+                 {'_id': {'c_score': {'$gt': ['$c_score', 3]}, 'spot_name': '$spot.spot_name'},
                   'count': {'$sum': 1}
                   }
              }]
@@ -117,24 +145,39 @@ class SpotComment:
 
     @classmethod
     def last_spot_comment(cls):
-        pipeline = [{
-            '$group': {
-                '_id': {
-                    'ota_id': '$ota_id',
-                    'ota_spot_id': '$ota_spot_id'
-                },
-                'time': {
-                    '$last': '$create_at'
-                },
-                'c_score': {
-                    '$last': '$c_score'
+        pipeline = [
+            {
+                '$lookup': {
+                    'from': "spot",
+                    'localField': "uid",
+                    'foreignField': "uid",
+                    'as': "spot"
                 }
-            }
-        }, {
-            '$sort': {
-                'create_at': - 1
-            }
-        }]
+            },
+            {
+                '$unwind': {
+                    'path': "$spot",
+                    'preserveNullAndEmptyArrays': True
+                }
+            },
+            {
+                '$group': {
+                    '_id': {
+                        'ota_id': '$ota_id',
+                        'spot_name': '$spot.spot_name'
+                    },
+                    'time': {
+                        '$last': '$create_at'
+                    },
+                    'c_score': {
+                        '$last': '$c_score'
+                    }
+                }
+            }, {
+                '$sort': {
+                    'create_at': - 1
+                }
+            }]
         spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
         L = []
         for p in spot_city_s:
@@ -145,6 +188,20 @@ class SpotComment:
     def count_comment(cls):
         pipeline = [
             {
+                '$lookup': {
+                    'from': "spot",
+                    'localField': "uid",
+                    'foreignField': "uid",
+                    'as': "spot"
+                }
+            },
+            {
+                '$unwind': {
+                    'path': "$spot",
+                    'preserveNullAndEmptyArrays': True
+                }
+            },
+            {
                 '$match': {
                     'create_at': {
                         '$gte': '2018-11-24'
@@ -153,19 +210,19 @@ class SpotComment:
             },
             {
                 '$match': {
-                    'ota_spot_id': {
-                        '$eq': 62931
-                    },
-                    'ota_id': {
-                        '$eq': 10002
-                    }
+                    # 'ota_spot_id': {
+                    #     '$eq': 62931
+                    # },
+                    # 'ota_id': {
+                    #     '$eq': 10002
+                    # }
                 }
             },
             {
                 '$group': {
                     '_id': {
                         'c_score': {'$gt': ['$c_score', 3]},
-                        'ota_spot_id': '$ota_spot_id',
+                        'spot_name': '$spot.spot_name',
                         'ota_id': '$ota_id'
                     },
                     'count': {
