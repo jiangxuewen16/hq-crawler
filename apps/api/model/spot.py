@@ -211,3 +211,71 @@ class SpotComment:
         for p in spot_city_s:
             L.append(dict(p))
         return L
+
+
+class Spot:
+    @classmethod
+    def list_spot(cls):
+        pipeline = [
+            {
+                '$sort': {"create_at": -1}
+            },
+            {
+                '$skip': 0
+            },
+            {
+                '$limit': 5
+            },
+            {
+                '$match': {
+                    'spot_score': {
+                        '$gt': 3,
+                        '$lte': 5
+                    }
+
+                }
+            },
+            {
+                '$project': {
+                    '_id': 0,
+                    'create_at': 0,
+                    'update_at': 0
+                }
+            }
+        ]
+        spot_city_s = spot.Spot.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p))
+        return L
+
+        # return get_three_type(spot_city_s)
+
+
+class SpotCity:
+    @classmethod
+    def detail_spot(cls):
+        pipeline = [
+            {
+                '$match': {
+                    'ota_spot_id': {
+                        '$eq': 6181785
+                    },
+                    'ota_id': {
+                        '$eq': 10004
+                    }
+                }
+            },
+            {
+                '$project': {
+                    '_id': 0,
+                    'create_at': 0,
+                    'update_at': 0
+                }
+            }
+        ]
+        spot_city_s = spot.SpotCity.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p))
+        return L

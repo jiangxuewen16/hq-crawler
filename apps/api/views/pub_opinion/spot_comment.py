@@ -1,7 +1,7 @@
 import datetime
 
 from apps.api.common import helper
-from apps.api.model.spot import SpotComment
+from apps.api.model.spot import SpotComment, Spot,SpotCity
 from core.lib.view import BaseView
 from core.lib.route import Route
 from spiders.items.spot import spot
@@ -43,14 +43,26 @@ class PublicOpinion(BaseView):
     # 评论数据 统计接口
     @Route.route(path='/count/comment')
     def count_comment(self):
-        count_comment = SpotComment.count_comment()
-        return self.success(count_comment)
+        result = SpotComment.count_comment()
+        return self.success(result)
 
     # 评价列表接口
     @Route.route(path='/list/comment')
     def list_comment(self):
-        list_comment = SpotComment.list_comment()
-        return self.success(list_comment)
+        result = SpotComment.list_comment()
+        return self.success(result)
+
+    # 景区列表
+    @Route.route(path='/list/spot')
+    def list_spot(self):
+        result = Spot.list_spot()
+        return self.success(result)
+
+    # 景区详情
+    @Route.route(path='spot/detail')
+    def detail_spot(self):
+        result = SpotCity.detail_spot()
+        return self.success(result)
 
     # 获取当前时间
     @Route.route(path='/now_time')
