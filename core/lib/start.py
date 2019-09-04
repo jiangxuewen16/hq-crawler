@@ -2,6 +2,8 @@ import configparser
 import os
 import platform
 
+import pika
+
 from core.common.helper import get_scrapyd_cli
 from hq_crawler import settings
 
@@ -11,7 +13,7 @@ from hq_crawler import settings
 """
 
 
-def deploy_scrapy(scrapyd_deploy: str = ''):
+def start_deploy_scrapy(scrapyd_deploy: str = ''):
     scrapyd_project_list = get_scrapyd_cli().list_projects()
 
     spiderConf = configparser.ConfigParser()  # 爬虫项目配置
@@ -32,6 +34,15 @@ def deploy_scrapy(scrapyd_deploy: str = ''):
                 raise Exception('windows环境执行注册scrapyd项目错误，请检查目录路径、python环境，是否已安装scrapyd、scrapyd client')
         else:
             os.system(f'scrapyd-deploy -p {scrapy_project_name}')
+
+
+def start_rabbitmq():
+    credentials = pika.PlainCredentials('guest', 'guest')
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host='118.126.105.239', port=5672, virtual_host='/', ))
+    channel = connection.channel()
+
+
 
 
 """
