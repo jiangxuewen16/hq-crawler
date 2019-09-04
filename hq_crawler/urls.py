@@ -30,7 +30,7 @@ if settings.SPIDER_START:       # 是否启动scrapy部署
     start_deploy_scrapy()  # 执行部署scrapy项目到scrapyd中
 
 if settings.RABBITMQ_START:     # 是否启动rabbitmq的监听
-    start_rabbitmq()
+    settings.RABBITMQ_CHANNEL = start_rabbitmq()
 
 
 """

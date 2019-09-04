@@ -160,7 +160,7 @@ SPIDER_PATH = f'{BASE_DIR}/spiders/'  # 爬虫项目目录
 """
 rabbitmq 配置
 """
-RABBITMQ_START = False
+RABBITMQ_START = True
 RABBITMQ_CONF = {
     'host': '118.126.105.239',
     'port': 5672,
@@ -168,3 +168,4 @@ RABBITMQ_CONF = {
     'password': 'guest',
     'vhost': '/'
 }
+RABBITMQ_CHANNEL = None     # rabbitmq连接

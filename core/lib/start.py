@@ -37,10 +37,32 @@ def start_deploy_scrapy(scrapyd_deploy: str = ''):
 
 
 def start_rabbitmq():
-    credentials = pika.PlainCredentials('guest', 'guest')
+    config = settings.RABBITMQ_CONF
+    credentials = pika.PlainCredentials(config['user'], config['password'])
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='118.126.105.239', port=5672, virtual_host='/', ))
+        pika.ConnectionParameters(host=config['host'], port=config['port'], virtual_host=config['vhost'], ))
     channel = connection.channel()
+
+    channel.exchange_declare(exchange='hq.system', exchange_type='topic')
+
+    result = channel.queue_declare('', exclusive=True)
+    queue_name = result.method.queue
+
+    binding_keys = ['hq.system.exception']
+
+    for binding_key in binding_keys:
+        channel.queue_bind(
+            exchange='hq.system', queue='hq-lx.system.exception', routing_key=binding_key)
+
+    print(' [*] Waiting for logs. To exit press CTRL+C')
+
+    def callback(ch, method, properties, body):
+        print(" [x] %r:%r" % (method.routing_key, body))
+
+    channel.basic_consume(
+        queue='hq-lx.system.exception', on_message_callback=callback, auto_ack=True)
+
+    channel.start_consuming()
 
 
 
