@@ -21,7 +21,8 @@ from django.urls import include
 
 from core.common.helper import auto_import_module
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(os.path.join(__file__, os.pardir))))
 
 sys.path.insert(0, os.path.join(BASE_DIR, "spiders"))  # 引入依赖包
 

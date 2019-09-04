@@ -1,3 +1,4 @@
+import configparser
 import importlib
 import os
 import pkgutil
@@ -50,6 +51,7 @@ def auto_import_module(moduleName: str, maxLevel=2):
 
 
 def get_scrapyd_cli() -> ScrapydAPI:
-    return ScrapydAPI(settings.SCRAPYD_URL)
-
-
+    spiderConf = configparser.ConfigParser()  # 爬虫项目配置
+    spiderConf.read(f'{settings.BASE_DIR}/spiders/scrapy.cfg', encoding="utf-8")
+    SCRAPYD_URL = spiderConf.get('deploy', 'url')  # scrapyd地址
+    return ScrapydAPI(SCRAPYD_URL)
