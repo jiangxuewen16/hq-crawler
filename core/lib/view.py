@@ -15,7 +15,7 @@ from core.lib.route import Route
 
 
 class BaseView(View):
-    request_param: dict = {}  # 请求数据
+    # request_param: dict = {}  # 请求数据
 
     def __init(self):
         request = json.loads(self.request.body)
@@ -42,6 +42,14 @@ class BaseView(View):
 
     def get(self, request: WSGIRequest) -> HttpResponse:
         pass
+
+    @property
+    def request_param(self):
+        return self.request_param
+
+    @request_param.setter
+    def request_param(self, value):
+        self.request_param = value
 
     """
     统一返回操作

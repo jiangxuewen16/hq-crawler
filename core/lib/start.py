@@ -4,6 +4,7 @@ import platform
 
 import pika
 
+from apps.scheduler.config.rabbitmq import RabbitMqReceive
 from core.common.helper import get_scrapyd_cli
 from hq_crawler import settings
 
@@ -36,6 +37,11 @@ def start_deploy_scrapy(scrapyd_deploy: str = ''):
             os.system(f'scrapyd-deploy -p {scrapy_project_name}')
 
 
+"""
+连接rabbitmq，并监听mq消息
+"""
+
+
 def start_rabbitmq():
     config = settings.RABBITMQ_CONF
     credentials = pika.PlainCredentials(config['user'], config['password'])
@@ -43,6 +49,8 @@ def start_rabbitmq():
         pika.ConnectionParameters(host=config['host'], port=config['port'], virtual_host=config['vhost'], ))
     channel = connection.channel()
 
+    settings.RABBITMQ_CHANNEL = channel  # 设置配置rabbitmq连接
+    print(RabbitMqReceive.__members__)
     channel.exchange_declare(exchange='hq.system', exchange_type='topic')
 
     result = channel.queue_declare('', exclusive=True)
@@ -65,8 +73,6 @@ def start_rabbitmq():
     channel.start_consuming()
 
 
-
-
 """
 项目环境配置:根据环境来自动切换项目环境配
 """
@@ -77,4 +83,3 @@ def project_env():
     current_env = 'develop'
     if 'APP_ENV' in env_dist:
         current_env = env_dist['APP_ENV']
-

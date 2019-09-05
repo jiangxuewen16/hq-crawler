@@ -17,7 +17,6 @@ import os
 import sys
 
 import mongoengine
-from django.urls import include
 
 from core.common.helper import auto_import_module
 
@@ -83,19 +82,19 @@ WSGI_APPLICATION = 'hq_crawler.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#         # 'ENGINE': 'django.db.backends.mysql',
-#         # 'NAME': 'spider',
-#         # 'USER': 'root',
-#         # 'HOST': '127.0.0.1',
-#         # 'PASSWORD': '123456',
-#         # 'PORT': 3306,
-#         # 'OPTIONS': {'charset': 'utf8mb4'},
-#     }
-# }
+DATABASES = {
+    'default': {
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'spider',
+        'USER': 'root',
+        'HOST': '127.0.0.1',
+        'PASSWORD': '123456',
+        'PORT': 3306,
+        'OPTIONS': {'charset': 'utf8mb4'},
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -147,7 +146,7 @@ auto_import_module('apps.api.views')  # view包，业务代码写到此包中
 """
 定时调度任务业务包
 """
-SCHEDULER_START = False  # 是否开启调度任务
+SCHEDULER_START = True  # 是否开启调度任务
 # 定时任务业务包，定时任务写到这里
 TASK_WORK_PACKAGE = 'apps.scheduler.task'
 
@@ -160,7 +159,7 @@ SPIDER_PATH = f'{BASE_DIR}/spiders/'  # 爬虫项目目录
 """
 rabbitmq 配置
 """
-RABBITMQ_START = True
+RABBITMQ_START = False
 RABBITMQ_CONF = {
     'host': '118.126.105.239',
     'port': 5672,
