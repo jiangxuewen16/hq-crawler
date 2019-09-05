@@ -1,4 +1,5 @@
 import datetime
+import math
 
 from apps.api.common import helper
 from apps.api.model.spot import SpotComment, Spot, SpotCity
@@ -52,10 +53,27 @@ class PublicOpinion(BaseView):
         return self.success(result)
 
     # 景区列表
-    @Route.route(path='/list/spot')
+    @Route.route(path='/spot/list')
     def list_spot(self):
-        result = Spot.list_spot()
-        return self.success(result)
+        param = self.request_param
+        s_name = ''
+        page = 1
+        limit = 10
+        sort = 'create_at'
+        if 's_name' in param:
+            s_name = param['s_name']
+        if 'page' in param:
+            page = param['page']
+        if 'limit' in param:
+            limit = param['limit']
+        if 'sort' in param:
+            sort = param['sort']
+        skip = (page - 1) * limit
+        result = Spot.list_spot(s_name=s_name, skip=skip, limit=5, sort=sort)
+        total = Spot.total_spot(s_name=s_name)
+        last_page = math.ceil(total / limit)
+        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
+        return self.success(data)
 
     # 景区详情
     @Route.route(path='/spot/detail')
@@ -74,5 +92,7 @@ class PublicOpinion(BaseView):
     @Route.route(path='/post/data')
     def post_data(self):
         data = self.request_param
-        self.success(data)
-
+        if 'item_detail_id' in data:
+            return self.success(data['item_detail_id'])
+        else:
+            return self.success('不存在')

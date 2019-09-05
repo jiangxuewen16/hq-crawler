@@ -272,41 +272,66 @@ class SpotComment:
 
 class Spot:
     @classmethod
-    def list_spot(cls):
+    def list_spot(cls, s_name, skip, limit, sort):
         pipeline = [
             {
-                '$sort': {"create_at": -1}
+                '$sort': {sort: -1}
             },
             {
-                '$skip': 0
+                '$skip': skip
             },
             {
-                '$limit': 5
+                '$limit': limit
             },
             {
                 '$match': {
-                    'spot_score': {
-                        '$gt': 3,
-                        '$lte': 5
-                    }
-
+                    's_name': {'$regex': '.*' + s_name + '.*'}
                 }
             },
             {
                 '$project': {
                     '_id': 0,
-                    'create_at': 0,
-                    'update_at': 0
+                    'city_id': 1,
+                    'city_name': 1,
+                    'ota_spot_id': 1,
+                    's_name': 1,
+                    's_addr': 1,
+                    's_level': 1,
+                    's_score': 1,
+                    's_comment_num': 1,
+                    's_sale_num': 1,
+                    's_ticket_num': 1,
+                    'year': {'$year': "$create_at"},
+                    'month': {'$month': "$create_at"},
+                    'day': {'$dayOfMonth': "$create_at"},
                 }
             }
         ]
-        spot_city_s = spot.Spot.objects.aggregate(*pipeline)
+        spot_city_s = spot.SpotCity.objects.aggregate(*pipeline)
         L = []
         for p in spot_city_s:
             L.append(dict(p))
         return L
 
-        # return get_three_type(spot_city_s)
+    @classmethod
+    def total_spot(cls, s_name):
+        pipeline = [
+            {
+                '$match': {
+                    's_name': {'$regex': '.*' + s_name + '.*'}
+                }
+            },
+            {
+                '$count': "count"
+            }
+
+        ]
+        count = spot.SpotCity.objects().aggregate(*pipeline)
+        # return dict(count)
+        L = []
+        for p in count:
+            L.append(dict(p))
+        return L[0]['count']
 
 
 class SpotCity:
