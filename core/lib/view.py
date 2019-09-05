@@ -20,7 +20,7 @@ class BaseView(View):
     def __init(self):
         request = json.loads(self.request.body)
         print(type(request))
-        self._request_param = request['data']
+        self.request_param = request['data']
         self.version = request['head']['version']
         self.time = request['head']['time']
         self.token = request['head']['token']
@@ -45,7 +45,11 @@ class BaseView(View):
 
     @property
     def request_param(self):
-        return self._request_param
+        return self.request_pa0ram
+
+    @request_param.setter
+    def request_param(self, value):
+        self.request_param = value
 
     """
     统一返回操作

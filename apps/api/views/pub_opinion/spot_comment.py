@@ -1,7 +1,7 @@
 import datetime
 
 from apps.api.common import helper
-from apps.api.model.spot import SpotComment, Spot,SpotCity
+from apps.api.model.spot import SpotComment, Spot, SpotCity
 from core.lib.view import BaseView
 from core.lib.route import Route
 from spiders.items.spot import spot
@@ -23,7 +23,6 @@ class PublicOpinion(BaseView):
         spot_city_s = spot.SpotComment.objects(c_score=5).first()
         # return self.success(spot_city_s.to_json())
         return self.success(dict(spot_city_s))
-        # return JsonResponse(dict(spot_city_s), safe=False)
 
     # 首页 舆情系统首页 接口
     @Route.route(path='/index/comment')
@@ -59,7 +58,7 @@ class PublicOpinion(BaseView):
         return self.success(result)
 
     # 景区详情
-    @Route.route(path='spot/detail')
+    @Route.route(path='/spot/detail')
     def detail_spot(self):
         result = SpotCity.detail_spot()
         return self.success(result)
@@ -70,3 +69,10 @@ class PublicOpinion(BaseView):
         now_time = datetime.date.today()
         print(str(now_time))
         return self.success(helper.get_yesterday())
+
+    # 获取post请求
+    @Route.route(path='/post/data')
+    def post_data(self):
+        data = self.request_param
+        self.success(data)
+
