@@ -256,16 +256,12 @@ class SpotComment:
                         '$lte': 5
                     }
                 }
-            },
-            {
-                '$project': {
-                    '_id': 0
-                }
             }
         ]
         spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
         L = []
         for p in spot_city_s:
+            p['_id'] = str(p['_id'])
             L.append(dict(p))
         return L
 
@@ -336,15 +332,12 @@ class Spot:
 
 class SpotCity:
     @classmethod
-    def detail_spot(cls):
+    def detail_spot(cls, ota_spot_id):
         pipeline = [
             {
                 '$match': {
                     'ota_spot_id': {
-                        '$eq': 6181785
-                    },
-                    'ota_id': {
-                        '$eq': 10004
+                        '$eq': ota_spot_id
                     }
                 }
             },

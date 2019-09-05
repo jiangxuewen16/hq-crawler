@@ -47,7 +47,7 @@ class PublicOpinion(BaseView):
         return self.success(result)
 
     # 评价列表接口
-    @Route.route(path='/list/comment')
+    @Route.route(path='/comment/list')
     def list_comment(self):
         result = SpotComment.list_comment()
         return self.success(result)
@@ -78,8 +78,13 @@ class PublicOpinion(BaseView):
     # 景区详情
     @Route.route(path='/spot/detail')
     def detail_spot(self):
-        result = SpotCity.detail_spot()
-        return self.success(result)
+        param = self.request_param
+        if 'ota_spot_id' in param:
+            ota_spot_id = param['ota_spot_id']
+            result = SpotCity.detail_spot(ota_spot_id=ota_spot_id)
+            return self.success(result)
+        else:
+            return self.failure(data='param ota_spot_id not exist')
 
     # 获取当前时间
     @Route.route(path='/now_time')
