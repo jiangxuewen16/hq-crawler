@@ -358,7 +358,10 @@ class SpotComment:
         L = []
         for p in count:
             L.append(dict(p))
-        return L[0]['count']
+        if 0 in L:
+            return L[0]['count']
+        else:
+            return 0
 
 
 class Spot:
@@ -422,7 +425,10 @@ class Spot:
         L = []
         for p in count:
             L.append(dict(p))
-        return L[0]['count']
+        if 0 in L:
+            return L[0]['count']
+        else:
+            return 0
 
     @classmethod
     def get_param(cls, param, in_name, default):

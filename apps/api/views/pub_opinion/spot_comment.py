@@ -26,7 +26,7 @@ class PublicOpinion(BaseView):
         return self.success(dict(spot_city_s))
 
     # 首页 舆情系统首页 接口
-    @Route.route(path='/index/comment')
+    @Route.route(path='/comment/index')
     def index_comment(self):
         today_total_comment = SpotComment.today_total_comment()
         yesterday_total_comment = SpotComment.yesterday_total_comment()
