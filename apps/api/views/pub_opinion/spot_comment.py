@@ -41,33 +41,51 @@ class PublicOpinion(BaseView):
         return self.success(index_comment)
 
     # 评论数据 统计接口
-    @Route.route(path='/count/comment')
+    @Route.route(path='/comment/count')
     def count_comment(self):
-        result = SpotComment.count_comment()
+        param = self.request_param
+        condition = {
+            'begin_date': Spot.get_param(param=param, in_name='begin_date', default=str(datetime.date.today())),
+            'end_date': Spot.get_param(param=param, in_name='end_date', default=str(datetime.datetime.now())),
+            'up_score': Spot.get_param(param=param, in_name='up_score', default=6),
+            'down_score': Spot.get_param(param=param, in_name='down_score', default=0),
+            'ota_spot_id': Spot.get_param(param=param, in_name='ota_spot_id', default=5427075),
+            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=10001)
+        }
+        result = SpotComment.count_comment(condition=condition)
         return self.success(result)
 
     # 评价列表接口
     @Route.route(path='/comment/list')
     def list_comment(self):
-        result = SpotComment.list_comment()
-        return self.success(result)
+        param = self.request_param
+        condition = {
+            'check_name': Spot.get_param(param=param, in_name='check_name', default=''),
+            'begin_date': Spot.get_param(param=param, in_name='begin_date', default=str(datetime.date.today())),
+            'end_date': Spot.get_param(param=param, in_name='end_date', default=str(datetime.datetime.now())),
+            'up_score': Spot.get_param(param=param, in_name='up_score', default=6),
+            'down_score': Spot.get_param(param=param, in_name='down_score', default=0),
+            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=10001)
+        }
+        sort = Spot.get_param(param=param, in_name='sort', default='create_at')
+        page = Spot.get_param(param=param, in_name='page', default=1)
+        limit = Spot.get_param(param=param, in_name='limit', default=10)
+        skip = (page - 1) * limit
+
+        result = SpotComment.list_comment(condition=condition, skip=skip, limit=5, sort=sort)
+        total = SpotComment.total_comment(condition=condition)
+        last_page = math.ceil(total / limit)
+        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
+        return self.success(data)
 
     # 景区列表
     @Route.route(path='/spot/list')
     def list_spot(self):
         param = self.request_param
-        s_name = ''
-        page = 1
-        limit = 10
-        sort = 'create_at'
-        if 's_name' in param:
-            s_name = param['s_name']
-        if 'page' in param:
-            page = param['page']
-        if 'limit' in param:
-            limit = param['limit']
-        if 'sort' in param:
-            sort = param['sort']
+        s_name = Spot.get_param(param=param, in_name='s_name', default='')
+        sort = Spot.get_param(param=param, in_name='sort', default='create_at')
+        page = Spot.get_param(param=param, in_name='page', default=1)
+        limit = Spot.get_param(param=param, in_name='limit', default=10)
         skip = (page - 1) * limit
         result = Spot.list_spot(s_name=s_name, skip=skip, limit=5, sort=sort)
         total = Spot.total_spot(s_name=s_name)
@@ -90,6 +108,7 @@ class PublicOpinion(BaseView):
     @Route.route(path='/now_time')
     def now_time(self):
         now_time = datetime.date.today()
+        # now_time = datetime.datetime.now()
         print(str(now_time))
         return self.success(helper.get_yesterday())
 

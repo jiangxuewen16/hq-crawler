@@ -185,7 +185,7 @@ class SpotComment:
         return L
 
     @classmethod
-    def count_comment(cls):
+    def count_comment(cls, condition):
         pipeline = [
             {
                 '$lookup': {
@@ -203,19 +203,26 @@ class SpotComment:
             },
             {
                 '$match': {
-                    'create_at': {
-                        '$gte': '2018-11-24'
-                    }
-                }
-            },
-            {
-                '$match': {
-                    # 'ota_spot_id': {
-                    #     '$eq': 62931
-                    # },
-                    # 'ota_id': {
-                    #     '$eq': 10002
-                    # }
+                    '$and': [
+                        {
+                            'create_at': {
+                                '$gte': condition['begin_date'],
+                                '$lt': condition['end_date']
+                            }
+                        },
+                        {
+                            'c_score': {
+                                '$gt': condition['down_score'],
+                                '$lte': condition['up_score']
+                            }
+                        },
+                        {
+                            'ota_id': condition['ota_id']
+                        },
+                        {
+                            'ota_spot_id': condition['ota_spot_id']
+                        }
+                    ]
                 }
             },
             {
@@ -238,23 +245,72 @@ class SpotComment:
         return L
 
     @classmethod
-    def list_comment(cls):
+    def list_comment(cls, condition, skip, limit, sort):
         pipeline = [
             {
-                '$sort': {"create_at": -1}
+                '$lookup': {
+                    'from': "spot",
+                    'localField': "ota_spot_id",
+                    'foreignField': "ota_spot_id",
+                    'as': "spot"
+                }
             },
             {
-                '$skip': 0
+                '$unwind': {
+                    'path': "$spot",
+                    'preserveNullAndEmptyArrays': True
+                }
             },
             {
-                '$limit': 5
+                '$project': {
+                    '_id': "$_id",
+                    'ota_id': "$ota_id",
+                    'ota_spot_id': "$ota_spot_id",
+                    'u_id': "$u_id",
+                    'u_avatar': "$u_avatar",
+                    'u_level': "$u_level",
+                    'u_name': "$u_name",
+                    'c_tag': "$c_tag",
+                    'c_id': "$c_id",
+                    'c_score': "$c_score",
+                    'c_content': "$c_content",
+                    'c_img': "$c_img",
+                    'create_at': "$create_at",
+                    'spot_name': "$spot.spot_name"
+                }
+            },
+            {
+                '$sort': {sort: -1}
+            },
+            {
+                '$skip': skip
+            },
+            {
+                '$limit': limit
             },
             {
                 '$match': {
-                    'c_score': {
-                        '$gt': 3,
-                        '$lte': 5
-                    }
+                    '$and': [
+                        {'$or': [
+                            {'u_name': {'$regex': '.*' + condition['check_name'] + '.*'}},
+                            {'_id': {'$regex': '.*' + condition['check_name'] + '.*'}},
+                        ]},
+                        {
+                            'create_at': {
+                                '$gte': condition['begin_date'],
+                                '$lt': condition['end_date']
+                            }
+                        },
+                        {
+                            'c_score': {
+                                '$gt': condition['down_score'],
+                                '$lte': condition['up_score']
+                            }
+                        },
+                        {
+                            'ota_id': condition['ota_id']
+                        }
+                    ]
                 }
             }
         ]
@@ -264,6 +320,45 @@ class SpotComment:
             p['_id'] = str(p['_id'])
             L.append(dict(p))
         return L
+
+    @classmethod
+    def total_comment(cls, condition):
+        pipeline = [
+            {
+                '$match': {
+                    '$and': [
+                        {'$or': [
+                            {'u_name': {'$regex': '.*' + condition['check_name'] + '.*'}},
+                            {'_id': {'$regex': '.*' + condition['check_name'] + '.*'}},
+                        ]},
+                        {
+                            'create_at': {
+                                '$gte': condition['begin_date'],
+                                '$lt': condition['end_date']
+                            }
+                        },
+                        {
+                            'c_score': {
+                                '$gt': condition['down_score'],
+                                '$lte': condition['up_score']
+                            }
+                        },
+                        {
+                            'ota_id': condition['ota_id']
+                        }
+                    ]
+                }
+            },
+            {
+                '$count': "count"
+            }
+
+        ]
+        count = spot.SpotComment.objects().aggregate(*pipeline)
+        L = []
+        for p in count:
+            L.append(dict(p))
+        return L[0]['count']
 
 
 class Spot:
@@ -328,6 +423,24 @@ class Spot:
         for p in count:
             L.append(dict(p))
         return L[0]['count']
+
+    @classmethod
+    def check_param(cls, param):
+        if 'page' in param:
+            page = param['page']
+        if 'limit' in param:
+            limit = param['limit']
+        if 'sort' in param:
+            sort = param['sort']
+        if 's_name' in param:
+            s_name = param['s_name']
+
+    @classmethod
+    def get_param(cls, param, in_name, default):
+        if in_name in param:
+            return param[in_name]
+        else:
+            return default
 
 
 class SpotCity:
