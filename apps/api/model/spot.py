@@ -425,17 +425,6 @@ class Spot:
         return L[0]['count']
 
     @classmethod
-    def check_param(cls, param):
-        if 'page' in param:
-            page = param['page']
-        if 'limit' in param:
-            limit = param['limit']
-        if 'sort' in param:
-            sort = param['sort']
-        if 's_name' in param:
-            s_name = param['s_name']
-
-    @classmethod
     def get_param(cls, param, in_name, default):
         if in_name in param:
             return param[in_name]
