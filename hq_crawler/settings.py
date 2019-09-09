@@ -176,7 +176,7 @@ auto_import_module('apps.api.views')  # view包，业务代码写到此包中
 """
 定时调度任务业务包
 """
-SCHEDULER_START = True  # 是否开启调度任务
+SCHEDULER_START = False  # 是否开启调度任务
 # 定时任务业务包，定时任务写到这里
 TASK_WORK_PACKAGE = 'apps.scheduler.task'
 

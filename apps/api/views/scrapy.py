@@ -19,7 +19,7 @@ class Scrapy(BaseView):
         return self.success({'sd': get_scrapyd_cli().delete_project('spiders')})
 
     @Route.route(path='spot/info')
-    def del_project(self):
+    def spot_info(self):
         jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_spot')
         print('=' * 30, '爬虫定时任务:::', '景区信息:::', ':::', jobid)
         jobid = get_scrapyd_cli().schedule('spiders', 'lvmama_spot')
@@ -28,4 +28,24 @@ class Scrapy(BaseView):
         print('=' * 30, '爬虫定时任务:::', '景区信息:::', ':::', jobid)
         jobid = get_scrapyd_cli().schedule('spiders', 'meituan_spot')
         print('=' * 30, '爬虫定时任务:::', '景区信息:::', ':::', jobid)
-        return self.success({'sd': jobid})
+        return self.success({'jobid': jobid})
+
+    @Route.route(path='spot/comment')
+    def spot_comment(self):
+        jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_comment')
+        print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
+        jobid = get_scrapyd_cli().schedule('spiders', 'lvmama_comment')
+        print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
+        jobid = get_scrapyd_cli().schedule('spiders', 'mafengwo_comment')
+        print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
+        jobid = get_scrapyd_cli().schedule('spiders', 'meituan_comment')
+        print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
+        jobid = get_scrapyd_cli().schedule('spiders', 'fliggy_comment')
+        print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
+        return self.success({'jobid': jobid})
+
+    @Route.route(path='spot/list/meituan')
+    def spot_list_(self):
+        jobid = get_scrapyd_cli().schedule('spiders', 'meituan_city_spot')
+        print('=' * 30, '爬虫定时任务:::', '美团景区列表:::', ':::', jobid)
+        return self.success({'jobid': jobid})
