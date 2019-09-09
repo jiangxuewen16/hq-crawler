@@ -19,4 +19,4 @@ class Scrapy(BaseView):
 
     @Route.route(path='del/project')
     def del_project(self):
-        return self.success({'sd': get_scrapyd_cli().delete_project('hq-spiders')})
+        return self.success({'sd': get_scrapyd_cli().delete_project('spiders')})
