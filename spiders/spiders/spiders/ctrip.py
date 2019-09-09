@@ -69,7 +69,7 @@ class CtripSpotSpider(scrapy.Spider):
             spot_data.spot_img.append(img.xpath('/a/img[@src]').extract_first())
 
         spot_data.desc = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[5]/div[1]/div[3]/div[2]')[0]
+            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[5]/div[1]/div[3]/div[2]').get()
         # spot_data.tel = ????
         spot_data.traffic = response.xpath(
             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[5]/div[1]/div[4]/div[3]/p/text()').extract()
@@ -82,7 +82,7 @@ class CtripSpotSpider(scrapy.Spider):
         spot_data.comment_num = response.xpath(
             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/a/text()').extract_first().strip(
             '查看条点评')
-        print(spot_data.to_json())
+        #print('='*20, spot_data.to_json())
         yield spot_data
 
 

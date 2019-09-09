@@ -97,10 +97,11 @@ ITEM_PIPELINES = {
 COOKIES_ENABLES = False
 
 # 代理ip列表
-PROXIES = ['118.126.105.239:8008', '106.15.39.21:8008', '193.112.181.35:8008', '120.78.153.88:8008']
+PROXIES = ['118.126.105.239:8008', '106.15.39.21:8008', '193.112.181.35:8008']
 
 # 连接mongodb
 import mongoengine
+
 mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017')
 
 """

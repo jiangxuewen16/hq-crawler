@@ -17,3 +17,15 @@ class Scrapy(BaseView):
     @Route.route(path='del/project')
     def del_project(self):
         return self.success({'sd': get_scrapyd_cli().delete_project('spiders')})
+
+    @Route.route(path='spot/info')
+    def del_project(self):
+        jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_spot')
+        print('=' * 30, '爬虫定时任务:::', '景区信息:::', ':::', jobid)
+        jobid = get_scrapyd_cli().schedule('spiders', 'lvmama_spot')
+        print('=' * 30, '爬虫定时任务:::', '景区信息:::', ':::', jobid)
+        jobid = get_scrapyd_cli().schedule('spiders', 'mafengwo_spot')
+        print('=' * 30, '爬虫定时任务:::', '景区信息:::', ':::', jobid)
+        jobid = get_scrapyd_cli().schedule('spiders', 'meituan_spot')
+        print('=' * 30, '爬虫定时任务:::', '景区信息:::', ':::', jobid)
+        return self.success({'sd': jobid})

@@ -45,6 +45,10 @@ class MeituanSpotSpider(scrapy.Spider):
         # 不存在数据则新增数据
         if not spot_data:
             spot_data = Spot()
+            spot_data.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+        spot_data.ota_spot_id = response.meta['ota_spot_id']
+        spot_data.ota_id = OTA.OtaCode.MEITUAN.value.id
         spot_data.spot_name = response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/h1/text()').extract_first()
         spot_data.spot_score = float(
             response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/text()[1]').extract_first())
@@ -54,6 +58,7 @@ class MeituanSpotSpider(scrapy.Spider):
             '//*[@id="react"]/div/div/div[2]/div[1]/div[2]/div[1]/a/span/text()').extract_first()
         spot_data.tel = response.xpath(
             '//*[@id="react"]/div/div/div[2]/div[1]/div[2]/div[2]/span[2]/text()').extract_first()
+        spot_data.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
         yield spot_data
 
