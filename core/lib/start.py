@@ -50,27 +50,49 @@ def start_rabbitmq():
     channel = connection.channel()
 
     settings.RABBITMQ_CHANNEL = channel  # 设置配置rabbitmq连接
-    print(RabbitMqReceive.__members__)
-    channel.exchange_declare(exchange='hq.system', exchange_type='topic')
 
-    result = channel.queue_declare('', exclusive=True)
-    queue_name = result.method.queue
+    # 监听消息列表
+    for _, member in RabbitMqReceive.__members__.items():
+        channel.exchange_declare(exchange='hq.system', exchange_type='topic')
 
-    binding_keys = ['hq.system.exception']
+        result = channel.queue_declare('', exclusive=True)
+        queue_name = result.method.queue
 
-    for binding_key in binding_keys:
-        channel.queue_bind(
-            exchange='hq.system', queue='hq-lx.system.exception', routing_key=binding_key)
+        binding_keys = ['hq.system.exception']
 
-    print(' [*] Waiting for logs. To exit press CTRL+C')
+        for binding_key in binding_keys:
+            channel.queue_bind(
+                exchange='hq.system', queue='hq-lx.system.exception', routing_key=binding_key)
 
-    def callback(ch, method, properties, body):
-        print(" [x] %r:%r" % (method.routing_key, body))
+        print(' [*] Waiting for logs. To exit press CTRL+C')
 
-    channel.basic_consume(
-        queue='hq-lx.system.exception', on_message_callback=callback, auto_ack=True)
+        def callback(ch, method, properties, body):
+            print(" [x] %r:%r" % (method.routing_key, body))
 
-    channel.start_consuming()
+        channel.basic_consume(
+            queue='hq-lx.system.exception', on_message_callback=callback, auto_ack=True)
+        print(member.value)
+
+    # channel.exchange_declare(exchange='hq.system', exchange_type='topic')
+    #
+    # result = channel.queue_declare('', exclusive=True)
+    # queue_name = result.method.queue
+    #
+    # binding_keys = ['hq.system.exception']
+    #
+    # for binding_key in binding_keys:
+    #     channel.queue_bind(
+    #         exchange='hq.system', queue='hq-lx.system.exception', routing_key=binding_key)
+    #
+    # print(' [*] Waiting for logs. To exit press CTRL+C')
+    #
+    # def callback(ch, method, properties, body):
+    #     print(" [x] %r:%r" % (method.routing_key, body))
+    #
+    # channel.basic_consume(
+    #     queue='hq-lx.system.exception', on_message_callback=callback, auto_ack=True)
+    #
+    # channel.start_consuming()
 
 
 """

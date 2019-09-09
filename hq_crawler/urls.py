@@ -19,7 +19,6 @@ import os
 from django.contrib import admin
 from django.urls import path, re_path
 
-from core.lib.start import start_deploy_scrapy, start_rabbitmq
 from hq_crawler import settings
 from core.lib.route import Route
 
@@ -27,9 +26,12 @@ from core.lib.route import Route
 启动某些应用
 """
 if settings.SPIDER_START:       # 是否启动scrapy部署
+    from core.lib.start import start_deploy_scrapy
     start_deploy_scrapy()  # 执行部署scrapy项目到scrapyd中
 
 if settings.RABBITMQ_START:     # 是否启动rabbitmq的监听
+    from core.lib.start import start_rabbitmq
+    print(1122222222)
     settings.RABBITMQ_CHANNEL = start_rabbitmq()
 
 

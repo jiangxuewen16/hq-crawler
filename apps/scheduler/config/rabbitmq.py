@@ -12,4 +12,4 @@ class RabbitMqReceive(Enum):
                                 Hqlx.exception)
 
     MMMMM = mq_receive_item('系统异常消息1', 'hq.system.exception', 'hq-crawler.system.exception', 'hq.system',
-                                Hqlx.exception)
+                            Hqlx.exception)
