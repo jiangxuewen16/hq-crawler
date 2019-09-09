@@ -66,6 +66,7 @@ class MafengwoSpotSpider(scrapy.Spider):
         # 不存在数据则新增数据
         if not spot_data:
             spot_data = Spot()
+            spot_data.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
         # spot_data.spot_id = OTA.OtaSpotIdMap.get_ota_spot_id(OTA.OtaSpotIdMap.SHI_YAN_HU.name, OTA.OtaCode.HUIQULX)       这里没什么用，到时候给及其学习来做匹配
         spot_data.ota_spot_id = response.meta['ota_spot_id']
@@ -77,8 +78,7 @@ class MafengwoSpotSpider(scrapy.Spider):
         spot_data.traffic = response.xpath('/html/body/div[2]/div[3]/div[2]/dl[1]/dd/div[1]/text()').extract_first()
         spot_data.ticket_num = 1
         spot_data.open_time = response.xpath('/html/body/div[2]/div[3]/div[2]/dl[3]/dd/text()').extract_first()
-        updateTime = response.xpath('/html/body/div[2]/div[3]/div[2]/div[2]/text()').extract_first()
-        spot_data.update_at = updateTime.split('：')[1].split(' ')[0].rstrip()
+        spot_data.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         spot_data.comment_num = \
             response.xpath('//*[@id="poi-navbar"]/ul/li[3]/a/span/text()').extract_first().split('条')[0].strip('（')
 

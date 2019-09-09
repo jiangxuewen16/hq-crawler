@@ -1,9 +1,6 @@
-from scrapyd_api import ScrapydAPI
-
 from core.common.helper import get_scrapyd_cli
 from core.lib.route import Route
 from core.lib.view import BaseView
-from hq_crawler import settings
 
 
 @Route.route(path='api/scrapy/')
