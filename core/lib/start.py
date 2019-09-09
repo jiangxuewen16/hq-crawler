@@ -23,18 +23,18 @@ def start_deploy_scrapy(scrapyd_deploy: str = ''):
 
     scrapy_project_name = spiderConf.get('deploy', 'project')  # scrapyd地址
 
-    if scrapy_project_name not in scrapyd_project_list:
-        if platform.system() == 'Windows':
-            if scrapyd_deploy != '':
-                cmd = f'cd {settings.SPIDER_PATH} && python {scrapyd_deploy} -p {scrapy_project_name}'
-            else:
-                cmd = f'cd {settings.SPIDER_PATH} && python {settings.BASE_DIR}\\venv\Scripts\\scrapyd-deploy -p {scrapy_project_name}'
-
-            status = os.system(cmd)
-            if status != 0:
-                raise Exception('windows环境执行注册scrapyd项目错误，请检查目录路径、python环境，是否已安装scrapyd、scrapyd client')
+    # if scrapy_project_name not in scrapyd_project_list:
+    if platform.system() == 'Windows':
+        if scrapyd_deploy != '':
+            cmd = f'cd {settings.SPIDER_PATH} && python {scrapyd_deploy} -p {scrapy_project_name}'
         else:
-            os.system(f'cd ./spiders && scrapyd-deploy -p {scrapy_project_name}')
+            cmd = f'cd {settings.SPIDER_PATH} && python {settings.BASE_DIR}\\venv\Scripts\\scrapyd-deploy -p {scrapy_project_name}'
+
+        status = os.system(cmd)
+        if status != 0:
+            raise Exception('windows环境执行注册scrapyd项目错误，请检查目录路径、python环境，是否已安装scrapyd、scrapyd client')
+    else:
+        os.system(f'cd ./spiders && scrapyd-deploy -p {scrapy_project_name}')
 
 
 """
