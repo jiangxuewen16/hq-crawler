@@ -288,7 +288,7 @@ class MeituanCitySpot(scrapy.Spider):
         response_data = json.loads(response.body.decode('utf-8'))
         data['detail_comment'] = response_data
 
-        city_id = data['detail_basic']['poiBasicInfo']['poiInfo']['cityId']
+        city_id = data['detail_basic']['poiBasicInfo']['poiInfo']['cityId'] if 'poiInfo' not in data['detail_basic']['poiBasicInfo'] else 0
 
         url = self.base_detail_info_url.format(ota_spot_id=ota_spot_id, city_id=city_id)
         yield Request(url=url, callback=self.spot_detail_info, dont_filter=True,
