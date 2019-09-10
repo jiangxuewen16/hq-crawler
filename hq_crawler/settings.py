@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'django_apscheduler',  # 定时执行任务
-    'djcelery',  # django-celery异步包
+    # 'djcelery',  # django-celery异步包
 
 ]
 
@@ -116,13 +116,13 @@ DATABASES = {
     'default': {
         # 'ENGINE': 'django.db.backends.sqlite3',
         # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        # 'ENGINE': 'django.db.backends.mysql',
-        # 'NAME': 'hq_crawler',
-        # 'USER': 'root',
-        # 'HOST': '11.75.1.20',
-        # 'PASSWORD': '123456',
-        # 'PORT': 3306,
-        # 'OPTIONS': {'charset': 'utf8mb4'},
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'hq_crawler',
+        'USER': 'root',
+        'HOST': '11.75.1.20',
+        'PASSWORD': '123456',
+        'PORT': 3306,
+        'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
 
@@ -176,28 +176,28 @@ auto_import_module('apps.api.views')  # view包，业务代码写到此包中
 """
 定时调度任务业务包
 """
-SCHEDULER_START = False  # 是否开启调度任务
+SCHEDULER_START = True  # 是否开启调度任务
 # 定时任务业务包，定时任务写到这里
 TASK_WORK_PACKAGE = 'apps.scheduler.task'
 
 """
 惠趣采集项目配置
 """
-SPIDER_START = False  # 是否开启采集项目
+SPIDER_START = True  # 是否开启采集项目
 SPIDER_PATH = f'{BASE_DIR}/spiders/'  # 爬虫项目目录
 
 """
 rabbitmq 配置
 """
 
-import djcelery
-djcelery.setup_loader()
-
-BROKER_HOST = "localhost"
-BROKER_PORT = 5672
-BROKER_USER = "guest"
-BROKER_PASSWORD = "guest"
-BROKER_VHOST = "/"
+# import djcelery
+# djcelery.setup_loader()
+#
+# BROKER_HOST = "localhost"
+# BROKER_PORT = 5672
+# BROKER_USER = "guest"
+# BROKER_PASSWORD = "guest"
+# BROKER_VHOST = "/"
 
 RABBITMQ_START = False
 RABBITMQ_CONF = {

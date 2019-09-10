@@ -31,7 +31,7 @@ if settings.SPIDER_START:  # 是否启动scrapy部署
 
 if settings.RABBITMQ_START:  # 是否启动rabbitmq的监听
     from core.lib.start import start_rabbitmq
-    settings.RABBITMQ_CHANNEL = start_rabbitmq()
+    # settings.RABBITMQ_CHANNEL = start_rabbitmq()
 
 """
 引入定时任务核心代码，是否启动定时任务

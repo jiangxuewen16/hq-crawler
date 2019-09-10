@@ -35,9 +35,9 @@ def spot_comment():
     jobid = get_scrapyd_cli().schedule('spiders', 'fliggy_comment')
     print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
 
-#
-# @register_job(scheduler, "interval", seconds=4)
-# def spot_in_meituan():
-#     pass
+
+@register_job(scheduler, "interval", seconds=4)
+def spot_in_meituan():
+    print('#'*50)
 
 
