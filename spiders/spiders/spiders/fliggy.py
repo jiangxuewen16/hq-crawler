@@ -28,7 +28,7 @@ class FliggySpider(scrapy.Spider):
 class FliggySpotSpider(scrapy.Spider):
     name = 'fliggy_spot'
     allowed_domains = ['www.fliggy.com']
-    base_url = r'https://traveldetail.fliggy.com/item.htm?id={ota_spot_id}'
+    base_url = r'https://traveldetail.fliggy.com/item.htm?id={ota_spot_id}&spm=181.7395991.1998089960.2.122d2405nqRYtu&expiredate='
     start_urls = ['https://traveldetail.fliggy.com/item.htm?id=556487712203']
 
     def parse(self, response: HtmlResponse):
@@ -52,7 +52,10 @@ class FliggyCommentSpider(scrapy.Spider):
             for ota_child_spot_id in ota_spot_id:
                 # 更新景区的评论数量
                 url = self.start_urls[0].format(ota_spot_id=ota_child_spot_id)
-                yield Request(url=url, callback=self.parse_count, dont_filter=True,
+                headers = {
+                    'referer': FliggySpotSpider.base_url.format(ota_spot_id=ota_child_spot_id)
+                }
+                yield Request(url=url, callback=self.parse_count, dont_filter=True, headers=headers,
                               meta={'ota_spot_id': ota_child_spot_id, 'page_no': 1, 'page_size': self.page_size})
 
     def parse_page(self, response: HtmlResponse):
@@ -63,7 +66,10 @@ class FliggyCommentSpider(scrapy.Spider):
         page_size = response.meta['page_size']
         new_num = response.meta['new_num']
         comment = json_data['module']['rateList']['rateCellList']
-        count_page = math.ceil(new_num / page_size)
+        if page_size == 0:
+            count_page = 0
+        else:
+            count_page = math.ceil(new_num / page_size)
         if comment is None:
             return
         for item in comment:
@@ -99,6 +105,8 @@ class FliggyCommentSpider(scrapy.Spider):
         ota_spot_id = response.meta['ota_spot_id']
         page_no = response.meta['page_no']
         page_size = response.meta['page_size']
+        if json_data['module'] == {}:
+            return
         new_total = json_data['module']['rateList']['total']
         comment_num = spot.SpotComment.objects(ota_id=OTA.OtaCode.FLIGGY.value.id, ota_spot_id=ota_spot_id).count()
 
