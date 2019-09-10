@@ -24,6 +24,19 @@ class CtripSpider(scrapy.Spider):
                          "lang": "01", "sid": "8888", "syscode": "09", "auth": "",
                          "extension": [{"name": "protocal", "value": "https"}]}, "ver": "7.10.3.0319180000"}
 
+    @classmethod
+    def build_request_city_spot_list(cls, city_id: int, page: int, page_size: int) -> dict:
+        return {"pageid": 10320662472, "searchtype": 1, "districtid": city_id, "needfact": False, "sort": 1,
+                "pidx": page,
+                "isintion": True, "psize": page_size, "imagesize": "C_190_190", "reltype": 1,
+                "assistfilter": {"userChooseSite": str(city_id)}, "spara": "", "filters": [], "excepts": [],
+                "abtests": [],
+                "extendAssociation": [{"key": "srhtraceid", "value": "46c1b092-284f-bdfc-56f3-156811484e94"}],
+                "contentType": "json",
+                "head": {"cid": "09031136211815241931", "ctok": "", "cver": "1.0", "lang": "01", "sid": "8888",
+                         "syscode": "09", "auth": "", "extension": [{"name": "protocal", "value": "https"}]},
+                "ver": "7.14.2"}
+
     def parse(self, response: HtmlResponse):
         pass
 
@@ -82,7 +95,7 @@ class CtripSpotSpider(scrapy.Spider):
         spot_data.comment_num = response.xpath(
             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/a/text()').extract_first().strip(
             '查看条点评')
-        #print('='*20, spot_data.to_json())
+        # print('='*20, spot_data.to_json())
         yield spot_data
 
 
@@ -135,7 +148,7 @@ class CtripCommentSpider(scrapy.Spider):
             page_size = new_num
 
         page = 1
-        print('x'*15, new_total, comment_num, new_num, ota_spot_id)
+        print('x' * 15, new_total, comment_num, new_num, ota_spot_id)
         request_data = CtripSpider.build_request_data(ota_spot_id=ota_spot_id, page=page, limit=page_size)
         yield Request(url=self.start_urls[0], callback=self.parse_page, dont_filter=True,
                       method="POST",
@@ -153,7 +166,7 @@ class CtripCommentSpider(scrapy.Spider):
         ota_spot_id = response.meta['ota_spot_id']
         page = response.meta['page']
 
-        print('x'*30, page, len(json_data['data']['comments']))
+        print('x' * 30, page, len(json_data['data']['comments']))
         for item in json_data['data']['comments']:
             spot_comment = spot.SpotComment()
 
@@ -188,10 +201,76 @@ class CtripCommentSpider(scrapy.Spider):
                 page_size = data_num
             print('============', data_num, page, page_size, ota_spot_id)
             request_data = CtripSpider.build_request_data(ota_spot_id=ota_spot_id, page=page, limit=page_size)
-            print('x'*30, request_data)
+            print('x' * 30, request_data)
             yield Request(url=self.start_urls[0], callback=self.parse_page, dont_filter=True,
                           method="POST",
                           body=json.dumps(request_data),
                           headers={'Content-Type': 'application/json'},
                           meta={'page': page, 'data_num': data_num, 'ota_spot_id': ota_spot_id,
                                 'page_size': page_size})
+
+
+class CtripCitySpot(scrapy.Spider):
+    name = 'ctrip_city_spot'
+    allowed_domains = ['m.ctrip.com', 'sec-m.ctrip.com']
+
+    page_size = 20
+
+    start_urls = ['https://m.ctrip.com/webapp/ticket/citylist']  # 获取美团地区列表
+
+    base_page_url = 'https://sec-m.ctrip.com/restapi/soa2/12530/json/ticketSpotSearch?_fxpcqlniredt=09031136211815241931'
+
+    def parse(self, response: HtmlResponse):
+        city_json_str = \
+        response.body.decode('utf-8').split('window.__INITIAL_STATE__ = ', 1)[1].split('window.__APP_SETTINGS__', 1)[0]
+        city_json = json.loads(city_json_str)
+        city_json = city_json['citymap']
+        # city_json = city_json['cityList']
+
+        # for _, item in city_json.items():
+        #     if item['ctyid'] == 110000:
+        #         area_pinyin = item['py']
+        #         area_id = item['districtid']
+        #         area_name = item['name']
+        #
+        #         page = 1
+        #         url = self.base_page_url
+        #         print('=' * 20, '爬取的地址：', url)
+        #         request_data = CtripSpider.build_request_city_spot_list(area_id, page, self.page_size)
+        #         yield Request(url=url, callback=self.parse_page, dont_filter=True,
+        #                       method="POST",
+        #                       body=json.dumps(request_data),
+        #                       headers={'Content-Type': 'application/json'},
+        #                       meta={'area_pinyin': area_pinyin, 'area_name': area_name, 'page': page,
+        #                             'area_id': area_id})
+
+        area_pinyin = 'changsha'
+        area_id = 148
+        area_name = '长沙'
+
+        page = 1
+        url = self.base_page_url
+        print('=' * 20, '爬取的地址：', url)
+        request_data = CtripSpider.build_request_city_spot_list(area_id, page, self.page_size)
+        yield Request(url=url, callback=self.parse_page, dont_filter=True,
+                      method="POST",
+                      body=json.dumps(request_data),
+                      headers={'Content-Type': 'application/json'},
+                      meta={'area_pinyin': area_pinyin, 'area_name': area_name, 'page': page,
+                            'area_id': area_id})
+
+    def parse_page(self, response: HtmlResponse):
+        area_pinyin = response.meta['area_pinyin']
+        area_id = response.meta['area_id']
+        area_name = response.meta['area_name']
+        page = response.meta['page']
+        area_id = response.meta['area_id']
+
+        json_str = response.body.decode('utf-8')
+        json_data = json.loads(json_str)
+        spot_list = json_data['data']['viewspots']
+        for spot in spot_list:
+            pass
+
+
+

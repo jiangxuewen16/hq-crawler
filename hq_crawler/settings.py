@@ -112,19 +112,19 @@ WSGI_APPLICATION = 'hq_crawler.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         # 'ENGINE': 'django.db.backends.sqlite3',
-#         # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'hq_crawler',
-#         'USER': 'root',
-#         'HOST': '11.75.1.20',
-#         'PASSWORD': '123456',
-#         'PORT': 3306,
-#         'OPTIONS': {'charset': 'utf8mb4'},
-#     }
-# }
+DATABASES = {
+    'default': {
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'hq_crawler',
+        'USER': 'root',
+        'HOST': '11.75.1.20',
+        'PASSWORD': '123456',
+        'PORT': 3306,
+        'OPTIONS': {'charset': 'utf8mb4'},
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
