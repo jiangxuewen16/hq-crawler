@@ -100,7 +100,8 @@ class SpotComment:
             },
             {
                 '$match': {
-                    'create_at': {'$gte': '2017-12-04', '$lt': '2018-12-05'}
+                    'create_at': {'$gte': '2017-12-04', '$lt': '2018-12-05'},
+                    'spot_name': {'$ne': None}
                 }
             },
             {
@@ -148,7 +149,8 @@ class SpotComment:
             },
             {
                 '$match': {
-                    'create_at': {'$gte': '2019-01-30'}
+                    'create_at': {'$gte': '2019-01-30'},
+                    'spot_name': {'$ne': None}
                 }
             },
             {
@@ -189,8 +191,11 @@ class SpotComment:
                     'ota_spot_id': '$ota_spot_id',
                     'c_score': '$c_score',
                     'ota_id': '$ota_id',
-                    'ota_10005': {'$cond': [{'$eq': ['$ota_id', 10005]}, 1, 0]},
                     'ota_10001': {'$cond': [{'$eq': ['$ota_id', 10001]}, 1, 0]},
+                    'ota_10002': {'$cond': [{'$eq': ['$ota_id', 10002]}, 1, 0]},
+                    'ota_10003': {'$cond': [{'$eq': ['$ota_id', 10003]}, 1, 0]},
+                    'ota_10004': {'$cond': [{'$eq': ['$ota_id', 10004]}, 1, 0]},
+                    'ota_10005': {'$cond': [{'$eq': ['$ota_id', 10005]}, 1, 0]},
                     'spot_name': '$spot.spot_name',
                     'create_at': '$create_at'
                 }
@@ -204,6 +209,9 @@ class SpotComment:
                 '$group': {
                     '_id': '$spot_name',
                     'ota_10001_total': {'$sum': '$ota_10001'},
+                    'ota_10002_total': {'$sum': '$ota_10002'},
+                    'ota_10003_total': {'$sum': '$ota_10003'},
+                    'ota_10004_total': {'$sum': '$ota_10004'},
                     'ota_10005_total': {'$sum': '$ota_10005'}
                 }
             }
