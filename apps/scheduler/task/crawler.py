@@ -10,7 +10,7 @@ from core.lib.task import scheduler
 """
 
 
-@register_job(scheduler, "cron", hour='16', minute='52', id='spot_info')
+@register_job(scheduler, "cron", hour='02', minute='10', id='spot_info')
 def spot_info():
     jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_spot')
     print('='*30, '爬虫定时任务:::', '景区信息:::', jobid)
@@ -22,16 +22,18 @@ def spot_info():
     print('='*30, '爬虫定时任务:::', '景区信息:::', jobid)
 
 
-@register_job(scheduler, "cron", hour='2', minute='10', id='spot_comment')
+@register_job(scheduler, "interval", seconds=5 * 60 * 60)
 def spot_comment():
-    jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_spot')
-    print('=' * 30, '爬虫定时任务:::', '景区信息:::', jobid)
-    jobid = get_scrapyd_cli().schedule('spiders', 'lvmama_spot')
-    print('=' * 30, '爬虫定时任务:::', '景区信息:::', jobid)
-    jobid = get_scrapyd_cli().schedule('spiders', 'mafengwo_spot')
-    print('=' * 30, '爬虫定时任务:::', '景区信息:::', jobid)
-    jobid = get_scrapyd_cli().schedule('spiders', 'meituan_spot')
-    print('=' * 30, '爬虫定时任务:::', '景区信息:::', jobid)
+    jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_comment')
+    print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
+    jobid = get_scrapyd_cli().schedule('spiders', 'lvmama_comment')
+    print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
+    jobid = get_scrapyd_cli().schedule('spiders', 'mafengwo_comment')
+    print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
+    jobid = get_scrapyd_cli().schedule('spiders', 'meituan_comment')
+    print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
+    jobid = get_scrapyd_cli().schedule('spiders', 'fliggy_comment')
+    print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
 
 #
 # @register_job(scheduler, "interval", seconds=4)
