@@ -104,6 +104,13 @@ class PublicOpinion(BaseView):
         else:
             return self.failure(data='param ota_spot_id not exist')
 
+    # 景区分组评论测试
+    @Route.route(path='/group/test')
+    def group_test(self):
+        group_true_false = Spot.spot_comment_group()
+
+        return self.success(group_true_false)
+
     # 获取当前时间
     @Route.route(path='/now_time')
     def now_time(self):

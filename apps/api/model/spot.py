@@ -75,9 +75,9 @@ class SpotComment:
         pipeline = [
             {
                 '$lookup': {
-                    'from': "spot",
-                    'localField': "uid",
-                    'foreignField': "uid",
+                    'from': 'spot',
+                    'localField': "ota_spot_id",
+                    'foreignField': "ota_spot_id",
                     'as': "spot"
                 }
             },
@@ -88,18 +88,29 @@ class SpotComment:
                 }
             },
             {
-                '$match': {
-                    'create_at': {
-                        '$gte': '2018-12-04',
-                        '$lt': '2018-12-05'
-                    }
+                '$project': {
+                    '_id': 0,
+                    'ota_spot_id': '$ota_spot_id',
+                    'c_score': '$c_score',
+                    'score_true': {'$cond': [{'$gt': ['$c_score', 3]}, 1, 0]},
+                    'score_false': {'$cond': [{'$lte': ['$c_score', 3]}, 1, 0]},
+                    'spot_name': '$spot.spot_name',
+                    'create_at': '$create_at'
                 }
             },
-            {'$group':
-                 {'_id': {'c_score': {'$gt': ['$c_score', 3]}, 'spot_name': '$spot.spot_name'},
-                  'count': {'$sum': 1}
-                  }
-             }]
+            {
+                '$match': {
+                    'create_at': {'$gte': '2017-12-04', '$lt': '2018-12-05'}
+                }
+            },
+            {
+                '$group': {
+                    '_id': '$spot_name',
+                    'score_true_total': {'$sum': '$score_true'},
+                    'score_false_total': {'$sum': '$score_false'}
+                }
+            }
+        ]
         spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
         L = []
         for p in spot_city_s:
@@ -112,9 +123,9 @@ class SpotComment:
         pipeline = [
             {
                 '$lookup': {
-                    'from': "spot",
-                    'localField': "uid",
-                    'foreignField': "uid",
+                    'from': 'spot',
+                    'localField': "ota_spot_id",
+                    'foreignField': "ota_spot_id",
                     'as': "spot"
                 }
             },
@@ -125,17 +136,29 @@ class SpotComment:
                 }
             },
             {
-                '$match': {
-                    'create_at': {
-                        '$gte': '2019-01-30'
-                    }
+                '$project': {
+                    '_id': 0,
+                    'ota_spot_id': '$ota_spot_id',
+                    'c_score': '$c_score',
+                    'score_true': {'$cond': [{'$gt': ['$c_score', 3]}, 1, 0]},
+                    'score_false': {'$cond': [{'$lte': ['$c_score', 3]}, 1, 0]},
+                    'spot_name': '$spot.spot_name',
+                    'create_at': '$create_at'
                 }
             },
-            {'$group':
-                 {'_id': {'c_score': {'$gt': ['$c_score', 3]}, 'spot_name': '$spot.spot_name'},
-                  'count': {'$sum': 1}
-                  }
-             }]
+            {
+                '$match': {
+                    'create_at': {'$gte': '2019-01-30'}
+                }
+            },
+            {
+                '$group': {
+                    '_id': '$spot_name',
+                    'score_true_total': {'$sum': '$score_true'},
+                    'score_false_total': {'$sum': '$score_false'}
+                }
+            }
+        ]
         spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
         L = []
         for p in spot_city_s:
@@ -148,9 +171,9 @@ class SpotComment:
         pipeline = [
             {
                 '$lookup': {
-                    'from': "spot",
-                    'localField': "uid",
-                    'foreignField': "uid",
+                    'from': 'spot',
+                    'localField': "ota_spot_id",
+                    'foreignField': "ota_spot_id",
                     'as': "spot"
                 }
             },
@@ -161,23 +184,30 @@ class SpotComment:
                 }
             },
             {
+                '$project': {
+                    '_id': 0,
+                    'ota_spot_id': '$ota_spot_id',
+                    'c_score': '$c_score',
+                    'ota_id': '$ota_id',
+                    'ota_10005': {'$cond': [{'$eq': ['$ota_id', 10005]}, 1, 0]},
+                    'ota_10001': {'$cond': [{'$eq': ['$ota_id', 10001]}, 1, 0]},
+                    'spot_name': '$spot.spot_name',
+                    'create_at': '$create_at'
+                }
+            },
+            {
+                '$match': {
+                    'create_at': {'$gte': '2017-12-04', '$lt': '2018-12-05'}
+                }
+            },
+            {
                 '$group': {
-                    '_id': {
-                        'ota_id': '$ota_id',
-                        'spot_name': '$spot.spot_name'
-                    },
-                    'time': {
-                        '$last': '$create_at'
-                    },
-                    'c_score': {
-                        '$last': '$c_score'
-                    }
+                    '_id': '$spot_name',
+                    'ota_10001_total': {'$sum': '$ota_10001'},
+                    'ota_10005_total': {'$sum': '$ota_10005'}
                 }
-            }, {
-                '$sort': {
-                    'create_at': - 1
-                }
-            }]
+            }
+        ]
         spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
         L = []
         for p in spot_city_s:
@@ -233,7 +263,7 @@ class SpotComment:
                         'ota_id': '$ota_id'
                     },
                     'count': {
-                        '$sum': 1
+                        '$sum': 1  # 尝试一下$sum 加条件
                     }
                 }
             }
@@ -431,11 +461,68 @@ class Spot:
             return 0
 
     @classmethod
+    def spot_comment_group(cls):
+        pipeline = [
+            {
+                '$lookup': {
+                    'from': "spot_comment",
+                    'localField': "ota_spot_id",
+                    'foreignField': "ota_spot_id",
+                    'as': "spot_comment"
+                }
+            },
+            {
+                '$project': {
+                    '_id': 0,
+                    'spot_name': "$spot_name",
+                    'ota_spot_id': "$ota_spot_id",
+                    'c_score': "$spot_comment.c_score",
+                    'comment_create_at': "$spot_comment.create_at",
+                }
+            }
+            ,
+            {
+                '$match': {
+                    '$and': [
+                        {
+                            '$or': [
+                                {'ota_spot_id': {'$eq': 103113}},
+                                {'ota_spot_id': {'$eq': 100025}},
+                                {'ota_spot_id': {'$eq': 5427075}},
+                                {'ota_spot_id': {'$eq': 339}},
+                            ]
+                        },
+                        {
+                            'comment_create_at': {
+                                '$gte': '2017-12-04',
+                                # '$lt': '2019-12-05'
+                            }
+                        }
+                    ]
+
+                }
+            }
+        ]
+        spot_city_s = spot.Spot.objects.aggregate(*pipeline)
+        L = []
+        # sum(i > 5 for i in j)
+        for p in spot_city_s:
+            p['total_up_score'] = sum(int(i) > 3 for i in p['c_score'])
+            p['total_down_score'] = sum(int(i) <= 3 for i in p['c_score'])
+            del p['c_score']
+            L.append(dict(p))
+        return L
+
+    @classmethod
     def get_param(cls, param, in_name, default):
         if in_name in param:
             return param[in_name]
         else:
             return default
+
+    @classmethod
+    def group_true_false(cls):
+        return 1
 
 
 class SpotCity:
