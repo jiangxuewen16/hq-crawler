@@ -45,6 +45,105 @@ class OtaSpotIdMap(Enum):
                     sp_map(OtaCode.FLIGGY, [588794344226, 556745581062, 589094123107, 596577545337, 596343512896])
                     ]
 
+    YI_YANG_JIA_NIAN_HUA = [
+        sp_map(OtaCode.HUIQULX, 10003),
+        sp_map(OtaCode.MAFENGWO, 34944996),
+        sp_map(OtaCode.MEITUAN, 179283431),
+        sp_map(OtaCode.LVMAMA, 11367356),
+        sp_map(OtaCode.CTRIP, 4741361),
+        sp_map(OtaCode.FLIGGY, [584492512950])
+    ]
+
+    HUA_TIAN_XI_GU = [
+        sp_map(OtaCode.HUIQULX, 10004),
+        sp_map(OtaCode.MAFENGWO, 71460244),
+        sp_map(OtaCode.MEITUAN, 188085997),
+        sp_map(OtaCode.CTRIP, 5060343),
+        sp_map(OtaCode.FLIGGY, [586838811004])
+    ]
+
+    DONG_HU_ZHAI = [
+        sp_map(OtaCode.HUIQULX, 10005),
+        sp_map(OtaCode.MAFENGWO, 33665644),
+        sp_map(OtaCode.MEITUAN, 115915971),
+        sp_map(OtaCode.LVMAMA, 10829578),
+        sp_map(OtaCode.CTRIP, 1979030),
+        sp_map(OtaCode.FLIGGY, [584799774465, 584799774465, 584668493687, 584161482247])
+    ]
+
+    MA_REN_QI_FENG = [
+        sp_map(OtaCode.HUIQULX, 10006),
+        sp_map(OtaCode.MAFENGWO, 5436442),
+        sp_map(OtaCode.MEITUAN, 1451152),
+        sp_map(OtaCode.LVMAMA, 103177),
+        sp_map(OtaCode.CTRIP, 65169),
+        sp_map(OtaCode.FLIGGY, [556756108062, 556837833893, 593398048461, 593790142866])
+    ]
+
+    DA_MAO_SHAN = [
+        sp_map(OtaCode.HUIQULX, 10007),
+        sp_map(OtaCode.MAFENGWO, 7689642),
+        sp_map(OtaCode.MEITUAN, 41614694),
+        sp_map(OtaCode.CTRIP, 1493248),
+        sp_map(OtaCode.FLIGGY, [5840262534215, 84310398410, 584668141383, 584178969632])
+    ]
+
+    JIU_LONG_JIANG = [
+        sp_map(OtaCode.HUIQULX, 10008),
+        sp_map(OtaCode.MEITUAN, 41164719),
+        sp_map(OtaCode.LVMAMA, 160416),
+        sp_map(OtaCode.CTRIP, 140900),
+        sp_map(OtaCode.FLIGGY, [564239378083, 584355858057])
+    ]
+
+    TIAN_KONG_ZHI_CHENG = [
+        sp_map(OtaCode.HUIQULX, 10009),
+        sp_map(OtaCode.MEITUAN, 182573099),
+        sp_map(OtaCode.LVMAMA, 11945662),
+        sp_map(OtaCode.CTRIP, 5058354),
+        sp_map(OtaCode.FLIGGY, [586483633204, 586613814791, 584164696714, 584644490539, 584372973470])
+    ]
+
+    LIAN_YUN_SHAN = [
+        sp_map(OtaCode.HUIQULX, 10010),
+        sp_map(OtaCode.MAFENGWO, 33673148),
+        sp_map(OtaCode.MEITUAN, 5464367),
+        sp_map(OtaCode.LVMAMA, 102525),
+        sp_map(OtaCode.CTRIP, 1411376),
+        sp_map(OtaCode.FLIGGY, [571936340529])
+    ]
+
+    XIA_TIAN_XIA = [
+        sp_map(OtaCode.HUIQULX, 10011),
+        sp_map(OtaCode.MAFENGWO, 24960734),
+        sp_map(OtaCode.MEITUAN, 51575391),
+        sp_map(OtaCode.LVMAMA, 10650528),
+        sp_map(OtaCode.CTRIP, 1415157),
+        sp_map(OtaCode.FLIGGY, [575750404213])
+    ]
+
+    SAN_FENG_HUA_YUAN = [
+        sp_map(OtaCode.HUIQULX, 10012),
+        sp_map(OtaCode.MAFENGWO, 70048608),
+        sp_map(OtaCode.MEITUAN, 158907227),
+        sp_map(OtaCode.LVMAMA, 12210014),
+        sp_map(OtaCode.CTRIP, 3989530),
+        sp_map(OtaCode.FLIGGY, [599579181915])
+    ]
+
+    WU_JIN_SHAN = [
+        sp_map(OtaCode.HUIQULX, 10013),
+        sp_map(OtaCode.MAFENGWO, 964195),
+        sp_map(OtaCode.MEITUAN, 2498352),
+        sp_map(OtaCode.LVMAMA, 162027),
+        sp_map(OtaCode.CTRIP, 3264963),
+        sp_map(OtaCode.FLIGGY, [575750404213])
+    ]
+
+    KAI_ZHI_FENG = [
+        sp_map(OtaCode.CTRIP, 1410449),
+    ]
+
     @classmethod
     def get_ota_spot_id(cls, spot_name: str, ota_code: OtaCode) -> int:
         if spot_name not in cls.__members__:

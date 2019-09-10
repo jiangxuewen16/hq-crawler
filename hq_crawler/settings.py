@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-import configparser
 import importlib
 import os
 
@@ -46,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'django_apscheduler',  # 定时执行任务
+    'djcelery',  # django-celery异步包
 
 ]
 
@@ -183,18 +183,37 @@ TASK_WORK_PACKAGE = 'apps.scheduler.task'
 """
 惠趣采集项目配置
 """
-SPIDER_START = True  # 是否开启采集项目
+SPIDER_START = False  # 是否开启采集项目
 SPIDER_PATH = f'{BASE_DIR}/spiders/'  # 爬虫项目目录
 
 """
 rabbitmq 配置
 """
+
+import djcelery
+djcelery.setup_loader()
+
+BROKER_HOST = "localhost"
+BROKER_PORT = 5672
+BROKER_USER = "guest"
+BROKER_PASSWORD = "guest"
+BROKER_VHOST = "/"
+
 RABBITMQ_START = False
 RABBITMQ_CONF = {
     'host': '118.126.105.239',
     'port': 5672,
     'user': 'guest',
     'password': 'guest',
-    'vhost': '/'
+    'vhost': '/',
+
+    'passive': False,
+    'durable': True,
+    'auto_delete': False,
+    'exclusive': False,
+    'no_local': False,
+    'no_ack': False,
+    'nowait': False,
+    'consumer_tag': '',
 }
 RABBITMQ_CHANNEL = None  # rabbitmq连接

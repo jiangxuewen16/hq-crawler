@@ -14,7 +14,6 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 import importlib
-import os
 
 from django.contrib import admin
 from django.urls import path, re_path
@@ -25,15 +24,14 @@ from core.lib.route import Route
 """
 启动某些应用
 """
-if settings.SPIDER_START:       # 是否启动scrapy部署
+if settings.SPIDER_START:  # 是否启动scrapy部署
     from core.lib.start import start_deploy_scrapy
+
     start_deploy_scrapy()  # 执行部署scrapy项目到scrapyd中
 
-if settings.RABBITMQ_START:     # 是否启动rabbitmq的监听
+if settings.RABBITMQ_START:  # 是否启动rabbitmq的监听
     from core.lib.start import start_rabbitmq
-    print(1122222222)
     settings.RABBITMQ_CHANNEL = start_rabbitmq()
-
 
 """
 引入定时任务核心代码，是否启动定时任务
