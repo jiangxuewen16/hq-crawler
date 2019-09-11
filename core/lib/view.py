@@ -16,6 +16,7 @@ from core.lib.route import Route
 
 class BaseView(View):
     # request_param: dict = {}  # 请求数据
+    token: str = ''
 
     def __init(self):
         request = json.loads(self.request.body)
@@ -47,14 +48,13 @@ class BaseView(View):
     def request_param(self):
         return self._request_param
 
-
     """
     统一返回操作
     """
 
     @classmethod
     def __response(cls, data: dict, service_code: ServiceCode, contentType: str = 'application/json') -> HttpResponse:
-        response: dict = {'head': {'token': '', 'time': int(time.time()), 'code': service_code.value.code,
+        response: dict = {'head': {'token': cls.token, 'time': int(time.time()), 'code': service_code.value.code,
                                    'message': service_code.value.msg}, 'data': data}
 
         return HttpResponse(json.dumps(response), contentType)
