@@ -1,6 +1,14 @@
 # from spiders.items.spot.spot import Spot
+import datetime
 
 from spiders.items.spot import spot
+
+
+def get_yesterday():
+    today = datetime.date.today()
+    one_day = datetime.timedelta(days=1)
+    yesterday = today - one_day
+    return yesterday
 
 
 def get_three_type(spot_city_s):
@@ -31,8 +39,8 @@ class SpotComment:
             {
                 '$match': {
                     'create_at': {
-                        '$gte': '2018-12-04',
-                        '$lt': '2018-12-05'
+                        '$gte': str(datetime.date.today())
+                        # '$lt': '2018-12-05'
                     }
                 }
             },
@@ -54,7 +62,8 @@ class SpotComment:
             {
                 '$match': {
                     'create_at': {
-                        '$gte': '2019-01-30'
+                        '$lt': str(datetime.date.today()),
+                        '$gte': str(get_yesterday())
                     }
                 }
             },
@@ -221,7 +230,7 @@ class Spot:
             },
             {
                 '$match': {
-                    'create_at': {'$gte': '2017-12-04', '$lt': '2019-12-05'},
+                    'create_at': {'$gte': str(datetime.date.today())},
                     # 'spot_name': {'$ne': None}
                 }
             },
@@ -270,7 +279,8 @@ class Spot:
             },
             {
                 '$match': {
-                    'create_at': {'$gte': '2019-01-30'},
+                    'create_at': {'$lt': str(datetime.date.today()),
+                                  '$gte': str(get_yesterday())},
                     # 'spot_name': {'$ne': None}
                 }
             },
