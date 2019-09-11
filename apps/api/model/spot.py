@@ -288,6 +288,7 @@ class Spot:
             L.append(dict(p))
 
         return L
+
     #
 
     @classmethod
@@ -320,6 +321,7 @@ class Spot:
                     's_comment_num': 1,
                     's_sale_num': 1,
                     's_ticket_num': 1,
+                    's_img': 1,
                     'year': {'$year': "$create_at"},
                     'month': {'$month': "$create_at"},
                     'day': {'$dayOfMonth': "$create_at"},

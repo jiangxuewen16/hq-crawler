@@ -80,10 +80,10 @@ class PublicOpinion(BaseView):
         }
         sort = Spot.get_param(param=param, in_name='sort', default='create_at')
         page = Spot.get_param(param=param, in_name='page', default=1)
-        limit = Spot.get_param(param=param, in_name='limit', default=10)
+        limit = Spot.get_param(param=param, in_name='limit', default=5)
         skip = (page - 1) * limit
 
-        result = SpotComment.list_comment(condition=condition, skip=skip, limit=5, sort=sort)
+        result = SpotComment.list_comment(condition=condition, skip=skip, limit=limit, sort=sort)
         total = SpotComment.total_comment(condition=condition)
         last_page = math.ceil(total / limit)
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
@@ -96,9 +96,9 @@ class PublicOpinion(BaseView):
         s_name = Spot.get_param(param=param, in_name='s_name', default='')
         sort = Spot.get_param(param=param, in_name='sort', default='create_at')
         page = Spot.get_param(param=param, in_name='page', default=1)
-        limit = Spot.get_param(param=param, in_name='limit', default=10)
+        limit = Spot.get_param(param=param, in_name='limit', default=5)
         skip = (page - 1) * limit
-        result = Spot.list_spot(s_name=s_name, skip=skip, limit=5, sort=sort)
+        result = Spot.list_spot(s_name=s_name, skip=skip, limit=limit, sort=sort)
         total = Spot.total_spot(s_name=s_name)
         last_page = math.ceil(total / limit)
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
