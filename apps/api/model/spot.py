@@ -592,7 +592,19 @@ class SpotCity:
                             s_desc += '<img src="' + content['content'] + '"/>'
                 p['s_desc'] = s_desc
 
+            # p['s_ticket'] =
+            ticket_list = []
+            for ticket in p['s_ticket']:
+                ticket_info = {}
+                ticket_info[ticket['productType'].lower()] = []
+                for product in ticket['productModels']:
+                    info = {'name': product['title5'], 'price': product['price'], 'sale': product['newSoldsString']}
+                    ticket_info[ticket['productType'].lower()].append(info)
+
+                ticket_list.append(ticket_info)
+
+            p['s_ticket'] = ticket_list
             L = p
             print(p)
-            #L.append(dict(p))
+            # L.append(dict(p))
         return L
