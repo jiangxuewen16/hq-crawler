@@ -219,21 +219,21 @@ class SpotComment:
                             {'u_name': {'$regex': '.*' + condition['check_name'] + '.*'}},
                             {'_id': {'$regex': '.*' + condition['check_name'] + '.*'}},
                         ]},
-                        {
-                            'create_at': {
-                                '$gte': condition['begin_date'],
-                                '$lt': condition['end_date']
-                            }
-                        },
-                        {
-                            'c_score': {
-                                '$gt': condition['down_score'],
-                                '$lte': condition['up_score']
-                            }
-                        },
-                        {
-                            'ota_id': condition['ota_id']
-                        }
+                        # {
+                        #     'create_at': {
+                        #         '$gte': condition['begin_date'],
+                        #         '$lt': condition['end_date']
+                        #     }
+                        # },
+                        # {
+                        #     'c_score': {
+                        #         '$gt': condition['down_score'],
+                        #         '$lte': condition['up_score']
+                        #     }
+                        # },
+                        # {
+                        #     'ota_id': condition['ota_id']
+                        # }
                     ]
                 }
             }
@@ -255,21 +255,21 @@ class SpotComment:
                             {'u_name': {'$regex': '.*' + condition['check_name'] + '.*'}},
                             {'_id': {'$regex': '.*' + condition['check_name'] + '.*'}},
                         ]},
-                        {
-                            'create_at': {
-                                '$gte': condition['begin_date'],
-                                '$lt': condition['end_date']
-                            }
-                        },
-                        {
-                            'c_score': {
-                                '$gt': condition['down_score'],
-                                '$lte': condition['up_score']
-                            }
-                        },
-                        {
-                            'ota_id': condition['ota_id']
-                        }
+                        # {
+                        #     'create_at': {
+                        #         '$gte': condition['begin_date'],
+                        #         '$lt': condition['end_date']
+                        #     }
+                        # },
+                        # {
+                        #     'c_score': {
+                        #         '$gt': condition['down_score'],
+                        #         '$lte': condition['up_score']
+                        #     }
+                        # },
+                        # {
+                        #     'ota_id': condition['ota_id']
+                        # }
                     ]
                 }
             },
