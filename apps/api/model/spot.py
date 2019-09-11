@@ -109,12 +109,6 @@ class SpotComment:
                 '$sort': {sort: -1}
             },
             {
-                '$skip': skip
-            },
-            {
-                '$limit': limit
-            },
-            {
                 '$match': {
                     '$and': [
                         {'$or': [
@@ -138,6 +132,12 @@ class SpotComment:
                         }
                     ]
                 }
+            },
+            {
+                '$skip': skip
+            },
+            {
+                '$limit': limit
             }
         ]
         spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
@@ -298,12 +298,6 @@ class Spot:
                 '$sort': {sort: -1}
             },
             {
-                '$skip': skip
-            },
-            {
-                '$limit': limit
-            },
-            {
                 '$match': {
                     's_name': {'$regex': '.*' + s_name + '.*'}
                 }
@@ -326,7 +320,13 @@ class Spot:
                     'month': {'$month': "$create_at"},
                     'day': {'$dayOfMonth': "$create_at"},
                 }
-            }
+            },
+            {
+                '$skip': skip
+            },
+            {
+                '$limit': limit
+            },
         ]
         spot_city_s = spot.SpotCity.objects.aggregate(*pipeline)
         L = []
