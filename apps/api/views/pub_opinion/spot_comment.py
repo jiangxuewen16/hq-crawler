@@ -49,9 +49,16 @@ class PublicOpinion(BaseView):
             'end_date': Spot.get_param(param=param, in_name='end_date', default=str(datetime.datetime.now())),
             'up_score': Spot.get_param(param=param, in_name='up_score', default=6),
             'down_score': Spot.get_param(param=param, in_name='down_score', default=0),
-            'ota_spot_id': Spot.get_param(param=param, in_name='ota_spot_id', default=5427075),
+            'ota_spot_id': Spot.get_param(param=param, in_name='ota_spot_id',
+                                          default=[127339, 62931, 103113, 100025, 5427075, 339, 30067, 1515791, 162027,
+                                                   10650528, 102525, 11945662, 160416, 103177, 10829578]),
             'ota_id': Spot.get_param(param=param, in_name='ota_id', default=[10001, 10002, 10003, 10004, 10005])
         }
+        if isinstance(condition['ota_spot_id'], list):
+            condition['ota_spot_id'] = condition['ota_spot_id']
+        else:
+            condition['ota_spot_id'] = [condition['ota_spot_id']]
+
         if isinstance(condition['ota_id'], list):
             condition['ota_id'] = condition['ota_id']
         else:
