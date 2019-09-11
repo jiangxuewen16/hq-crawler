@@ -49,3 +49,9 @@ class Scrapy(BaseView):
         jobid = get_scrapyd_cli().schedule('spiders', 'meituan_city_spot')
         print('=' * 30, '爬虫定时任务:::', '美团景区列表:::', ':::', jobid)
         return self.success({'jobid': jobid})
+
+    @Route.route(path='spot/list/ctrip')
+    def spot_list_(self):
+        jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_city_spot')
+        print('=' * 30, '爬虫定时任务:::', '美团景区列表:::', ':::', jobid)
+        return self.success({'jobid': jobid})
