@@ -34,7 +34,7 @@ class PublicOpinion(BaseView):
         today_spot_comment = SpotComment.today_spot_comment()
         yesterday_spot_comment = SpotComment.yesterday_spot_comment()
 
-        last_spot_comment = SpotComment.last_spot_comment()
+        last_spot_comment = Spot.last_spot_comment()
         index_comment = {'today_total_comment': today_total_comment, 'yesterday_total_comment': yesterday_total_comment,
                          'today_spot_comment': today_spot_comment, 'yesterday_spot_comment': yesterday_spot_comment,
                          'last_spot_comment': last_spot_comment}

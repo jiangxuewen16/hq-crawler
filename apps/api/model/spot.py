@@ -169,60 +169,6 @@ class SpotComment:
         return L
 
     @classmethod
-    def last_spot_comment(cls):
-        pipeline = [
-            {
-                '$lookup': {
-                    'from': 'spot',
-                    'localField': "ota_spot_id",
-                    'foreignField': "ota_spot_id",
-                    'as': "spot"
-                }
-            },
-            {
-                '$unwind': {
-                    'path': "$spot",
-                    'preserveNullAndEmptyArrays': True
-                }
-            },
-            {
-                '$project': {
-                    '_id': 0,
-                    'ota_spot_id': '$ota_spot_id',
-                    'c_score': '$c_score',
-                    'ota_id': '$ota_id',
-                    'ota_10001': {'$cond': [{'$eq': ['$ota_id', 10001]}, 1, 0]},
-                    'ota_10002': {'$cond': [{'$eq': ['$ota_id', 10002]}, 1, 0]},
-                    'ota_10003': {'$cond': [{'$eq': ['$ota_id', 10003]}, 1, 0]},
-                    'ota_10004': {'$cond': [{'$eq': ['$ota_id', 10004]}, 1, 0]},
-                    'ota_10005': {'$cond': [{'$eq': ['$ota_id', 10005]}, 1, 0]},
-                    'spot_name': '$spot.spot_name',
-                    'create_at': '$create_at'
-                }
-            },
-            {
-                '$match': {
-                    'create_at': {'$gte': '2017-12-04', '$lt': '2018-12-05'}
-                }
-            },
-            {
-                '$group': {
-                    '_id': '$spot_name',
-                    'ota_10001_total': {'$sum': '$ota_10001'},
-                    'ota_10002_total': {'$sum': '$ota_10002'},
-                    'ota_10003_total': {'$sum': '$ota_10003'},
-                    'ota_10004_total': {'$sum': '$ota_10004'},
-                    'ota_10005_total': {'$sum': '$ota_10005'}
-                }
-            }
-        ]
-        spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
-        L = []
-        for p in spot_city_s:
-            L.append(dict(p))
-        return L
-
-    @classmethod
     def count_comment(cls, condition):
         pipeline = [
             {
@@ -518,6 +464,50 @@ class Spot:
             p['total_up_score'] = sum(int(i) > 3 for i in p['c_score'])
             p['total_down_score'] = sum(int(i) <= 3 for i in p['c_score'])
             del p['c_score']
+            L.append(dict(p))
+        return L
+
+    @classmethod
+    def last_spot_comment(cls):
+        pipeline = [
+            {
+                '$lookup': {
+                    'from': 'spot_comment',
+                    'localField': 'ota_spot_id',
+                    'foreignField': 'ota_spot_id',
+                    'as': 'spot_comments'
+                }
+            },
+            {
+                '$unwind': {
+                    'path': "$spot_comments",
+                    'preserveNullAndEmptyArrays': True
+                }
+            },
+            {
+                '$group': {
+                    '_id': {'ota_spot_id': '$ota_spot_id', 'spot_name': '$spot_name', 'ota_id': '$ota_id'},
+                    'c_score': {'$first': "$spot_comments.c_score"},
+                    'create_at': {'$first': "$spot_comments.create_at"}
+                }
+            },
+            {
+                '$sort': {'create_at': -1}
+            },
+            {
+                '$group': {
+                    '_id': {'ota_spot_id': '$_id.ota_spot_id', 'spot_name': '$_id.spot_name'},
+                    'ota_10001_score': {'$sum': {'$cond': [{'$eq': ['$_id.ota_id', 10001]}, '$c_score', 0]}},
+                    'ota_10002_score': {'$sum': {'$cond': [{'$eq': ['$_id.ota_id', 10002]}, '$c_score', 0]}},
+                    'ota_10003_score': {'$sum': {'$cond': [{'$eq': ['$_id.ota_id', 10003]}, '$c_score', 0]}},
+                    'ota_10004_score': {'$sum': {'$cond': [{'$eq': ['$_id.ota_id', 10004]}, '$c_score', 0]}},
+                    'ota_10005_score': {'$sum': {'$cond': [{'$eq': ['$_id.ota_id', 10005]}, '$c_score', 0]}},
+                }
+            }
+        ]
+        spot_city_s = spot.Spot.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
             L.append(dict(p))
         return L
 
