@@ -72,11 +72,11 @@ class PublicOpinion(BaseView):
         param = self.request_param
         condition = {
             'check_name': Spot.get_param(param=param, in_name='check_name', default=''),
-            'begin_date': Spot.get_param(param=param, in_name='begin_date', default=str(datetime.date.today())),
+            'begin_date': Spot.get_param(param=param, in_name='begin_date', default='1990-07-18'),
             'end_date': Spot.get_param(param=param, in_name='end_date', default=str(datetime.datetime.now())),
             'up_score': Spot.get_param(param=param, in_name='up_score', default=6),
             'down_score': Spot.get_param(param=param, in_name='down_score', default=0),
-            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=10001)
+            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=10002)
         }
         sort = Spot.get_param(param=param, in_name='sort', default='create_at')
         page = Spot.get_param(param=param, in_name='page', default=1)
