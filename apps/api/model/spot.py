@@ -579,10 +579,10 @@ class SpotCity:
             if p['ota_id'] == OTA.OtaCode.MEITUAN.value.id:
                 p['s_notes'] = [item['text'] for note in p['s_notes'] for item in note['contents']]
             elif p['ota_id'] == OTA.OtaCode.CTRIP.value.id:
-                p['s_notes'] = [note['subtitle'] + ':' + item['desc'] for note in p['s_notes'] for item in note['desclist']]
+                p['s_notes'] = [note['subtitle'] + ':' + item['desc'] for note in p['s_notes'] for item in
+                                note['desclist']]
 
-
-            if isinstance(p['s_desc'], list):
+            if p['ota_id'] == OTA.OtaCode.MEITUAN.value.id:
                 s_desc = ''
                 for desc in p['s_desc']:
                     contents = desc['contents']
