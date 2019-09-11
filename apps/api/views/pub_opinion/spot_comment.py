@@ -52,7 +52,7 @@ class PublicOpinion(BaseView):
             'ota_spot_id': Spot.get_param(param=param, in_name='ota_spot_id', default=5427075),
             'ota_id': Spot.get_param(param=param, in_name='ota_id', default=10001)
         }
-        result = SpotComment.count_comment(condition=condition)
+        result = Spot.count_comment(condition=condition)
         return self.success(result)
 
     # 评价列表接口

@@ -199,6 +199,6 @@ class MafengwoCommentSpider(scrapy.Spider):
         score = response.xpath('/html/body/div[2]/section[1]/div[1]/div[1]/div[1]/strong/text()').extract_first()
         spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.MAFENGWO.value.id,
                                       ota_spot_id=response.meta['ota_spot_id']).first()
-        spot_data.spot_score = float(score)
+        spot_data.spot_score = float(score) if score else 0
 
         yield spot_data

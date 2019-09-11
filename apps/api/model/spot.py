@@ -169,66 +169,6 @@ class SpotComment:
         return L
 
     @classmethod
-    def count_comment(cls, condition):
-        pipeline = [
-            {
-                '$lookup': {
-                    'from': "spot",
-                    'localField': "uid",
-                    'foreignField': "uid",
-                    'as': "spot"
-                }
-            },
-            {
-                '$unwind': {
-                    'path': "$spot",
-                    'preserveNullAndEmptyArrays': True
-                }
-            },
-            {
-                '$match': {
-                    '$and': [
-                        {
-                            'create_at': {
-                                '$gte': condition['begin_date'],
-                                '$lt': condition['end_date']
-                            }
-                        },
-                        {
-                            'c_score': {
-                                '$gt': condition['down_score'],
-                                '$lte': condition['up_score']
-                            }
-                        },
-                        {
-                            'ota_id': condition['ota_id']
-                        },
-                        {
-                            'ota_spot_id': condition['ota_spot_id']
-                        }
-                    ]
-                }
-            },
-            {
-                '$group': {
-                    '_id': {
-                        'c_score': {'$gt': ['$c_score', 3]},
-                        'spot_name': '$spot.spot_name',
-                        'ota_id': '$ota_id'
-                    },
-                    'count': {
-                        '$sum': 1  # 尝试一下$sum 加条件
-                    }
-                }
-            }
-        ]
-        spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
-        L = []
-        for p in spot_city_s:
-            L.append(dict(p))
-        return L
-
-    @classmethod
     def list_comment(cls, condition, skip, limit, sort):
         pipeline = [
             {
@@ -502,6 +442,75 @@ class Spot:
                     'ota_10003_score': {'$sum': {'$cond': [{'$eq': ['$_id.ota_id', 10003]}, '$c_score', 0]}},
                     'ota_10004_score': {'$sum': {'$cond': [{'$eq': ['$_id.ota_id', 10004]}, '$c_score', 0]}},
                     'ota_10005_score': {'$sum': {'$cond': [{'$eq': ['$_id.ota_id', 10005]}, '$c_score', 0]}},
+                }
+            }
+        ]
+        spot_city_s = spot.Spot.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p))
+        return L
+
+    @classmethod
+    def count_comment(cls, condition):
+        pipeline = [
+            {
+                '$lookup': {
+                    'from': "spot_comment",
+                    'localField': "ota_spot_id",
+                    'foreignField': "ota_spot_id",
+                    'as': "spot_comments"
+                }
+            },
+            {
+                '$unwind': {
+                    'path': "$spot_comments",
+                    'preserveNullAndEmptyArrays': True
+                }
+            },
+            {
+                '$project': {
+                    '_id': 0,
+                    'ota_id': '$spot_comments.ota_id',
+                    'ota_spot_id': '$ota_spot_id',
+                    'spot_name': '$spot_name',
+                    'c_score': '$spot_comments.c_score',
+                    'score_true': {'$cond': [{'$gt': ['$spot_comments.c_score', 3]}, 1, 0]},
+                    'score_false': {'$cond': [{'$lte': ['$spot_comments.c_score', 3]}, 1, 0]},
+                    'score_total': {'$cond': [{'$lte': ['$spot_comments.c_score', 3]}, 1, 1]},
+                    'create_at': '$spot_comments.create_at'
+                }
+            },
+            {
+                '$match': {
+                    '$and': [
+                        {
+                            'create_at': {
+                                '$gte': condition['begin_date'],
+                                '$lt': condition['end_date']
+                            }
+                        },
+                        {
+                            'c_score': {
+                                '$gt': condition['down_score'],
+                                '$lte': condition['up_score']
+                            }
+                        },
+                        # {
+                        #     'ota_id': condition['ota_id']
+                        # },
+                        # {
+                        #     'ota_spot_id': condition['ota_spot_id']
+                        # }
+                    ]
+                }
+            },
+            {
+                '$group': {
+                    '_id': {'spot_name': '$spot_name', 'ota_spot_id': '$ota_spot_id', 'ota_id': '$ota_id'},
+                    'score_true_total': {'$sum': '$score_true'},
+                    'score_false_total': {'$sum': '$score_false'},
+                    'score_total': {'$sum': '$score_total'}
                 }
             }
         ]
