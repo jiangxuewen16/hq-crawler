@@ -288,6 +288,7 @@ class Spot:
             L.append(dict(p))
 
         return L
+    #
 
     @classmethod
     def list_spot(cls, s_name, skip, limit, sort):
