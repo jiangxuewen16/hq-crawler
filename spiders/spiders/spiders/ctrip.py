@@ -25,14 +25,28 @@ class CtripSpider(scrapy.Spider):
                          "extension": [{"name": "protocal", "value": "https"}]}, "ver": "7.10.3.0319180000"}
 
     @classmethod
-    def build_request_city_spot_list(cls, city_id: int, page: int, page_size: int) -> dict:
-        return {"pageid": 10320662472, "searchtype": 1, "districtid": city_id, "needfact": False, "sort": 1,
+    def build_request_city_spot_list(cls, area_id: int, page: int, page_size: int) -> dict:
+        return {"pageid": 10320662472, "searchtype": 1, "districtid": area_id, "needfact": False, "sort": 1,
                 "pidx": page,
                 "isintion": True, "psize": page_size, "imagesize": "C_190_190", "reltype": 1,
-                "assistfilter": {"userChooseSite": str(city_id)}, "spara": "", "filters": [], "excepts": [],
+                "assistfilter": {"userChooseSite": str(area_id)}, "spara": "", "filters": [], "excepts": [],
                 "abtests": [],
                 "extendAssociation": [{"key": "srhtraceid", "value": "46c1b092-284f-bdfc-56f3-156811484e94"}],
                 "contentType": "json",
+                "head": {"cid": "09031136211815241931", "ctok": "", "cver": "1.0", "lang": "01", "sid": "8888",
+                         "syscode": "09", "auth": "", "extension": [{"name": "protocal", "value": "https"}]},
+                "ver": "7.14.2"}
+
+    @classmethod
+    def build_request_spot_detail(cls, spot_id):
+        return {"spotid": spot_id, "pageid": 10320662470, "imgsize": "C_640_360", "contentType": "json",
+                "head": {"cid": "09031136211815241931", "ctok": "", "cver": "1.0", "lang": "01", "sid": "8888",
+                         "syscode": "09", "auth": "", "extension": [{"name": "protocal", "value": "https"}]},
+                "ver": "8.3.2"}
+
+    @classmethod
+    def build_request_hotel_ticket(cls, spot_id):
+        return {"id": spot_id, "limit": 20, "pageid": 10320662470, "contentType": "json",
                 "head": {"cid": "09031136211815241931", "ctok": "", "cver": "1.0", "lang": "01", "sid": "8888",
                          "syscode": "09", "auth": "", "extension": [{"name": "protocal", "value": "https"}]},
                 "ver": "7.14.2"}
@@ -219,10 +233,17 @@ class CtripCitySpot(scrapy.Spider):
     start_urls = ['https://m.ctrip.com/webapp/ticket/citylist']  # 获取美团地区列表
 
     base_page_url = 'https://sec-m.ctrip.com/restapi/soa2/12530/json/ticketSpotSearch?_fxpcqlniredt=09031136211815241931'
+    # 跟团游
+    # base_category_recommend_url = 'https://sec-m.ctrip.com/restapi/soa2/12530/json/getRecommendProductByCategoryPoi?_fxpcqlniredt=09031136211815241931'
+    # 酒+景
+    base_hotel_recommend_url = 'https://sec-m.ctrip.com/restapi/soa2/12530/json/viewHotelRecommend?_fxpcqlniredt=09031136211815241931'
+    # 景区详情
+    base_spot_detail_url = 'https://sec-m.ctrip.com/restapi/soa2/12530/json/scenicSpotDetails?_fxpcqlniredt=09031136211815241931'
 
     def parse(self, response: HtmlResponse):
         city_json_str = \
-        response.body.decode('utf-8').split('window.__INITIAL_STATE__ = ', 1)[1].split('window.__APP_SETTINGS__', 1)[0]
+            response.body.decode('utf-8').split('window.__INITIAL_STATE__ = ', 1)[1].split('window.__APP_SETTINGS__',
+                                                                                           1)[0]
         city_json = json.loads(city_json_str)
         city_json = city_json['citymap']
         # city_json = city_json['cityList']
@@ -241,12 +262,10 @@ class CtripCitySpot(scrapy.Spider):
         #                       method="POST",
         #                       body=json.dumps(request_data),
         #                       headers={'Content-Type': 'application/json'},
-        #                       meta={'area_pinyin': area_pinyin, 'area_name': area_name, 'page': page,
-        #                             'area_id': area_id})
+        #                       meta={'area_pinyin': area_pinyin, 'area_id': area_id, 'page': page})
 
         area_pinyin = 'changsha'
         area_id = 148
-        area_name = '长沙'
 
         page = 1
         url = self.base_page_url
@@ -256,21 +275,101 @@ class CtripCitySpot(scrapy.Spider):
                       method="POST",
                       body=json.dumps(request_data),
                       headers={'Content-Type': 'application/json'},
-                      meta={'area_pinyin': area_pinyin, 'area_name': area_name, 'page': page,
-                            'area_id': area_id})
+                      meta={'area_pinyin': area_pinyin, 'area_id': area_id, 'page': page})
 
     def parse_page(self, response: HtmlResponse):
         area_pinyin = response.meta['area_pinyin']
-        area_id = response.meta['area_id']
-        area_name = response.meta['area_name']
         page = response.meta['page']
+        ota_id = OTA.OtaCode.CTRIP.value.id
         area_id = response.meta['area_id']
 
         json_str = response.body.decode('utf-8')
         json_data = json.loads(json_str)
         spot_list = json_data['data']['viewspots']
-        for spot in spot_list:
-            pass
+        for item in spot_list:
+            print('+'*30, item['name'], item['cityname'], item['districtId'])
+            if item['districtId'] != area_id:       # 如果地区id不是需要查询的地区id直接退出
+                print('+' * 30, item)
+                continue
 
+            ota_spot_id = item['id']
+            spot_city = spot.SpotCity.objects(ota_id=ota_id, ota_spot_id=ota_spot_id).first()
+            # 不存在数据则新增数据,增量爬取
+            if not spot_city:
+                spot_city = spot.SpotCity()
+                spot_city.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
+            spot_city.ota_spot_id = ota_spot_id
+            spot_city.area_name = item['cityname']
+            spot_city.area_id = item['districtId']
+            spot_city.ota_id = ota_id
+            spot_city.area_pinyin = area_pinyin
 
+            spot_city.s_name = item['name']
+            spot_city.s_score = item['cmtscore']
+
+            spot_city.lat = item['vslat']
+            spot_city.lng = item['vslon']
+            spot_city.s_sale_num = item['annualsales']
+            spot_city.s_comment_num = item['commentCount']
+            spot_city.s_img = item['cimgurl']
+            spot_city.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+            # spot_city.s_level = ???
+
+            # spot_city.save(force_insert=False, validate=False, clean=True)      #保存景区信息
+
+            request_data = CtripSpider.build_request_spot_detail(ota_spot_id)
+            yield Request(url=self.base_spot_detail_url, callback=self.spot_detail, dont_filter=True,
+                          method="POST",
+                          body=json.dumps(request_data),
+                          headers={'Content-Type': 'application/json'},
+                          meta={'spot_city': spot_city})
+
+        page += 1
+        if page < 5:
+            url = self.base_page_url
+            request_data = CtripSpider.build_request_city_spot_list(area_id, page, self.page_size)
+            yield Request(url=url, callback=self.parse_page, dont_filter=True,
+                          method="POST",
+                          body=json.dumps(request_data),
+                          headers={'Content-Type': 'application/json'},
+                          meta={'area_pinyin': area_pinyin, 'area_id': area_id, 'page': page})
+
+    def spot_detail(self, response: HtmlResponse):
+        spot_city = response.meta['spot_city']
+
+        #print('=' * 30, spot_city.s_name)
+
+        json_str = response.body.decode('utf-8')
+        json_data = json.loads(json_str)
+
+        spot_detail = json_data['data']
+
+        spot_city.s_addr = spot_detail['address']
+        spot_city.city_id = spot_detail['gscid']
+        spot_city.city_name = spot_detail['gscname']
+        spot_city.s_notes = spot_detail['painfos']
+        spot_city.s_desc = spot_detail['prodes']
+        spot_city.s_ticket_num = len(spot_detail['resources'])
+        spot_city.s_ticket = {'spot_ticket': spot_detail['resources']}
+
+        request_data = CtripSpider.build_request_hotel_ticket(spot_city.ota_spot_id)
+        yield Request(url=self.base_hotel_recommend_url, callback=self.spot_hotel, dont_filter=True,
+                      method="POST",
+                      body=json.dumps(request_data),
+                      headers={'Content-Type': 'application/json'},
+                      meta={'spot_city': spot_city})
+
+    def spot_hotel(self, response: HtmlResponse):
+        spot_city = response.meta['spot_city']
+
+        json_str = response.body.decode('utf-8')
+        json_data = json.loads(json_str)
+
+        spot_hotel_product = json_data['data']['recommends']
+        print('=' * 30, spot_city.s_name, spot_city.s_ticket_num, spot_city.city_name)
+        spot_city.s_ticket_num = len(spot_hotel_product)
+        spot_city.s_ticket['spot_hotel'] = spot_hotel_product
+
+        yield spot_city
