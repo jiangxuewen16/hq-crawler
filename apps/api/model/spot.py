@@ -282,10 +282,10 @@ class SpotComment:
         L = []
         for p in count:
             L.append(dict(p))
-        if 0 in L:
-            return L[0]['count']
-        else:
+        if len(L) < 1:
             return 0
+        else:
+            return L[0]['count']
 
 
 class Spot:
@@ -349,10 +349,10 @@ class Spot:
         L = []
         for p in count:
             L.append(dict(p))
-        if 0 in L:
-            return L[0]['count']
-        else:
+        if len(L) < 1:
             return 0
+        else:
+            return L[0]['count']
 
     @classmethod
     def spot_comment_group(cls):
