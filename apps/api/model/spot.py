@@ -551,26 +551,26 @@ class Spot:
 class SpotCity:
     @classmethod
     def detail_spot(cls, ota_spot_id):
-        spot_city = spot.SpotCity.objects(ota_spot_id=ota_spot_id).fields(slice__comments=[5, 10]).first()
-        print(spot_city.to_mongo())
-        # pipeline = [
-        #     {
-        #         '$match': {
-        #             'ota_spot_id': {
-        #                 '$eq': ota_spot_id
-        #             }
-        #         }
-        #     },
-        #     {
-        #         '$project': {
-        #             '_id': 0,
-        #             'create_at': 0,
-        #             'update_at': 0
-        #         }
-        #     }
-        # ]
-        # spot_city_s = spot.SpotCity.objects.aggregate(*pipeline)
-        # L = []
-        # for p in spot_city_s:
-        #     L.append(dict(p))
-        # return L
+        # spot_city = spot.SpotCity.objects(ota_spot_id=ota_spot_id).fields(slice__comments=[5, 10]).first()
+        # print(spot_city.to_mongo())
+        pipeline = [
+            {
+                '$match': {
+                    'ota_spot_id': {
+                        '$eq': ota_spot_id
+                    }
+                }
+            },
+            {
+                '$project': {
+                    '_id': 0,
+                    'create_at': 0,
+                    'update_at': 0
+                }
+            }
+        ]
+        spot_city_s = spot.SpotCity.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p))
+        return L

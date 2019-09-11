@@ -109,7 +109,7 @@ class PublicOpinion(BaseView):
     def detail_spot(self):
         param = self.request_param
         if 'ota_spot_id' in param:
-            ota_spot_id = param['ota_spot_id']
+            ota_spot_id = int(param['ota_spot_id'])
             result = SpotCity.detail_spot(ota_spot_id=ota_spot_id)
             return self.success(result)
         else:
