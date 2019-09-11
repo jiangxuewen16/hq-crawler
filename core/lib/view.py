@@ -52,9 +52,8 @@ class BaseView(View):
     统一返回操作
     """
 
-    @classmethod
-    def __response(cls, data: dict, service_code: ServiceCode, contentType: str = 'application/json') -> HttpResponse:
-        response: dict = {'head': {'token': cls.token, 'time': int(time.time()), 'code': service_code.value.code,
+    def __response(self, data: dict, service_code: ServiceCode, contentType: str = 'application/json') -> HttpResponse:
+        response: dict = {'head': {'token': self.token, 'time': int(time.time()), 'code': service_code.value.code,
                                    'message': service_code.value.msg}, 'data': data}
 
         return HttpResponse(json.dumps(response), contentType)
@@ -63,14 +62,12 @@ class BaseView(View):
     成功返回方法
     """
 
-    @classmethod
-    def success(cls, data: dict, service_code: ServiceCode = ServiceCode.other_success) -> HttpResponse:
-        return cls.__response(data, service_code)
+    def success(self, data: dict, service_code: ServiceCode = ServiceCode.other_success) -> HttpResponse:
+        return self.__response(data, service_code)
 
     """
     失败返回方法
     """
 
-    @classmethod
-    def failure(cls, service_code: ServiceCode = ServiceCode.other_failure, data: dict = None) -> HttpResponse:
-        return cls.__response(data, service_code)
+    def failure(self, service_code: ServiceCode = ServiceCode.other_failure, data: dict = None) -> HttpResponse:
+        return self.__response(data, service_code)

@@ -112,6 +112,7 @@ class SpotComment:
                     'c_content': "$c_content",
                     'c_img': "$c_img",
                     'create_at': "$create_at",
+                    'update_at': "$update_at",
                     'spot_name': "$spot.spot_name"
                 }
             },
