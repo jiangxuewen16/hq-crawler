@@ -369,7 +369,7 @@ class CtripCitySpot(scrapy.Spider):
 
         spot_hotel_product = json_data['data']['recommends']
         print('=' * 30, spot_city.s_name, spot_city.s_ticket_num, spot_city.city_name)
-        spot_city.s_ticket_num = len(spot_hotel_product)
+        spot_city.s_ticket_num += len(spot_hotel_product)
         spot_city.s_ticket['spot_hotel'] = spot_hotel_product
 
         yield spot_city
