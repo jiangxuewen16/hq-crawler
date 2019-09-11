@@ -573,6 +573,8 @@ class SpotCity:
             # print(p)
             p['create_at'] = p['create_at'].strftime("%Y-%m-%d %H:%M:%S")
             p['update_at'] = p['update_at'].strftime("%Y-%m-%d %H:%M:%S")
+
+            p['s_notes'] = [item['text'] for note in p['s_notes'] for item in note['contents']]
             L = p
             print(p)
             #L.append(dict(p))
