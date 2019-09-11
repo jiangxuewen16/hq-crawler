@@ -248,34 +248,34 @@ class CtripCitySpot(scrapy.Spider):
         city_json = city_json['citymap']
         # city_json = city_json['cityList']
 
-        # for _, item in city_json.items():
-        #     if item['ctyid'] == 110000:
-        #         area_pinyin = item['py']
-        #         area_id = item['districtid']
-        #         area_name = item['name']
+        for _, item in city_json.items():
+            if item['ctyid'] == 110000:
+                area_pinyin = item['py']
+                area_id = item['districtid']
+                # area_name = item['name']
+
+                page = 1
+                url = self.base_page_url
+                print('=' * 20, '爬取的地址：', url)
+                request_data = CtripSpider.build_request_city_spot_list(area_id, page, self.page_size)
+                yield Request(url=url, callback=self.parse_page, dont_filter=True,
+                              method="POST",
+                              body=json.dumps(request_data),
+                              headers={'Content-Type': 'application/json'},
+                              meta={'area_pinyin': area_pinyin, 'area_id': area_id, 'page': page})
+
+        # area_pinyin = 'changsha'
+        # area_id = 148
         #
-        #         page = 1
-        #         url = self.base_page_url
-        #         print('=' * 20, '爬取的地址：', url)
-        #         request_data = CtripSpider.build_request_city_spot_list(area_id, page, self.page_size)
-        #         yield Request(url=url, callback=self.parse_page, dont_filter=True,
-        #                       method="POST",
-        #                       body=json.dumps(request_data),
-        #                       headers={'Content-Type': 'application/json'},
-        #                       meta={'area_pinyin': area_pinyin, 'area_id': area_id, 'page': page})
-
-        area_pinyin = 'changsha'
-        area_id = 148
-
-        page = 1
-        url = self.base_page_url
-        print('=' * 20, '爬取的地址：', url)
-        request_data = CtripSpider.build_request_city_spot_list(area_id, page, self.page_size)
-        yield Request(url=url, callback=self.parse_page, dont_filter=True,
-                      method="POST",
-                      body=json.dumps(request_data),
-                      headers={'Content-Type': 'application/json'},
-                      meta={'area_pinyin': area_pinyin, 'area_id': area_id, 'page': page})
+        # page = 1
+        # url = self.base_page_url
+        # print('=' * 20, '爬取的地址：', url)
+        # request_data = CtripSpider.build_request_city_spot_list(area_id, page, self.page_size)
+        # yield Request(url=url, callback=self.parse_page, dont_filter=True,
+        #               method="POST",
+        #               body=json.dumps(request_data),
+        #               headers={'Content-Type': 'application/json'},
+        #               meta={'area_pinyin': area_pinyin, 'area_id': area_id, 'page': page})
 
     def parse_page(self, response: HtmlResponse):
         area_pinyin = response.meta['area_pinyin']
@@ -369,7 +369,7 @@ class CtripCitySpot(scrapy.Spider):
 
         spot_hotel_product = json_data['data']['recommends']
         print('=' * 30, spot_city.s_name, spot_city.s_ticket_num, spot_city.city_name)
-        spot_city.s_ticket_num = len(spot_hotel_product)
+        spot_city.s_ticket_num += len(spot_hotel_product)
         spot_city.s_ticket['spot_hotel'] = spot_hotel_product
 
         yield spot_city

@@ -46,10 +46,10 @@ class LvmamaSpotSpider(scrapy.Spider):
         spot_data.ota_id = OTA.OtaCode.LVMAMA.value.id
         spot_data.ota_spot_id = response.meta['ota_spot_id']
         spot_data.spot_name = response.xpath('//body/div[4]/div/div[2]/div/div/h1/text()').extract_first()
-        spot_data.spot_score = float(
-            response.xpath('//*[@id="comments"]/div[2]/div[1]/div/div[1]/i/text()').extract_first())
-        spot_data.comment_num = float(
-            response.xpath('//*[@id="comments"]/div[2]/div[1]/div/div[1]/em[2]/a/text()').extract_first())
+        score = response.xpath('//*[@id="comments"]/div[2]/div[1]/div/div[1]/i/text()').extract_first()
+        spot_data.spot_score = float(score) if score else 0
+        comment_num = response.xpath('//*[@id="comments"]/div[2]/div[1]/div/div[1]/em[2]/a/text()').extract_first()
+        spot_data.comment_num = float(comment_num) if comment_num else 0
         spot_data.spot_favorable = response.xpath('//*[@id="comments"]/div[2]/div[1]/div/div[1]/em[1]/text()') \
             .extract_first()
         spot_data.open_time = response.xpath(
