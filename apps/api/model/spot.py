@@ -2,6 +2,7 @@
 import datetime
 import json
 
+from spiders.common import OTA
 from spiders.items.spot import spot
 
 
@@ -575,8 +576,13 @@ class SpotCity:
             p['create_at'] = p['create_at'].strftime("%Y-%m-%d %H:%M:%S")
             p['update_at'] = p['update_at'].strftime("%Y-%m-%d %H:%M:%S")
 
-            p['s_notes'] = [item['text'] for note in p['s_notes'] for item in note['contents']]
-            if isinstance(p['s_desc'], list) :
+            if p['ota_id'] == OTA.OtaCode.MEITUAN.value.id:
+                p['s_notes'] = [item['text'] for note in p['s_notes'] for item in note['contents']]
+            elif p['ota_id'] == OTA.OtaCode.CTRIP.value.id:
+                p['s_notes'] = [note['subtitle'] + ':' + item['desc'] for note in p['s_notes'] for item in note['desclist']]
+
+
+            if isinstance(p['s_desc'], list):
                 s_desc = ''
                 for desc in p['s_desc']:
                     contents = desc['contents']
@@ -594,16 +600,17 @@ class SpotCity:
                 p['s_desc'] = s_desc
 
             # p['s_ticket'] =
-            ticket_info = {}
-            for ticket in p['s_ticket']:
-                ticket_info[ticket['productType'].lower()] = []
-                for product in ticket['productModels']:
-                    info = {'name': product['title5'], 'price': product['price'], 'sale': product['newSoldsString']}
-                    ticket_info[ticket['productType'].lower()].append(info)
+            if p['ota_id'] == OTA.OtaCode.MEITUAN.value.id:
+                ticket_info = {}
+                for ticket in p['s_ticket']:
+                    ticket_info[ticket['productType'].lower()] = []
+                    for product in ticket['productModels']:
+                        info = {'name': product['title5'], 'price': product['price'], 'sale': product['newSoldsString']}
+                        ticket_info[ticket['productType'].lower()].append(info)
 
-                # append(ticket_info)
+                    # append(ticket_info)
 
-            p['s_ticket'] = ticket_info
+                p['s_ticket'] = ticket_info
             L = p
             print(p)
             # L.append(dict(p))
