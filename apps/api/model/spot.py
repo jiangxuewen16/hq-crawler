@@ -593,17 +593,16 @@ class SpotCity:
                 p['s_desc'] = s_desc
 
             # p['s_ticket'] =
-            ticket_list = []
+            ticket_info = {}
             for ticket in p['s_ticket']:
-                ticket_info = {}
                 ticket_info[ticket['productType'].lower()] = []
                 for product in ticket['productModels']:
                     info = {'name': product['title5'], 'price': product['price'], 'sale': product['newSoldsString']}
                     ticket_info[ticket['productType'].lower()].append(info)
 
-                ticket_list.append(ticket_info)
+                # append(ticket_info)
 
-            p['s_ticket'] = ticket_list
+            p['s_ticket'] = ticket_info
             L = p
             print(p)
             # L.append(dict(p))
