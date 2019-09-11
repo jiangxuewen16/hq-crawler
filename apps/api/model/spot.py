@@ -329,6 +329,8 @@ class Spot:
                     'year': {'$year': "$create_at"},
                     'month': {'$month': "$create_at"},
                     'day': {'$dayOfMonth': "$create_at"},
+                    'create_at': {'$toString': {'$toDate': "$create_at"}},
+                    'update_at': {'$toString': {'$toDate': "$update_at"}}
                 }
             },
             {
