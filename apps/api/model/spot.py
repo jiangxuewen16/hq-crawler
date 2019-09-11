@@ -568,7 +568,12 @@ class SpotCity:
             }
         ]
         spot_city_s = spot.SpotCity.objects.aggregate(*pipeline)
-        L = []
+        L = {}
         for p in spot_city_s:
-            L.append(dict(p))
+            # print(p)
+            p['create_at'] = p['create_at'].strftime("%Y-%m-%d %H:%M:%S")
+            p['update_at'] = p['update_at'].strftime("%Y-%m-%d %H:%M:%S")
+            L = p
+            print(p)
+            #L.append(dict(p))
         return L
