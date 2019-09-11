@@ -71,7 +71,8 @@ class SpotCity(BaseItem, mongoengine.Document):
 
     city_id = mongoengine.IntField()  # 城市id
     area_pinyin = mongoengine.StringField(max_length=200)  # 城市名称拼音
-    area_name = mongoengine.StringField(max_length=100)  # 城市名称拼音
+    area_id = mongoengine.IntField()  # 地区id
+    area_name = mongoengine.StringField(max_length=100)  # 地区名称
     city_name = mongoengine.StringField(max_length=100)  # 城市名称
 
     ota_id = mongoengine.IntField()  # ota 的 id @see spiders.common.OTA
