@@ -563,9 +563,7 @@ class SpotCity:
             },
             {
                 '$project': {
-                    '_id': 0,
-                    'create_at': 0,
-                    'update_at': 0
+                    '_id': 0
                 }
             }
         ]
