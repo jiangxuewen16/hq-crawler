@@ -50,8 +50,12 @@ class PublicOpinion(BaseView):
             'up_score': Spot.get_param(param=param, in_name='up_score', default=6),
             'down_score': Spot.get_param(param=param, in_name='down_score', default=0),
             'ota_spot_id': Spot.get_param(param=param, in_name='ota_spot_id', default=5427075),
-            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=10001)
+            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=[10001, 10002, 10003, 10004, 10005])
         }
+        if isinstance(condition['ota_id'], list):
+            condition['ota_id'] = condition['ota_id']
+        else:
+            condition['ota_id'] = [condition['ota_id']]
         result = Spot.count_comment(condition=condition)
         return self.success(result)
 
