@@ -575,6 +575,23 @@ class SpotCity:
             p['update_at'] = p['update_at'].strftime("%Y-%m-%d %H:%M:%S")
 
             p['s_notes'] = [item['text'] for note in p['s_notes'] for item in note['contents']]
+            if isinstance(p['s_desc'], list) :
+                s_desc = ''
+                for desc in p['s_desc']:
+                    contents = desc['contents']
+                    for content in contents:
+                        if 'type' not in content:
+                            if 'text' in content:
+                                print('=' * 20, content)
+                                s_desc += '<p>' + content['text'] + '</p>'
+                            else:
+                                print(content)
+                        elif content['type'] == 'text':
+                            s_desc += '<p>' + content['content']['text'] + '</p>'
+                        elif content['type'] == 'img':
+                            s_desc += '<img src="' + content['content'] + '"/>'
+                p['s_desc'] = s_desc
+
             L = p
             print(p)
             #L.append(dict(p))
