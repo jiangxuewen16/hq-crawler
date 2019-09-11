@@ -71,104 +71,6 @@ class SpotComment:
         # return get_three_type(spot_city_s)
 
     @classmethod
-    def today_spot_comment(cls):
-        pipeline = [
-            {
-                '$lookup': {
-                    'from': 'spot',
-                    'localField': "ota_spot_id",
-                    'foreignField': "ota_spot_id",
-                    'as': "spot"
-                }
-            },
-            {
-                '$unwind': {
-                    'path': "$spot",
-                    'preserveNullAndEmptyArrays': True
-                }
-            },
-            {
-                '$project': {
-                    '_id': 0,
-                    'ota_spot_id': '$ota_spot_id',
-                    'c_score': '$c_score',
-                    'score_true': {'$cond': [{'$gt': ['$c_score', 3]}, 1, 0]},
-                    'score_false': {'$cond': [{'$lte': ['$c_score', 3]}, 1, 0]},
-                    'spot_name': '$spot.spot_name',
-                    'create_at': '$create_at'
-                }
-            },
-            {
-                '$match': {
-                    'create_at': {'$gte': '2017-12-04', '$lt': '2018-12-05'},
-                    'spot_name': {'$ne': None}
-                }
-            },
-            {
-                '$group': {
-                    '_id': '$spot_name',
-                    'score_true_total': {'$sum': '$score_true'},
-                    'score_false_total': {'$sum': '$score_false'}
-                }
-            }
-        ]
-        spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
-        L = []
-        for p in spot_city_s:
-            L.append(dict(p))
-
-        return L
-
-    @classmethod
-    def yesterday_spot_comment(cls):
-        pipeline = [
-            {
-                '$lookup': {
-                    'from': 'spot',
-                    'localField': "ota_spot_id",
-                    'foreignField': "ota_spot_id",
-                    'as': "spot"
-                }
-            },
-            {
-                '$unwind': {
-                    'path': "$spot",
-                    'preserveNullAndEmptyArrays': True
-                }
-            },
-            {
-                '$project': {
-                    '_id': 0,
-                    'ota_spot_id': '$ota_spot_id',
-                    'c_score': '$c_score',
-                    'score_true': {'$cond': [{'$gt': ['$c_score', 3]}, 1, 0]},
-                    'score_false': {'$cond': [{'$lte': ['$c_score', 3]}, 1, 0]},
-                    'spot_name': '$spot.spot_name',
-                    'create_at': '$create_at'
-                }
-            },
-            {
-                '$match': {
-                    'create_at': {'$gte': '2019-01-30'},
-                    'spot_name': {'$ne': None}
-                }
-            },
-            {
-                '$group': {
-                    '_id': '$spot_name',
-                    'score_true_total': {'$sum': '$score_true'},
-                    'score_false_total': {'$sum': '$score_false'}
-                }
-            }
-        ]
-        spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
-        L = []
-        for p in spot_city_s:
-            L.append(dict(p))
-
-        return L
-
-    @classmethod
     def list_comment(cls, condition, skip, limit, sort):
         pipeline = [
             {
@@ -289,6 +191,104 @@ class SpotComment:
 
 
 class Spot:
+    @classmethod
+    def today_spot_comment(cls):
+        pipeline = [
+            {
+                '$lookup': {
+                    'from': 'spot_comment',
+                    'localField': "ota_spot_id",
+                    'foreignField': "ota_spot_id",
+                    'as': "spot_comments"
+                }
+            },
+            {
+                '$unwind': {
+                    'path': "$spot_comments",
+                    'preserveNullAndEmptyArrays': True
+                }
+            },
+            {
+                '$project': {
+                    '_id': 0,
+                    'ota_spot_id': '$spot_comments.ota_spot_id',
+                    'c_score': '$spot_comments.c_score',
+                    'score_true': {'$cond': [{'$gt': ['$spot_comments.c_score', 3]}, 1, 0]},
+                    'score_false': {'$cond': [{'$lte': ['$spot_comments.c_score', 3]}, 1, 0]},
+                    'spot_name': '$spot_name',
+                    'create_at': '$spot_comments.create_at'
+                }
+            },
+            {
+                '$match': {
+                    'create_at': {'$gte': '2017-12-04', '$lt': '2019-12-05'},
+                    # 'spot_name': {'$ne': None}
+                }
+            },
+            {
+                '$group': {
+                    '_id': {'spot_name': '$spot_name', 'ota_spot_id': '$ota_spot_id'},
+                    'score_true_total': {'$sum': '$score_true'},
+                    'score_false_total': {'$sum': '$score_false'}
+                }
+            }
+        ]
+        spot_city_s = spot.Spot.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p))
+
+        return L
+
+    @classmethod
+    def yesterday_spot_comment(cls):
+        pipeline = [
+            {
+                '$lookup': {
+                    'from': 'spot_comment',
+                    'localField': "ota_spot_id",
+                    'foreignField': "ota_spot_id",
+                    'as': "spot_comments"
+                }
+            },
+            {
+                '$unwind': {
+                    'path': "$spot_comments",
+                    'preserveNullAndEmptyArrays': True
+                }
+            },
+            {
+                '$project': {
+                    '_id': 0,
+                    'ota_spot_id': '$ota_spot_id',
+                    'c_score': '$spot_comments.c_score',
+                    'score_true': {'$cond': [{'$gt': ['$spot_comments.c_score', 3]}, 1, 0]},
+                    'score_false': {'$cond': [{'$lte': ['$spot_comments.c_score', 3]}, 1, 0]},
+                    'spot_name': '$spot_name',
+                    'create_at': '$spot_comments.create_at'
+                }
+            },
+            {
+                '$match': {
+                    'create_at': {'$gte': '2019-01-30'},
+                    # 'spot_name': {'$ne': None}
+                }
+            },
+            {
+                '$group': {
+                    '_id': {'spot_name': '$spot_name', 'ota_spot_id': '$ota_spot_id'},
+                    'score_true_total': {'$sum': '$score_true'},
+                    'score_false_total': {'$sum': '$score_false'}
+                }
+            }
+        ]
+        spot_city_s = spot.Spot.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p))
+
+        return L
+
     @classmethod
     def list_spot(cls, s_name, skip, limit, sort):
         pipeline = [
