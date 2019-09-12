@@ -643,8 +643,10 @@ class SpotCity:
                 for ticket in p['s_ticket']:
                     ticket_info[ticket['productType'].lower()] = []
                     for product in ticket['productModels']:
-                        info = {'name': product['title5'], 'price': product['price'], 'sale': product['newSoldsString']}
-                        ticket_info[ticket['productType'].lower()].append(info)
+                        if 'title5' in product:
+                            info = {'name': product['title5'], 'price': product['price'],
+                                    'sale': product['newSoldsString']}
+                            ticket_info[ticket['productType'].lower()].append(info)
 
                     # append(ticket_info)
 
