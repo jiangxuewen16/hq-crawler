@@ -443,6 +443,11 @@ class Spot:
                 }
             },
             {
+                '$match': {
+                    'spot_name': {'$ne': None}
+                }
+            },
+            {
                 '$group': {
                     '_id': {'ota_spot_id': '$ota_spot_id', 'spot_name': '$spot_name', 'ota_id': '$ota_id'},
                     'c_score': {'$first': "$spot_comments.c_score"},
