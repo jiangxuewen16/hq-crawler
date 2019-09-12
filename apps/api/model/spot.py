@@ -627,7 +627,7 @@ class SpotCity:
                     for item in p['s_ticket']['spot_ticket']:
                         ticket_info['mp'].append({'name': item['name'], 'price': '未知', 'sale': '已售未知'})
                 p['s_ticket'] = ticket_info
-            elif p['ota_id'] == OTA.OtaCode.MAFENGWO.value.id:
+            elif p['ota_id'] == OTA.OtaCode.LVMAMA.value.id:
                 ticket_info = {}
                 if 'ADULT' in p['s_ticket']:
                     ticket_info['mp'] = []
