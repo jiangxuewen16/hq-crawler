@@ -634,9 +634,10 @@ class SpotCity:
                     for item in p['s_ticket']['ADULT']:
                         ticket_info['mp'].append({'name': item['name'], 'price': item['pay_price'], 'sale': '已售未知'})
                 if 'TC' in p['s_ticket']:
-                    ticket_info['mp'] = []
+                    ticket_info['tc'] = []
                     for item in p['s_ticket']['ADULT']:
-                        ticket_info['mp'].append({'name': item['name'], 'price': item['pay_price'], 'sale': '已售未知'})
+                        ticket_info['tc'].append({'name': item['name'], 'price': item['pay_price'], 'sale': '已售未知'})
+                p['s_ticket'] = ticket_info
 
             L = p
             print(p)
