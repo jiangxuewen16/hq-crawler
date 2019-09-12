@@ -50,8 +50,7 @@ class PublicOpinion(BaseView):
             'up_score': Spot.get_param(param=param, in_name='up_score', default=6),
             'down_score': Spot.get_param(param=param, in_name='down_score', default=0),
             'ota_spot_id': Spot.get_param(param=param, in_name='ota_spot_id',
-                                          default=[127339, 62931, 103113, 100025, 5427075, 339, 30067, 1515791, 162027,
-                                                   10650528, 102525, 11945662, 160416, 103177, 10829578]),
+                                          default=Spot.list_spot_array()),
             'ota_id': Spot.get_param(param=param, in_name='ota_id', default=[10001, 10002, 10003, 10004, 10005])
         }
         if isinstance(condition['ota_spot_id'], list):
@@ -116,10 +115,10 @@ class PublicOpinion(BaseView):
             return self.failure(data='param ota_spot_id not exist')
 
     # 景区分组评论测试
-    @Route.route(path='/group/test')
+    @Route.route(path='/spot/select')
     def group_test(self):
-        group_true_false = Spot.spot_comment_group()
-
+        # group_true_false = Spot.list_spot_array()
+        group_true_false = Spot.list_spot_select()
         return self.success(group_true_false)
 
     # 获取当前时间

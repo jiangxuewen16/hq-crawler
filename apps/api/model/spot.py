@@ -204,6 +204,39 @@ class SpotComment:
 
 class Spot:
     @classmethod
+    def list_spot_array(cls):
+        pipeline = [
+            {
+                '$project': {
+                    '_id': 0,
+                    'ota_spot_id': 1,
+                }
+            }
+        ]
+        spot_city_s = spot.Spot.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p)['ota_spot_id'])
+        return L
+
+    @classmethod
+    def list_spot_select(cls):
+        pipeline = [
+            {
+                '$project': {
+                    '_id': 0,
+                    'spot_name':1,
+                    'ota_spot_id': 1,
+                }
+            }
+        ]
+        spot_city_s = spot.Spot.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            L.append(dict(p))
+        return L
+
+    @classmethod
     def today_spot_comment(cls):
         pipeline = [
             {
