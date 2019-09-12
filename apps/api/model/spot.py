@@ -616,6 +616,18 @@ class SpotCity:
                     # append(ticket_info)
 
                 p['s_ticket'] = ticket_info
+            elif p['ota_id'] == OTA.OtaCode.CTRIP.value.id:
+                ticket_info = {}
+                if 'spot_hotel' in p['s_ticket']:
+                    ticket_info['tc'] = []
+                    for item in p['s_ticket']['spot_hotel']:
+                        ticket_info['tc'].append({'name': item['productname'], 'price': 0.00, 'sale': 0})
+                if 'spot_ticket' in p['s_ticket']:
+                    ticket_info['mp'] = []
+                    for item in p['s_ticket']['spot_ticket']:
+                        ticket_info['mp'].append({'name': item['name'], 'price': 0.00, 'sale': 0})
+                p['s_ticket'] = ticket_info
+
             L = p
             print(p)
             # L.append(dict(p))
