@@ -56,12 +56,12 @@ class PublicOpinion(BaseView):
         if isinstance(condition['ota_spot_id'], list):
             condition['ota_spot_id'] = condition['ota_spot_id']
         else:
-            condition['ota_spot_id'] = [condition['ota_spot_id']]
+            condition['ota_spot_id'] = [int(condition['ota_spot_id'])]
 
         if isinstance(condition['ota_id'], list):
             condition['ota_id'] = condition['ota_id']
         else:
-            condition['ota_id'] = [condition['ota_id']]
+            condition['ota_id'] = [int(condition['ota_id'])]
         result = Spot.count_comment(condition=condition)
         return self.success(result)
 
@@ -114,7 +114,7 @@ class PublicOpinion(BaseView):
         else:
             return self.failure(data='param ota_spot_id not exist')
 
-    # 景区分组评论测试
+    # 景区下拉选择框
     @Route.route(path='/spot/select')
     def group_test(self):
         # group_true_false = Spot.list_spot_array()
