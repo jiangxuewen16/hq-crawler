@@ -75,12 +75,17 @@ class PublicOpinion(BaseView):
             'end_date': Spot.get_param(param=param, in_name='end_date', default=str(datetime.datetime.now())),
             'up_score': Spot.get_param(param=param, in_name='up_score', default=6),
             'down_score': Spot.get_param(param=param, in_name='down_score', default=0),
-            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=10002)
+            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=[10001, 10002, 10003, 10004, 10005])
         }
         sort = Spot.get_param(param=param, in_name='sort', default='create_at')
         page = Spot.get_param(param=param, in_name='page', default=1)
         limit = Spot.get_param(param=param, in_name='limit', default=5)
         skip = (page - 1) * limit
+
+        if isinstance(condition['ota_id'], list):
+            condition['ota_id'] = condition['ota_id']
+        else:
+            condition['ota_id'] = [int(condition['ota_id'])]
 
         result = SpotComment.list_comment(condition=condition, skip=skip, limit=limit, sort=sort)
         total = SpotComment.total_comment(condition=condition)

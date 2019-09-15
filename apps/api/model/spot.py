@@ -139,8 +139,11 @@ class SpotComment:
                                 '$lte': condition['up_score']
                             }
                         },
+                        # {
+                        #     'ota_id': condition['ota_id']
+                        # }
                         {
-                            'ota_id': condition['ota_id']
+                            'ota_id': {'$in': condition['ota_id']}
                         }
                     ]
                 }
@@ -181,8 +184,11 @@ class SpotComment:
                                 '$lte': condition['up_score']
                             }
                         },
+                        # {
+                        #     'ota_id': condition['ota_id']
+                        # }
                         {
-                            'ota_id': condition['ota_id']
+                            'ota_id': {'$in': condition['ota_id']}
                         }
                     ]
                 }
@@ -555,9 +561,9 @@ class Spot:
                         {
                             'ota_id': {'$in': condition['ota_id']}
                         },
-                        # {
-                        #     'ota_spot_id': condition['ota_spot_id']
-                        # }
+                        {
+                            'ota_spot_id': {'$in': condition['ota_spot_id']}
+                        }
                     ]
                 }
             },
