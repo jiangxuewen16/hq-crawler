@@ -82,8 +82,17 @@ class PublicOpinion(BaseView):
             condition['ota_spot_id'] = condition['ota_spot_id']
         else:
             condition['ota_spot_id'] = [int(condition['ota_spot_id'])]
-        result = Spot.all_comment(condition=condition)
-        return self.success(result)
+
+        page = Spot.get_param(param=param, in_name='page', default=1)
+        limit = Spot.get_param(param=param, in_name='limit', default=5)
+        skip = (page - 1) * limit
+
+        result = Spot.all_comment(condition=condition, skip=skip, limit=limit)
+        result_count = Spot.all_comment(condition=condition, skip=0, limit=10000)
+        total = len(result_count)
+        last_page = math.ceil(total / limit)
+        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
+        return self.success(data)
 
     # 评价列表接口
     @Route.route(path='/comment/list')

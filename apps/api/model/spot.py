@@ -583,7 +583,7 @@ class Spot:
         return L
 
     @classmethod
-    def all_comment(cls, condition):
+    def all_comment(cls, condition, skip, limit):
         pipeline = [
             {
                 "$lookup": {
@@ -623,12 +623,12 @@ class Spot:
                         },
                         {
                             "create_at": {
-                                "$gte": condition['begin_date']+" 00:00:00"
+                                "$gte": condition['begin_date'] + " 00:00:00"
                             }
                         },
                         {
                             "create_at": {
-                                "$lte": condition['end_date']+" 23:59:59"
+                                "$lte": condition['end_date'] + " 23:59:59"
                             }
                         }
                     ]
@@ -847,6 +847,12 @@ class Spot:
                 "$sort": {
                     "avg_total": -1
                 }
+            },
+            {
+                '$skip': skip
+            },
+            {
+                '$limit': limit
             }
         ]
         spot_comment_s = spot.Spot.objects.aggregate(*pipeline)
