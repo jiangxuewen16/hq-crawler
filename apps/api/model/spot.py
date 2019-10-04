@@ -231,7 +231,7 @@ class Spot:
             {
                 '$project': {
                     '_id': 0,
-                    'spot_name':1,
+                    'spot_name': 1,
                     'ota_spot_id': 1,
                 }
             }
@@ -580,6 +580,296 @@ class Spot:
         L = []
         for p in spot_city_s:
             L.append(dict(p))
+        return L
+
+    @classmethod
+    def all_comment(cls, condition):
+        pipeline = [
+            {
+                "$lookup": {
+                    "from": "spot_comment",
+                    "localField": "ota_spot_id",
+                    "foreignField": "ota_spot_id",
+                    "as": "spot_comment"
+                }
+            },
+            {
+                "$unwind": {
+                    "path": "$spot_comment",
+                    "preserveNullAndEmptyArrays": True
+                }
+            },
+            {
+                "$project": {
+                    "ota_spot_id": "$ota_spot_id",
+                    "spot_name": "$spot_name",
+                    "create_at": "$spot_comment.create_at",
+                    "ota_id": "$spot_comment.ota_id",
+                    "c_score": "$spot_comment.c_score"
+                }
+            },
+            {
+                "$match": {
+                    "$and": [
+                        {
+                            "spot_name": {
+                                "$exists": True
+                            }
+                        },
+                        {
+                            "ota_spot_id": {
+                                "$in": condition['ota_spot_id']
+                            }
+                        },
+                        {
+                            "create_at": {
+                                "$gte": condition['begin_date']+" 00:00:00"
+                            }
+                        },
+                        {
+                            "create_at": {
+                                "$lte": condition['end_date']+" 23:59:59"
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "$group": {
+                    "_id": {
+                        "ota_spot_id": "$ota_spot_id",
+                        "spot_name": "$spot_name"
+                    },
+                    "sum_score_ota_id_10000": {
+                        "$sum": {
+                            "$cond": [{
+                                "$eq": ["$ota_id", 10000]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10000": {
+                        "$sum": {
+                            "$cond": [{
+                                "$eq": ["$ota_id", 10000]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10001": {
+                        "$sum": {
+                            "$cond": [{
+                                "$eq": ["$ota_id", 10001]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10001": {
+                        "$sum": {
+                            "$cond": [{
+                                "$eq": ["$ota_id", 10001]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10002": {
+                        "$sum": {
+                            "$cond": [{
+                                "$eq": ["$ota_id", 10002]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10002": {
+                        "$sum": {
+                            "$cond": [{
+                                "$eq": ["$ota_id", 10002]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10003": {
+                        "$sum": {
+                            "$cond": [{
+                                "$eq": ["$ota_id", 10003]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10003": {
+                        "$sum": {
+                            "$cond": [{
+                                "$eq": ["$ota_id", 10003]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10004": {
+                        "$sum": {
+                            "$cond": [{
+                                "$eq": ["$ota_id", 10004]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10004": {
+                        "$sum": {
+                            "$cond": [{
+                                "$eq": ["$ota_id", 10004]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10005": {
+                        "$sum": {
+                            "$cond": [{
+                                "$eq": ["$ota_id", 10005]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10005": {
+                        "$sum": {
+                            "$cond": [{
+                                "$eq": ["$ota_id", 10005]
+                            }, 1, 0]
+                        }
+                    },
+                    "count_start_5": {
+                        "$sum": {
+                            "$cond": [{
+                                "$gte": ["$c_score", 5]
+                            }, 1, 0]
+                        }
+                    },
+                    "count_start_4": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$gte": ["$c_score", 4]
+                                }, {
+                                    "$lt": ["$c_score", 5]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "count_start_3": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$gte": ["$c_score", 3]
+                                }, {
+                                    "$lt": ["$c_score", 4]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "count_start_2": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$gte": ["$c_score", 2]
+                                }, {
+                                    "$lt": ["$c_score", 3]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "count_start_1": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$gte": ["$c_score", 1]
+                                }, {
+                                    "$lt": ["$c_score", 2]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score": {
+                        "$sum": "$c_score"
+                    },
+                    "count_comment": {
+                        "$sum": 1
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "avg_total": {
+                        "$cond": [{
+                            "$eq": ["$count_comment", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score", "$count_comment"]
+                        }]
+                    },
+                    "avg_10000": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10000", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10000", "$count_score_ota_id_10000"]
+                        }]
+                    },
+                    "avg_10001": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10001", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10001", "$count_score_ota_id_10001"]
+                        }]
+                    },
+                    "avg_10002": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10002", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10002", "$count_score_ota_id_10002"]
+                        }]
+                    },
+                    "avg_10003": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10003", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10003", "$count_score_ota_id_10003"]
+                        }]
+                    },
+                    "avg_10004": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10004", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10004", "$count_score_ota_id_10004"]
+                        }]
+                    },
+                    "avg_10005": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10005", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10005", "$count_score_ota_id_10005"]
+                        }]
+                    },
+                    "count_start_5": "$count_start_5",
+                    "count_start_4": "$count_start_4",
+                    "count_start_3": "$count_start_3",
+                    "count_start_2": "$count_start_2",
+                    "count_start_1": "$count_start_1",
+                    "count_comment": "$count_comment",
+
+                }
+            },
+            {
+                "$sort": {
+                    "avg_total": -1
+                }
+            }
+        ]
+        spot_comment_s = spot.Spot.objects.aggregate(*pipeline)
+        L = []
+        i = 1
+        for p in spot_comment_s:
+            p['sort'] = i
+            p['avg_total'] = round(p['avg_total'], 1)
+            p['avg_10000'] = round(p['avg_10000'], 1)
+            p['avg_10001'] = round(p['avg_10001'], 1)
+            p['avg_10002'] = round(p['avg_10002'], 1)
+            p['avg_10003'] = round(p['avg_10003'], 1)
+            p['avg_10004'] = round(p['avg_10004'], 1)
+            p['avg_10005'] = round(p['avg_10005'], 1)
+            if p['avg_total'] >= 4:
+                p['tags'] = '优秀'
+            elif p['avg_total'] < 3.0:
+                p['tags'] = '差评'
+            else:
+                p['tags'] = '良好'
+
+            L.append(dict(p))
+            i = i + 1
         return L
 
     @classmethod

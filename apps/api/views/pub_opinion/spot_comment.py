@@ -1,5 +1,6 @@
 import datetime
 import math
+import time
 
 from apps.api.common import helper
 from apps.api.model.spot import SpotComment, Spot, SpotCity
@@ -63,6 +64,25 @@ class PublicOpinion(BaseView):
         else:
             condition['ota_id'] = [int(condition['ota_id'])]
         result = Spot.count_comment(condition=condition)
+        return self.success(result)
+
+    # 全网口碑
+    @Route.route(path='/comment/all')
+    def all_comment(self):
+        param = self.request_param
+        condition = {
+            'begin_date': Spot.get_param(param=param, in_name='begin_date',
+                                         default="2000-01-01"),
+            'end_date': Spot.get_param(param=param, in_name='end_date',
+                                       default=time.strftime("%Y-%m-%d", time.localtime())),
+            'ota_spot_id': Spot.get_param(param=param, in_name='ota_spot_id',
+                                          default=Spot.list_spot_array())
+        }
+        if isinstance(condition['ota_spot_id'], list):
+            condition['ota_spot_id'] = condition['ota_spot_id']
+        else:
+            condition['ota_spot_id'] = [int(condition['ota_spot_id'])]
+        result = Spot.all_comment(condition=condition)
         return self.success(result)
 
     # 评价列表接口
