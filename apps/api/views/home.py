@@ -1,14 +1,15 @@
 from core.common.service_code import ServiceCode
 from core.lib.view import BaseView
 from core.lib.route import Route
+from apps.scheduler.app import add
 
 
 @Route.route(path='api/home/')
 class Home(BaseView):
-
     @Route.route(path='index')
     def index(self):
-        return self.success(self.request_param)
+        a = add.delay(1, 2)
+        return self.success({'sum': 1})
 
     @Route.route(path='home/1')
     def home(self):
