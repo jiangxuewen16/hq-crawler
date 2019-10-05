@@ -8,7 +8,7 @@ from apps.scheduler.app import add
 class Home(BaseView):
     @Route.route(path='index')
     def index(self):
-        a = add.delay(1, 2)
+        a = add.delay()
         return self.success({'sum': 1})
 
     @Route.route(path='home/1')

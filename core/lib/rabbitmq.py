@@ -1,7 +1,7 @@
 import pika
 
 
-class Rabbitmq(object):
+class RabbitMq(object):
     config: dict = {
         'host': '118.126.105.239',
         'port': 5672,
@@ -35,20 +35,30 @@ class Rabbitmq(object):
     def __channel(self):
         return self.connection.channel()
 
+    """
+    接收消息（监听）
+    """
     def receive(self, receive_list: list):
         for item in receive_list:
-            self.channel.exchange_declare(exchange=item['exchange'], exchange_type='topic',
+            print('='*20, item)
+            self.channel.exchange_declare(exchange=item.exchange, exchange_type='topic',
                                           passive=self.config['passive'], durable=self.config['durable'],
                                           auto_delete=self.config['auto_delete'])
-            result = self.channel.queue_declare(item['queue'], passive=self.config['passive'],
+            result = self.channel.queue_declare(item.queue_name, passive=self.config['passive'],
                                                 durable=self.config['durable'],
                                                 exclusive=self.config['exclusive'],
                                                 auto_delete=self.config['auto_delete'])
             queue_name = result.method.queue
-            self.channel.queue_bind(exchange=item['exchange'], queue=queue_name, routing_key=item['routing_key'])
-            print(' [*] 启动监听:', item['exchange'], queue_name, item['routing_key'])
-            self.channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=self.config['no_ack'])
+            self.channel.queue_bind(exchange=item.exchange, queue=queue_name, routing_key=item.routing_key)
+            print(' [*] 启动监听:', item.exchange, queue_name, item.routing_key)
+            self.channel.basic_consume(queue=queue_name, on_message_callback=item.callback,
+                                       auto_ack=self.config['no_ack'])
+        self.channel.start_consuming()
+        self.close()
 
+    """
+    发送消息
+    """
     def send(self, message: str, routing_key: str, exchange=''):
         if not exchange:
             str_list = routing_key.split('.')

@@ -1,6 +1,7 @@
 from collections import namedtuple
 from enum import Enum, unique
 
+from apps.monitor.service import exception_service
 from apps.scheduler.mq.hqlx import Hqlx
 
 mq_receive_item = namedtuple('mq_receive_item', 'name routing_key queue_name exchange callback')
@@ -9,7 +10,7 @@ mq_receive_item = namedtuple('mq_receive_item', 'name routing_key queue_name exc
 @unique
 class RabbitMqReceive(Enum):
     EXCEPTION = mq_receive_item('系统异常消息', 'hq.system.exception', 'hq-crawler.system.exception', 'hq.system',
-                                Hqlx.exception)
+                                exception_service.receive_exception)
 
-    MMMMM = mq_receive_item('系统异常消息1', 'hq.system.exception', 'hq-crawler.system.exception', 'hq.system',
+    MMMMM = mq_receive_item('系统异常消息1', 'hq.system.exception', 'hq-crawler.system.exception1', 'hq.system',
                             Hqlx.exception)
