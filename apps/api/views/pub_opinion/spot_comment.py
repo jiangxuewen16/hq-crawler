@@ -94,6 +94,22 @@ class PublicOpinion(BaseView):
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
         return self.success(data)
 
+    # 运营中心数据 景区评论统计
+    @Route.route(path='/spot/score')
+    def score_spot(self):
+        param = self.request_param
+        condition = {
+            'begin_date': Spot.get_param(param=param, in_name='begin_date',
+                                         default="2000-01-01"),
+            'end_date': Spot.get_param(param=param, in_name='end_date',
+                                       default=time.strftime("%Y-%m-%d", time.localtime())),
+            'spot_name': Spot.get_param(param=param, in_name='spot_name',
+                                        default='')
+        }
+        condition['spot_name'] = '.*' + condition['spot_name'] + '.*'
+        result = Spot.spot_score_count(condition=condition)
+        return self.success(result)
+
     # 评价列表接口
     @Route.route(path='/comment/list')
     def list_comment(self):

@@ -1,6 +1,7 @@
 # from spiders.items.spot.spot import Spot
 import datetime
 import json
+import re
 
 from spiders.common import OTA
 from spiders.items.spot import spot
@@ -879,8 +880,89 @@ class Spot:
         return L
 
     @classmethod
+    def spot_score_count(cls, condition):
+        pipeline = [
+            {
+                "$lookup": {
+                    "from": "spot_comment",
+                    "localField": "ota_spot_id",
+                    "foreignField": "ota_spot_id",
+                    "as": "spot_comment"
+                }
+            },
+            {
+                "$unwind": {
+                    "path": "$spot_comment",
+                    "preserveNullAndEmptyArrays": True
+                }
+            },
+            {
+                "$project": {
+                    "ota_spot_id": "$ota_spot_id",
+                    "spot_name": "$spot_name",
+                    "create_at": "$spot_comment.create_at",
+                    "c_score": "$spot_comment.c_score"
+                }
+            },
+            {
+                "$match": {
+                    "$and": [
+                        {
+                            "spot_name": {
+                                "$exists": True
+                            }
+                        },
+                        {
+                            "spot_name": {
+                                "$regex": re.compile(condition['spot_name'])
+                            }
+                        },
+                        {
+                            "create_at": {
+                                "$gte": condition['begin_date']+" 00:00:00"
+                            }
+                        },
+                        {
+                            "create_at": {
+                                "$lte": condition['end_date']+" 23:59:59"
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "$group": {
+
+                    "_id": None,
+                    "score_True": {
+                        "$sum": {
+                            "$cond": [{
+                                "$gt": ["$c_score", 3]
+                            }, 1, 0]
+                        }
+                    },
+                    "score_false": {
+                        "$sum": {
+                            "$cond": [{
+                                "$lte": ["$c_score", 3]
+                            }, 1, 0]
+                        }
+                    },
+                    "score_total": {
+                        "$sum": 1
+                    }
+                }
+            }
+        ]
+        spot_comment_s = spot.Spot.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_comment_s:
+            L.append(dict(p))
+        return L
+
+    @classmethod
     def get_param(cls, param, in_name, default):
-        if in_name in param:
+        if in_name in param and param[in_name]:
             return param[in_name]
         else:
             return default
