@@ -14,3 +14,4 @@ class ExceptionLog(mongoengine.Document):
     request_id = mongoengine.StringField()
     request_time = mongoengine.StringField()
     request_param = mongoengine.StringField()
+    create_at = mongoengine.StringField()

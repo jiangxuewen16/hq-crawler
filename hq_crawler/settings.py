@@ -168,7 +168,8 @@ STATIC_URL = '/static/'
 下面是项目自定义配置
 """
 
-mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017')  # 连接mongodb
+mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017', alias='default')  # 连接mongodb
+mongoengine.connect('passport', host='mongodb://11.75.1.20:27017', alias='passport')  # passport
 
 # 这里放每个应用的视图包，自动加载，主要用于自定路径路由注册
 auto_import_module('apps.api.views')  # view包，业务代码写到此包中
