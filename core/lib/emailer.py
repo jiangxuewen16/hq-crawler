@@ -1,4 +1,5 @@
 import smtplib
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr
 from enum import Enum
@@ -22,6 +23,7 @@ class Email(object):
     sender_name = ''
 
     receivers = []
+    cc_mail = []  # 抄送人
 
     def __init__(self, host: str, port: int, user: str, password: str):
         self.port = port
@@ -34,20 +36,28 @@ class Email(object):
         self.sender_name = sender_name
         return self
 
-    def set_receiver(self, receivers: list):
+    def set_receiver(self, receivers: list, cc_mail: list):
         self.receivers = receivers
+        self.cc_mail = cc_mail
         return self
 
     def send(self, subject: str, msg: str):
         try:
-            msg = MIMEText(msg, 'plain', 'utf-8')
-            msg['From'] = formataddr([self.sender_name, self.sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
-            msg['To'] = ','.join(self.receivers)  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
-            msg['Subject'] = subject  # 邮件的主题，也可以说是标题
+            message = MIMEMultipart()
+            message.attach(MIMEText(msg, 'html', 'utf-8'))
+            message['From'] = formataddr([self.sender_name, self.sender])
+            message['To'] = ','.join(self.receivers)
+            message['Cc'] = ','.join(self.cc_mail)
+
+            # msg = MIMEText(msg, 'plain', 'utf-8')
+            # msg['From'] = formataddr([self.sender_name, self.sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
+            # msg['To'] = ','.join(self.receivers)  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
+            # msg['Subject'] = subject  # 邮件的主题，也可以说是标题
 
             server = smtplib.SMTP_SSL(self.host, self.port)  # 发件人邮箱中的SMTP服务器，端口是25
             server.login(self.user, self.password)  # 括号中对应的是发件人邮箱账号、邮箱密码
-            server.sendmail(self.sender, self.receivers, msg.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
+            server.sendmail(self.sender, self.receivers + self.cc_mail,
+                            message.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
             server.close()  # 关闭邮箱
             server.quit()  # 关闭连接
         except smtplib.SMTPException as e:  # 如果 try 中的语句没有执行，则会执行下面的
@@ -55,6 +65,3 @@ class Email(object):
 
     def build_end_data(self):
         pass
-
-
-
