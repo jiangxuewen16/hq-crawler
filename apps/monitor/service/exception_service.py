@@ -31,8 +31,23 @@ def receive_exception(ch, method, properties, body):
     docInterface = DocInterface.objects(path=exception_log.api_url).fields(uid=1).first()
     docUser = DocUser.objects(_id=docInterface.uid).first()
 
-    print('='*20, docUser.email)
+    print('=' * 20, docUser.email)
+    content = f"""
+            <h1>{exception_log.system_name}异常通知</h1>
+            <h2 style="color:red">惠趣异常通知</h1>
+            <a href="#">地址</a><br>
+            <p>异常API：{exception_log.api_url}</p>
+            <p>异常时间：{exception_log.request_time}</p>
+            <p>异常文件：{exception_log.file}</p>
+            <p>异常行：{exception_log.line}</p>
+            <p>异常原因：{exception_log.msg}</p>
+            <p>异常详情：{exception_log.trace}</p>
+            <p>原因：{exception_log.msg}</p>
+            <p>请求参数：{exception_log.request_param}</p>
+            <p>图片演示：</p>
+            <p><img src="cid:image1"></p>
+    """
     receivers = [docUser.email]
     Email('smtp.qq.com', 465, '445251692@qq.com', 'vadzhpbsercybhje') \
         .set_sender('445251692@qq.com', '惠趣运维中心').set_receiver(receivers) \
-        .send('群发测试，勿回，如有打扰，在此致歉，谢谢', '群发测试，勿回，如有打扰，在此致歉，谢谢xxxxxx!')
+        .send('惠趣异常通知', content)
