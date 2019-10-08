@@ -47,7 +47,8 @@ def receive_exception(ch, method, properties, body):
             <p>图片演示：</p>
             <p><img src="cid:image1"></p>
     """
+    receivers
     receivers = [docUser.email]
     Email('smtp.qq.com', 465, '445251692@qq.com', 'vadzhpbsercybhje') \
-        .set_sender('445251692@qq.com', '惠趣运维中心').set_receiver(receivers) \
+        .set_sender('445251692@qq.com', '惠趣运维中心').set_receiver(receivers, ['445251692@qq.com']) \
         .send('惠趣异常通知', content)
