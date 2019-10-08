@@ -21,4 +21,4 @@ class PublicOpinion(BaseView):
             c = i.get('consumers')  # 消费者数
             m = i.get('memory')  ## 队列消耗内存
             print(k, v, c, m)
-        return self.success(1)
+        return self.success(parsed)
