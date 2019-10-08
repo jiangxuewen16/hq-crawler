@@ -2,9 +2,7 @@ import configparser
 import os
 import platform
 
-import pika
 
-from apps.scheduler.config.rabbitmq import RabbitMqReceive
 from core.common.helper import get_scrapyd_cli
 from hq_crawler import settings
 

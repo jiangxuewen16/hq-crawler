@@ -1,12 +1,14 @@
-class Hqlx:
-    @classmethod
-    def exception(cls, ch, method, properties, body):
-        print('='*30, ch)
-        print('='*30, method.consumer_tag)
-        print('='*30, properties)
-        print('='*30, body)
-        # with open('C:/python/test_add_celery/books.txt', 'a', encoding='utf-8') as f:
-        #     f.write(ch)
-        #     f.write(method)
-        #     f.write(properties)
-        #     f.write(body)
+import json
+
+from apps.monitor.service import exception_service
+from core.lib import rabbitmq
+
+"""
+异常消息接收
+"""
+@rabbitmq.Decorator.listen('hq.system.exception', 'hq-crawler.system.exception', 'hq.system')  # rabbitmq 消息监听
+def receive_exception(ch, method, properties, body):
+    print('=' * 20, ch, method, properties, body)
+    body = body.decode('utf-8')
+    json_data = json.loads(body)
+    exception_service.receive_exception(json_data)

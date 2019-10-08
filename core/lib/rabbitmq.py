@@ -1,4 +1,8 @@
+from collections import namedtuple
+
 import pika
+
+mq_receive_item = namedtuple('mq_receive_item', 'routing_key queue_name exchange callback')
 
 
 class RabbitMq(object):
@@ -38,9 +42,11 @@ class RabbitMq(object):
     """
     接收消息（监听）
     """
-    def receive(self, receive_list: list):
+
+    def receive(self):
+        receive_list = Decorator.RECEIVE_FUNC_LIST
         for item in receive_list:
-            print('='*20, item)
+            print('=' * 20, item)
             self.channel.exchange_declare(exchange=item.exchange, exchange_type='topic',
                                           passive=self.config['passive'], durable=self.config['durable'],
                                           auto_delete=self.config['auto_delete'])
@@ -59,6 +65,7 @@ class RabbitMq(object):
     """
     发送消息
     """
+
     def send(self, message: str, routing_key: str, exchange=''):
         if not exchange:
             str_list = routing_key.split('.')
@@ -76,3 +83,22 @@ class RabbitMq(object):
 
     def callback(self):
         pass
+
+
+class Decorator(object):
+    RECEIVE_FUNC_LIST: list = []
+
+    """
+    rabbitmq接收装饰器
+    """
+
+    @classmethod
+    def listen(cls, routing_key: str, queue_name: str, exchange: str):
+        def my_decorator(func):
+            receive_item = mq_receive_item(routing_key, queue_name, exchange, func)
+            cls.RECEIVE_FUNC_LIST.append(receive_item)
+
+            def wrapper(self, *args, **kwargs):
+                return func(self, *args, **kwargs)
+            return wrapper
+        return my_decorator

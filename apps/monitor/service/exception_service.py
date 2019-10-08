@@ -1,29 +1,24 @@
-import json
 import time
 
 from apps.models.crawler import ExceptionLog
 from apps.models.passport import DocInterface, DocUser
-from core.lib.emailer import Email
+from apps.monitor.common import helper
 
 
-def receive_exception(ch, method, properties, body):
-    print(ch, method, properties, body)
-    body = body.decode('utf-8')
-    json_data = json.loads(body)
-    print('+' * 30, json_data)
+def receive_exception(data: dict):
     exception_log = ExceptionLog()
-    exception_log.event = json_data['event']
-    exception_log.system_name = json_data['system_name']
-    exception_log.platform = json_data['platform']
-    exception_log.level = json_data['level']
-    exception_log.api_url = json_data['api_url']
-    exception_log.trace = json_data['trace']
-    exception_log.file = json_data['file']
-    exception_log.msg = json_data['msg']
-    exception_log.line = json_data['line']
-    exception_log.request_id = json_data['request_id']
-    exception_log.request_time = json_data['request_time']
-    exception_log.request_param = json_data['request_param']
+    exception_log.event = data['event']
+    exception_log.system_name = data['system_name']
+    exception_log.platform = data['platform']
+    exception_log.level = data['level']
+    exception_log.api_url = data['api_url']
+    exception_log.trace = data['trace']
+    exception_log.file = data['file']
+    exception_log.msg = data['msg']
+    exception_log.line = data['line']
+    exception_log.request_id = data['request_id']
+    exception_log.request_time = data['request_time']
+    exception_log.request_param = data['request_param']
     exception_log.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
     exception_log.save(force_insert=False, validate=False, clean=True)
@@ -47,8 +42,7 @@ def receive_exception(ch, method, properties, body):
             <p>图片演示：</p>
             <p><img src="cid:image1"></p>
     """
-    receivers
     receivers = [docUser.email]
-    Email('smtp.qq.com', 465, '445251692@qq.com', 'vadzhpbsercybhje') \
-        .set_sender('445251692@qq.com', '惠趣运维中心').set_receiver(receivers, ['445251692@qq.com']) \
-        .send('惠趣异常通知', content)
+    cc_list = ['445251692@qq.com']
+    helper.send_email(receivers, cc_list, '惠趣异常通知', content)
+
