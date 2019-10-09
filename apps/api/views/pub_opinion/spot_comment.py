@@ -1,5 +1,6 @@
 import datetime
 import math
+import time
 
 from apps.api.common import helper
 from apps.api.model.spot import SpotComment, Spot, SpotCity
@@ -31,10 +32,10 @@ class PublicOpinion(BaseView):
         today_total_comment = SpotComment.today_total_comment()
         yesterday_total_comment = SpotComment.yesterday_total_comment()
 
-        today_spot_comment = SpotComment.today_spot_comment()
-        yesterday_spot_comment = SpotComment.yesterday_spot_comment()
+        today_spot_comment = Spot.today_spot_comment()
+        yesterday_spot_comment = Spot.yesterday_spot_comment()
 
-        last_spot_comment = SpotComment.last_spot_comment()
+        last_spot_comment = Spot.last_spot_comment()
         index_comment = {'today_total_comment': today_total_comment, 'yesterday_total_comment': yesterday_total_comment,
                          'today_spot_comment': today_spot_comment, 'yesterday_spot_comment': yesterday_spot_comment,
                          'last_spot_comment': last_spot_comment}
@@ -49,10 +50,64 @@ class PublicOpinion(BaseView):
             'end_date': Spot.get_param(param=param, in_name='end_date', default=str(datetime.datetime.now())),
             'up_score': Spot.get_param(param=param, in_name='up_score', default=6),
             'down_score': Spot.get_param(param=param, in_name='down_score', default=0),
-            'ota_spot_id': Spot.get_param(param=param, in_name='ota_spot_id', default=5427075),
-            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=10001)
+            'ota_spot_id': Spot.get_param(param=param, in_name='ota_spot_id',
+                                          default=Spot.list_spot_array()),
+            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=[10001, 10002, 10003, 10004, 10005])
         }
-        result = SpotComment.count_comment(condition=condition)
+        if isinstance(condition['ota_spot_id'], list):
+            condition['ota_spot_id'] = condition['ota_spot_id']
+        else:
+            condition['ota_spot_id'] = [int(condition['ota_spot_id'])]
+
+        if isinstance(condition['ota_id'], list):
+            condition['ota_id'] = condition['ota_id']
+        else:
+            condition['ota_id'] = [int(condition['ota_id'])]
+        result = Spot.count_comment(condition=condition)
+        return self.success(result)
+
+    # 全网口碑
+    @Route.route(path='/comment/all')
+    def all_comment(self):
+        param = self.request_param
+        condition = {
+            'begin_date': Spot.get_param(param=param, in_name='begin_date',
+                                         default="2000-01-01"),
+            'end_date': Spot.get_param(param=param, in_name='end_date',
+                                       default=time.strftime("%Y-%m-%d", time.localtime())),
+            'ota_spot_id': Spot.get_param(param=param, in_name='ota_spot_id',
+                                          default=Spot.list_spot_array())
+        }
+        if isinstance(condition['ota_spot_id'], list):
+            condition['ota_spot_id'] = condition['ota_spot_id']
+        else:
+            condition['ota_spot_id'] = [int(condition['ota_spot_id'])]
+
+        page = Spot.get_param(param=param, in_name='page', default=1)
+        limit = Spot.get_param(param=param, in_name='limit', default=5)
+        skip = (page - 1) * limit
+
+        result = Spot.all_comment(condition=condition, skip=skip, limit=limit)
+        result_count = Spot.all_comment(condition=condition, skip=0, limit=10000)
+        total = len(result_count)
+        last_page = math.ceil(total / limit)
+        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
+        return self.success(data)
+
+    # 运营中心数据 景区评论统计
+    @Route.route(path='/spot/score')
+    def score_spot(self):
+        param = self.request_param
+        condition = {
+            'begin_date': Spot.get_param(param=param, in_name='begin_date',
+                                         default="2000-01-01"),
+            'end_date': Spot.get_param(param=param, in_name='end_date',
+                                       default=time.strftime("%Y-%m-%d", time.localtime())),
+            'spot_name': Spot.get_param(param=param, in_name='spot_name',
+                                        default='')
+        }
+        condition['spot_name'] = '.*' + condition['spot_name'] + '.*'
+        result = Spot.spot_score_count(condition=condition)
         return self.success(result)
 
     # 评价列表接口
@@ -61,18 +116,23 @@ class PublicOpinion(BaseView):
         param = self.request_param
         condition = {
             'check_name': Spot.get_param(param=param, in_name='check_name', default=''),
-            'begin_date': Spot.get_param(param=param, in_name='begin_date', default=str(datetime.date.today())),
+            'begin_date': Spot.get_param(param=param, in_name='begin_date', default='1990-07-18'),
             'end_date': Spot.get_param(param=param, in_name='end_date', default=str(datetime.datetime.now())),
             'up_score': Spot.get_param(param=param, in_name='up_score', default=6),
             'down_score': Spot.get_param(param=param, in_name='down_score', default=0),
-            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=10001)
+            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=[10001, 10002, 10003, 10004, 10005])
         }
         sort = Spot.get_param(param=param, in_name='sort', default='create_at')
         page = Spot.get_param(param=param, in_name='page', default=1)
-        limit = Spot.get_param(param=param, in_name='limit', default=10)
+        limit = Spot.get_param(param=param, in_name='limit', default=5)
         skip = (page - 1) * limit
 
-        result = SpotComment.list_comment(condition=condition, skip=skip, limit=5, sort=sort)
+        if isinstance(condition['ota_id'], list):
+            condition['ota_id'] = condition['ota_id']
+        else:
+            condition['ota_id'] = [int(condition['ota_id'])]
+
+        result = SpotComment.list_comment(condition=condition, skip=skip, limit=limit, sort=sort)
         total = SpotComment.total_comment(condition=condition)
         last_page = math.ceil(total / limit)
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
@@ -85,9 +145,9 @@ class PublicOpinion(BaseView):
         s_name = Spot.get_param(param=param, in_name='s_name', default='')
         sort = Spot.get_param(param=param, in_name='sort', default='create_at')
         page = Spot.get_param(param=param, in_name='page', default=1)
-        limit = Spot.get_param(param=param, in_name='limit', default=10)
+        limit = Spot.get_param(param=param, in_name='limit', default=5)
         skip = (page - 1) * limit
-        result = Spot.list_spot(s_name=s_name, skip=skip, limit=5, sort=sort)
+        result = Spot.list_spot(s_name=s_name, skip=skip, limit=limit, sort=sort)
         total = Spot.total_spot(s_name=s_name)
         last_page = math.ceil(total / limit)
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
@@ -98,17 +158,17 @@ class PublicOpinion(BaseView):
     def detail_spot(self):
         param = self.request_param
         if 'ota_spot_id' in param:
-            ota_spot_id = param['ota_spot_id']
+            ota_spot_id = int(param['ota_spot_id'])
             result = SpotCity.detail_spot(ota_spot_id=ota_spot_id)
             return self.success(result)
         else:
             return self.failure(data='param ota_spot_id not exist')
 
-    # 景区分组评论测试
-    @Route.route(path='/group/test')
+    # 景区下拉选择框
+    @Route.route(path='/spot/select')
     def group_test(self):
-        group_true_false = Spot.spot_comment_group()
-
+        # group_true_false = Spot.list_spot_array()
+        group_true_false = Spot.list_spot_select()
         return self.success(group_true_false)
 
     # 获取当前时间

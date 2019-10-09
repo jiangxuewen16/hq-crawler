@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'django_apscheduler',  # 定时执行任务
-    # 'djcelery',  # django-celery异步包
+    'djcelery',  # django-celery异步包
 
 ]
 
@@ -112,19 +112,19 @@ WSGI_APPLICATION = 'hq_crawler.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         # 'ENGINE': 'django.db.backends.sqlite3',
-#         # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'hq_crawler',
-#         'USER': 'root',
-#         'HOST': '11.75.1.20',
-#         'PASSWORD': '123456',
-#         'PORT': 3306,
-#         'OPTIONS': {'charset': 'utf8mb4'},
-#     }
-# }
+DATABASES = {
+    'default': {
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'hq_crawler',
+        'USER': 'root',
+        'HOST': '127.0.0.1',
+        'PASSWORD': '123456',
+        'PORT': 3306,
+        'OPTIONS': {'charset': 'utf8mb4'},
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -168,7 +168,8 @@ STATIC_URL = '/static/'
 下面是项目自定义配置
 """
 
-mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017')  # 连接mongodb
+mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017', alias='default')  # 连接hq_crawler.mongodb
+mongoengine.connect('passport', host='mongodb://11.75.1.20:27017', alias='passport')  # 连接passport
 
 # 这里放每个应用的视图包，自动加载，主要用于自定路径路由注册
 auto_import_module('apps.api.views')  # view包，业务代码写到此包中
@@ -189,17 +190,6 @@ SPIDER_PATH = f'{BASE_DIR}/spiders/'  # 爬虫项目目录
 """
 rabbitmq 配置
 """
-
-# import djcelery
-# djcelery.setup_loader()
-#
-# BROKER_HOST = "localhost"
-# BROKER_PORT = 5672
-# BROKER_USER = "guest"
-# BROKER_PASSWORD = "guest"
-# BROKER_VHOST = "/"
-
-RABBITMQ_START = False
 RABBITMQ_CONF = {
     'host': '118.126.105.239',
     'port': 5672,
@@ -217,3 +207,50 @@ RABBITMQ_CONF = {
     'consumer_tag': '',
 }
 RABBITMQ_CHANNEL = None  # rabbitmq连接
+
+"""
+惠趣邮件配置
+"""
+EMAIL_CONF = {
+    'host': 'smtp.qq.com',
+    'port': 465,
+    'sender': '445251692@qq.com',
+    'sender_name': '惠趣运维中心',
+    'user_name': '445251692@qq.com',
+    'password': 'vadzhpbsercybhje'
+}
+
+
+"""
+异步任务扩展
+"""
+from hq_crawler import celery
+import djcelery
+
+djcelery.setup_loader()
+# 有些情况可以防止死锁
+CELERYD_FORCE_EXECV = True
+# 设置并发worker数量
+CELERYD_CONCURRENCY = 4
+# 允许重试
+CELERY_ACKS_LATE = True
+# 每个worker最多执行100个任务被销毁，可以防止内存泄漏
+CELERYD_MAX_TASKS_PER_CHILD = 100
+# 超时时间
+# CELERYD_TASK_TIME_LIMIT = 12 * 30
+CELERY_DISABLE_RATE_LIMITS = True
+
+# celery内容等消息的格式设置
+CELERY_ACCEPT_CONTENT = ['application/json', ]
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+BROKER_BACKEND = 'redis'
+# celery settings
+# celery中间人 redis://redis服务所在的ip地址:端口/数据库号
+BROKER_URL = 'redis://:jiangxuewen@118.126.105.239:6378/1'
+# celery结果返回，可用于跟踪结果
+CELERY_RESULT_BACKEND = 'redis://:jiangxuewen@118.126.105.239:6378/1'
+# celery时区设置，使用settings中TIME_ZONE同样的时区
+CELERY_TIMEZONE = TIME_ZONE

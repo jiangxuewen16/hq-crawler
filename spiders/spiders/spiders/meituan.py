@@ -50,6 +50,7 @@ class MeituanSpotSpider(scrapy.Spider):
         spot_data.ota_spot_id = response.meta['ota_spot_id']
         spot_data.ota_id = OTA.OtaCode.MEITUAN.value.id
         spot_data.spot_name = response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/h1/text()').extract_first()
+        # print('++'*20,response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/text()[1]'))
         spot_data.spot_score = float(
             response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/text()[1]').extract_first())
         spot_data.avg_price = float(

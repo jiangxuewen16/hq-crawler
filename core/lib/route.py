@@ -17,7 +17,7 @@ class Route:
     @classmethod
     def route(cls, path):
         def my_decorator(func):
-            print('调用的方法列表：', func)
+            # print('调用的方法列表：', func)
             # 类的路由
             if not isinstance(func, FunctionType):
                 cls.classRoute.append(cls.classRouteTuple(func.__module__, func.__qualname__, path))

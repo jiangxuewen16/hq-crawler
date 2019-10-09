@@ -2,9 +2,7 @@ import configparser
 import os
 import platform
 
-import pika
 
-from apps.scheduler.config.rabbitmq import RabbitMqReceive
 from core.common.helper import get_scrapyd_cli
 from hq_crawler import settings
 
@@ -35,64 +33,6 @@ def start_deploy_scrapy(scrapyd_deploy: str = ''):
             raise Exception('windows环境执行注册scrapyd项目错误，请检查目录路径、python环境，是否已安装scrapyd、scrapyd client')
     else:
         os.system(f'cd ./spiders && scrapyd-deploy -p {scrapy_project_name}')
-
-
-"""
-连接rabbitmq，并监听mq消息
-"""
-
-
-def start_rabbitmq():
-    config = settings.RABBITMQ_CONF
-    credentials = pika.PlainCredentials(config['user'], config['password'])
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host=config['host'], port=config['port'], virtual_host=config['vhost'], ))
-    channel = connection.channel()
-
-    # settings.RABBITMQ_CHANNEL = channel  # 设置配置rabbitmq连接
-    #
-    # # 监听消息列表
-    # for _, member in RabbitMqReceive.__members__.items():
-    #     channel.exchange_declare(exchange='hq.system', exchange_type='topic')
-    #
-    #     result = channel.queue_declare('', exclusive=True)
-    #     queue_name = result.method.queue
-    #
-    #     binding_keys = ['hq.system.exception']
-    #
-    #     for binding_key in binding_keys:
-    #         channel.queue_bind(
-    #             exchange='hq.system', queue='hq-lx.system.exception', routing_key=binding_key)
-    #
-    #     print(' [*] Waiting for logs. To exit press CTRL+C')
-    #
-    #     def callback(ch, method, properties, body):
-    #         print(" [x] %r:%r" % (method.routing_key, body))
-    #
-    #     channel.basic_consume(
-    #         queue='hq-lx.system.exception', on_message_callback=callback, auto_ack=True)
-    #     print(member.value)
-
-    # channel.exchange_declare(exchange='hq.system', exchange_type='topic')
-    #
-    # result = channel.queue_declare('', exclusive=True)
-    # queue_name = result.method.queue
-    #
-    # binding_keys = ['hq.system.exception']
-    #
-    # for binding_key in binding_keys:
-    #     channel.queue_bind(
-    #         exchange='hq.system', queue='hq-lx.system.exception', routing_key=binding_key)
-    #
-    # print(' [*] Waiting for logs. To exit press CTRL+C')
-    #
-    # def callback(ch, method, properties, body):
-    #     print(" [x] %r:%r" % (method.routing_key, body))
-    #
-    # channel.basic_consume(
-    #     queue='hq-lx.system.exception', on_message_callback=callback, auto_ack=True)
-    #
-    # channel.start_consuming()
 
 
 """

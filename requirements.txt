@@ -8,6 +8,10 @@ scrapyd-client==1.1.0
 mongoengine==0.18.2
 fake-useragent==0.1.11
 pika==1.1.0
-django-cors-headers===3.1.0
+django-cors-headers==3.1.0
 # mysqlclient===1.4.4
-celery===4.3.0
+celery==4.3.0
+django-celery==3.3.1
+redis==3.3.8
+eventlet==0.25.1
+django-celery-beat==1.5.0

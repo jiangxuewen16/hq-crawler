@@ -73,14 +73,15 @@ class MafengwoSpotSpider(scrapy.Spider):
 
         spot_data.ota_id = OTA.OtaCode.MAFENGWO.value.id
         spot_data.spot_name = response.xpath('/html/body/div[2]/div[2]/div/div[3]/h1/text()').extract_first()
-        spot_data.desc = response.xpath('/html/body/div[2]/div[3]/div[2]/div[1]/text()').extract_first().strip()
+        desc = response.xpath('/html/body/div[2]/div[3]/div[2]/div[1]/text()').extract_first()
+        spot_data.desc = desc.strip() if desc else ''
         spot_data.tel = response.xpath('/html/body/div[2]/div[3]/div[2]/ul/li[1]/div[2]/text()').extract_first()
         spot_data.traffic = response.xpath('/html/body/div[2]/div[3]/div[2]/dl[1]/dd/div[1]/text()').extract_first()
         spot_data.ticket_num = 1
         spot_data.open_time = response.xpath('/html/body/div[2]/div[3]/div[2]/dl[3]/dd/text()').extract_first()
         spot_data.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        spot_data.comment_num = \
-            response.xpath('//*[@id="poi-navbar"]/ul/li[3]/a/span/text()').extract_first().split('条')[0].strip('（')
+        #spot_data.comment_num = \
+        #    response.xpath('//*[@id="poi-navbar"]/ul/li[3]/a/span/text()').extract_first().split('条')[0].strip('（')
 
         yield spot_data
 
@@ -199,6 +200,6 @@ class MafengwoCommentSpider(scrapy.Spider):
         score = response.xpath('/html/body/div[2]/section[1]/div[1]/div[1]/div[1]/strong/text()').extract_first()
         spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.MAFENGWO.value.id,
                                       ota_spot_id=response.meta['ota_spot_id']).first()
-        spot_data.spot_score = float(score)
+        spot_data.spot_score = float(score) if score else 0
 
         yield spot_data
