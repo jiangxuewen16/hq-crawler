@@ -10,7 +10,6 @@ from spiders.common import OTA
 from spiders.items.spot import spot
 from spiders.items.spot.spot import Spot
 
-
 class LvmamaSpider(scrapy.Spider):
     name = 'lvmama'
     allowed_domains = ['http://www.lvmama.com']
@@ -189,3 +188,158 @@ class LvmamaCommentSpider(scrapy.Spider):
         yield Request(url=url, callback=self.parse_page, dont_filter=True,
                       meta={'ota_spot_id': ota_spot_id, 'page_size': page_total, 'max_offset': new_num,
                             'now_offset': 1, 'now_size': 1})
+
+class LvmamaCitySpider(scrapy.Spider):
+    name = 'lvmama_city'
+    allowed_domains = ['www.m.lvmama.com']
+    base_url = r'https://m.lvmama.com/ticket/?fromCity=1'
+    start_urls = ['https://m.lvmama.com/ticket/?fromCity=1']
+    city_url = 'https://m.lvmama.com/api/router/rest.do?method=api.com.home.getStations&version=1.0.0&format=' \
+               'json&firstChannel=TOUCH&secondChannel=LVMM'
+    spot_url = 'https://m.lvmama.com/tour/ticket?keyword={city_name}&ajax=true&ticket_page={page}'
+    ticket_url = 'https://m.lvmama.com/ticket/piao-{ticket_id}'
+    address_url = 'https://m.lvmama.com/ticket/piao-{ticket_id}/map'
+    info_url = 'https://m.lvmama.com/ticket/piao-{ticket_id}/introduction'
+    comment_url = 'https://m.lvmama.com/ticket/piao-{ticket_id}/comment'
+
+    def parse(self, response: HtmlResponse):
+        headers = {
+            'signal': 'ab4494b2-f532-4f99-b57e-7ca121a137ca'
+        }
+        yield Request(url=self.city_url, callback=self.spot_city, headers=headers, dont_filter=True)
+
+
+    def spot_city(self, response: HtmlResponse):
+        response_str = response.body.decode('utf-8')
+        json_data = json.loads(response_str)
+        for city_rs in json_data['data']:
+            # spot_city.ota_id = OTA.OtaCode.LVMAMA.value.id
+            url = self.spot_url.format(city_name=city_rs['name'], page=1)
+            yield Request(url=url, callback=self.get_spot_by_city, dont_filter=True,
+                          meta={'city_id': city_rs['id'], 'city_name': city_rs['name'], 'area_pinyin': city_rs['pinyin'], 'area_name': city_rs['name'],
+                                'province_name': city_rs['provinceName'], 'page': 1})
+
+    def get_spot_by_city(self, response: HtmlResponse):
+        response_str = response.body.decode('utf-8')
+        json_data = json.loads(response_str)
+        html = Selector(text=json_data['html'])
+        spot_rs = html.css('.exact-item')
+        if not spot_rs:
+            return
+        for spot_data in spot_rs:
+            spot_id = int(spot_data.css('::attr(data-product-id)').extract_first())
+            spot_city = spot.SpotCity.objects(ota_id=OTA.OtaCode.LVMAMA.value.id,
+                                              ota_spot_id=spot_id).first()
+            # 不存在数据则新增数据,增量爬取
+            if not spot_city:
+                spot_city = spot.SpotCity()
+                spot_city.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+            spot_city.ota_spot_id = spot_id
+            spot_city.ota_id = OTA.OtaCode.LVMAMA.value.id
+
+            spot_city.city_id = int(response.meta['city_id'])
+            spot_city.area_pinyin = response.meta['area_pinyin']
+            spot_city.area_name = response.meta['area_name']
+            spot_city.city_name = response.meta['city_name']
+
+            spot_city.s_img = spot_data.css('.img-wrap img::attr(data-src)').extract_first()
+            spot_city.s_name = spot_data.css('.product-name-1::text').extract_first()
+            spot_city.s_score = float(spot_data.css('.score-wrap > span::text').extract_first()) if \
+                spot_data.css('.score-wrap > span::text').extract_first() is not None else 5.0
+
+            spot_city.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            # yield spot_city
+            url = self.ticket_url.format(ticket_id=spot_id)
+            yield Request(url=url, callback=self.get_ticket_by_spot, dont_filter=True,
+                          meta={'spot_city': spot_city})
+
+
+        page = response.meta['page'] +1
+        url = self.spot_url.format(city_name=response.meta['city_name'], page=page)
+        yield Request(url=url, callback=self.get_spot_by_city, dont_filter=True,
+                          meta={'city_id': response.meta['city_id'], 'city_name': response.meta['city_name'], 'area_pinyin': response.meta['area_pinyin'],
+                                'area_name': response.meta['area_name'],
+                                'province_name': response.meta['province_name'], 'page': page})
+
+
+
+    def get_ticket_by_spot(self, response: HtmlResponse):
+        # spot_city = spot.SpotCity.objects(ota_id=OTA.OtaCode.LVMAMA.value.id,
+        #                                   ota_spot_id=response.meta['spot_id']).first()
+        spot_city = response.meta['spot_city']
+        ticket_arr = {'ADULT': [], 'ACTIVITY': [], 'FREE': [], 'TC': [], 'num': 0}
+        ticket_rs = response.css('div.adult-ticket.hasGoods.ADULT')
+        ticket_rs = ticket_rs.css('.list-module')
+        for ticket_data in ticket_rs:
+            ticket_arr['num'] += 1
+            ticket_arr['ADULT'].append({
+                'name': ticket_data.css('.name::text').extract_first().strip(),
+                'rule': ticket_data.css('.notes > span::text').extract(),
+                'rack_price': ticket_data.css('.marketPrice > del::text').extract_first(),
+                'pay_price': float(ticket_data.css('.price > span > i::text').extract()[1])
+            })
+        ticket_rs = response.css('div.adult-ticket.hasGoods.ACTIVITY')
+        ticket_rs = ticket_rs.css('.list-module')
+        for ticket_data in ticket_rs:
+            ticket_arr['num'] += 1
+            ticket_arr['ACTIVITY'].append({
+                'name': ticket_data.css('.name::text').extract_first().strip(),
+                 'rule': ticket_data.css('.notes > span::text').extract(),
+                 'rack_price': ticket_data.css('.marketPrice > del::text').extract_first(),
+                   'pay_price': float(ticket_data.css('.price > span > i::text').extract()[1])
+               })
+        ticket_rs = ticket_rs.css('.list-module')
+        for ticket_data in ticket_rs:
+            ticket_arr['num'] += 1
+            ticket_arr['FREE'].append({
+                'name': ticket_data.css('.name::text').extract_first().strip(),
+                'rule': ticket_data.css('.notes > span::text').extract(),
+                'rack_price': ticket_data.css('.marketPrice > del::text').extract_first(),
+                'pay_price': float(ticket_data.css('.price > span > i::text').extract()[1])
+            })
+        ticket_rs = ticket_rs.css('.prdShow')
+        for ticket_data in ticket_rs:
+            ticket_arr['num'] += 1
+            ticket_arr['TC'].append({
+                'name': ticket_data.css('.prdName::text').extract_first().strip(),
+                'rule': ticket_data.css('.right::text').extract(),
+                'rack_price': float(ticket_data.css('.price > span > i::text').extract()[1]),
+                'pay_price': float(ticket_data.css('.price > span > i::text').extract()[1])
+            })
+        spot_city.s_ticket = ticket_arr
+        spot_city.s_ticket_num = ticket_arr['num']
+        spot_city.s_addr = response.xpath('//*[@id="tpl"]/div[1]/div[2]/div[2]/p/text()').extract_first()
+
+        url = self.info_url.format(ticket_id=spot_city.ota_spot_id)
+        yield Request(url=url, callback=self.get_info_by_ticket, dont_filter=True,
+                      meta={'spot_city': spot_city})
+
+    def get_info_by_ticket(self,response: HtmlResponse):
+        spot_city = response.meta['spot_city']
+        spot_city.s_notes = response.css('.play-project.scenicSpots.YDXZ p::text').extract()
+        spot_city.s_desc = response.css('.play-project.JQJS').get()
+
+        url = self.address_url.format(ticket_id=spot_city.ota_spot_id)
+        yield Request(url=url, callback=self.get_address_by_ticket, dont_filter=True,
+                      meta={'spot_city': spot_city})
+
+
+    def get_address_by_ticket(self,response: HtmlResponse):
+        spot_city = response.meta['spot_city']
+
+        address_rs = response.xpath('//script[4]/text()').extract_first()
+        spot_city.lat = address_rs.split("latitude = '")[1].split("'")[0]
+        spot_city.lng = address_rs.split("longitude = '")[1].split("'")[0]
+
+        url = self.comment_url.format(ticket_id=spot_city.ota_spot_id)
+        yield Request(url=url, callback=self.get_comment_by_ticket, dont_filter=True,
+                      meta={'spot_city': spot_city})
+
+    def get_comment_by_ticket(self, response: HtmlResponse):
+        spot_city = response.meta['spot_city']
+
+        spot_city.s_comment_num = int(response.css('.tic.activeT::text').extract_first().split("全部(")[1].split(")")[0]) if response.css('.tic.activeT::text').extract_first() is not None  else 0
+        yield spot_city
+
+
