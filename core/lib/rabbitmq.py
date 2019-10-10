@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import pika
 
-mq_receive_item = namedtuple('mq_receive_item', 'routing_key queue_name exchange callback')
+mq_receive_item = namedtuple('mq_receive_item', 'routing_key queue_name exchange callback no_ack')
 
 
 class RabbitMq(object):
@@ -58,7 +58,7 @@ class RabbitMq(object):
             self.channel.queue_bind(exchange=item.exchange, queue=queue_name, routing_key=item.routing_key)
             print(' [*] 启动监听:', item.exchange, queue_name, item.routing_key)
             self.channel.basic_consume(queue=queue_name, on_message_callback=item.callback,
-                                       auto_ack=self.config['no_ack'])
+                                       auto_ack=item.no_ack)
         self.channel.start_consuming()
         self.close()
 
@@ -93,9 +93,10 @@ class Decorator(object):
     """
 
     @classmethod
-    def listen(cls, routing_key: str, queue_name: str, exchange: str):
+    def listen(cls, routing_key: str, queue_name: str, exchange: str, no_ack: bool = False):
         def my_decorator(func):
-            receive_item = mq_receive_item(routing_key, queue_name, exchange, func)
+            print('=' * 30, func)
+            receive_item = mq_receive_item(routing_key, queue_name, exchange, func, no_ack)
             cls.RECEIVE_FUNC_LIST.append(receive_item)
 
             def wrapper(self, *args, **kwargs):

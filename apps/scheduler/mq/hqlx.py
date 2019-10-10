@@ -6,7 +6,9 @@ from core.lib import rabbitmq
 """
 异常消息接收
 """
-@rabbitmq.Decorator.listen('hq.system.exception', 'hq-crawler.system.exception', 'hq.system')  # rabbitmq 消息监听
+
+
+@rabbitmq.Decorator.listen('hq.system.exception', 'hq-crawler.system.exception', 'hq.system', True)  # rabbitmq 消息监听
 def receive_exception(ch, method, properties, body):
     print('=' * 20, ch, method, properties, body)
     body = body.decode('utf-8')

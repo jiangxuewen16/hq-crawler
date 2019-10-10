@@ -48,7 +48,7 @@ class Email(object):
             message['From'] = formataddr([self.sender_name, self.sender])
             message['To'] = ','.join(self.receivers)
             message['Cc'] = ','.join(self.cc_mail)
-
+            message['Subject'] = subject
             # msg = MIMEText(msg, 'plain', 'utf-8')
             # msg['From'] = formataddr([self.sender_name, self.sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
             # msg['To'] = ','.join(self.receivers)  # 括号里的对应收件人邮箱昵称、收件人邮箱账号

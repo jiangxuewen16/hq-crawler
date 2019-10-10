@@ -17,8 +17,6 @@ import sys
 
 import mongoengine
 
-from core.common.helper import auto_import_module
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 sys.path.insert(0, os.path.join(BASE_DIR, "spiders"))  # 引入依赖包
@@ -171,20 +169,19 @@ STATIC_URL = '/static/'
 mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017', alias='default')  # 连接hq_crawler.mongodb
 mongoengine.connect('passport', host='mongodb://11.75.1.20:27017', alias='passport')  # 连接passport
 
-# 这里放每个应用的视图包，自动加载，主要用于自定路径路由注册
-auto_import_module('apps.api.views')  # view包，业务代码写到此包中
+
 
 """
 定时调度任务业务包
 """
-SCHEDULER_START = False  # 是否开启调度任务
+SCHEDULER_START = True  # 是否开启调度任务
 # 定时任务业务包，定时任务写到这里
 TASK_WORK_PACKAGE = 'apps.scheduler.task'
 
 """
 惠趣采集项目配置
 """
-SPIDER_START = True  # 是否开启采集项目
+SPIDER_START = False  # 是否开启采集项目
 SPIDER_PATH = f'{BASE_DIR}/spiders/'  # 爬虫项目目录
 
 """
@@ -193,6 +190,7 @@ rabbitmq 配置
 RABBITMQ_CONF = {
     'host': '118.126.105.239',
     'port': 5672,
+    'api_port': 15672,
     'user': 'guest',
     'password': 'guest',
     'vhost': '/',
@@ -206,7 +204,6 @@ RABBITMQ_CONF = {
     'nowait': False,
     'consumer_tag': '',
 }
-RABBITMQ_CHANNEL = None  # rabbitmq连接
 
 """
 惠趣邮件配置
@@ -219,7 +216,6 @@ EMAIL_CONF = {
     'user_name': '445251692@qq.com',
     'password': 'vadzhpbsercybhje'
 }
-
 
 """
 异步任务扩展
