@@ -45,4 +45,4 @@ class PublicOpinion(BaseView):
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
         # result = ExcLog.select_all()
         # result = ExcLog.count()
-        return self.success(str(helper.get_yesterday()))
+        return self.success(data)
