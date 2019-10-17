@@ -96,8 +96,8 @@ class ExcLog:
         logs = ExceptionLog.objects.aggregate(*pipeline)
         L = []
         for p in logs:
-            # detail = ExcLog.find_doc_detail(p['_id']['api_url'])
-            detail = ExcLog.find_doc_detail('/order/order_new/createNew')
+            detail = ExcLog.find_doc_detail(p['_id']['api_url'])
+            # detail = ExcLog.find_doc_detail('/order/order_new/createNew')
             p['title'] = detail['title']
             p['username'] = detail['username']
             p['email'] = detail['email']
