@@ -1,4 +1,6 @@
+import datetime
 import math
+import time
 
 from apps.api.common.helper import helper
 from apps.api.model.exception import ExcLog
@@ -34,15 +36,31 @@ class PublicOpinion(BaseView):
         result = data.json()
         return self.success(result)
 
+    # 异常数据可视化
     @Route.route(path='/exception/list')
     def exception_list(self):
-        page = 1
-        limit = 20
+        param = self.request_param
+        condition = {
+            'begin_date': helper.get_param(param=param, in_name='begin_date',
+                                           default="2000-01-01"),
+            'end_date': helper.get_param(param=param, in_name='end_date',
+                                         default=time.strftime("%Y-%m-%d", time.localtime())),
+        }
+        page = helper.get_param(param=param, in_name='page', default=1)
+        limit = helper.get_param(param=param, in_name='limit', default=20)
         skip = (page - 1) * limit
-        result = ExcLog.select_all()
-        total = ExcLog.count()
+        result = ExcLog.select_all(skip, limit, condition=condition)
+        total = ExcLog.count(condition=condition)
         last_page = math.ceil(total / limit)
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
-        # result = ExcLog.select_all()
-        # result = ExcLog.count()
+        return self.success(data)
+
+    """
+    条件：时间段
+    按接口名，分组统计报错接口
+    """
+
+    @Route.route(path='/exception/group')
+    def exception_group(self):
+        data = ExcLog.group_by_name(condition=[])
         return self.success(data)
