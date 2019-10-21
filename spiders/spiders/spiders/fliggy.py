@@ -11,7 +11,7 @@ from spiders.items.spot import spot
 from spiders.common import OTA
 
 """
-飞猪
+飞猪: todo:暂时不要爬
 """
 
 

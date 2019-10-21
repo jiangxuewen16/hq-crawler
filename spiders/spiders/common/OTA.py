@@ -13,11 +13,13 @@ ota的id定义
 @unique
 class OtaCode(Enum):
     HUIQULX = ota('惠趣旅行', 10000)
-    MAFENGWO = ota('马蜂窝', 10001)
+    MAFENGWO = ota('马蜂窝', 10001)  # 不需要爬取
     CTRIP = ota('携程', 10002)
-    FLIGGY = ota('飞猪', 10003)
+    FLIGGY = ota('飞猪', 10003)  # 不需要爬
     MEITUAN = ota('美团', 10004)
     LVMAMA = ota('驴妈妈', 10005)
+    QUNAR = ota('去哪儿', 10006)
+    LY = ota('同程', 10007)
 
 
 """

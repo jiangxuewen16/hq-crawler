@@ -12,7 +12,7 @@ from spiders.items.spot import spot
 from spiders.items.spot.spot import Spot
 
 """
-马蜂窝
+马蜂窝 todo:暂时不要爬
 """
 
 
