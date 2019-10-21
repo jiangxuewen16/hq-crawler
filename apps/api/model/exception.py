@@ -83,6 +83,27 @@ class ExcLog:
     def group_by_name(cls, condition):
         pipeline = [
             {
+                '$match': {
+                    "$and": [
+                        {
+                            "create_at": {
+                                "$gte": condition['begin_date']
+                            }
+                        },
+                        {
+                            "create_at": {
+                                "$lte": condition['end_date'] 
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                '$sort': {
+                    "create_at": -1
+                }
+            },
+            {
                 '$group': {
                     '_id': {
                         'api_url': '$api_url'

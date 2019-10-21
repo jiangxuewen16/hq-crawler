@@ -57,10 +57,17 @@ class PublicOpinion(BaseView):
 
     """
     条件：时间段
-    按接口名，分组统计报错接口
+    按接口名、分组统计报错接口
     """
 
     @Route.route(path='/exception/group')
     def exception_group(self):
-        data = ExcLog.group_by_name(condition=[])
+        param = self.request_param
+        condition = {
+            'begin_date': helper.get_param(param=param, in_name='begin_date',
+                                           default="2000-01-01 00:00:00"),
+            'end_date': helper.get_param(param=param, in_name='end_date',
+                                         default=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())),
+        }
+        data = ExcLog.group_by_name(condition=condition)
         return self.success(data)
