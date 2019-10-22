@@ -117,8 +117,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'hq_crawler',
         'USER': 'root',
-        'HOST': '192.168.56.100',
-        'PASSWORD': 'root',
+        'HOST': '127.0.0.1',
+        'PASSWORD': '123456',
         'PORT': 3306,
         'OPTIONS': {'charset': 'utf8mb4'},
     }
