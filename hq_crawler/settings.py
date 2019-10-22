@@ -117,8 +117,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'hq_crawler',
         'USER': 'root',
-        'HOST': '127.0.0.1',
-        'PASSWORD': '123456',
+        'HOST': '192.168.56.100',
+        'PASSWORD': 'root',
         'PORT': 3306,
         'OPTIONS': {'charset': 'utf8mb4'},
     }
@@ -181,7 +181,7 @@ TASK_WORK_PACKAGE = 'apps.scheduler.task'
 """
 惠趣采集项目配置
 """
-SPIDER_START = False  # 是否开启采集项目
+SPIDER_START = True  # 是否开启采集项目
 SPIDER_PATH = f'{BASE_DIR}/spiders/'  # 爬虫项目目录
 
 """

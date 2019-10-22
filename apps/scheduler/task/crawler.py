@@ -36,9 +36,8 @@ def spot_comment():
     print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
 
 
-# 订单接口检测
-@register_job(scheduler, "interval", seconds=5)  # 每5秒执行一次
-def order_check():
-    jobid = get_scrapyd_cli().schedule('spiders', 'hqlx_order')
-    print('=' * 30, 'test:::', 'test:::', ':::', jobid)
-    # print("#" * 20, "每秒执行一次")
+# 订单接口检测 每2秒执行一次
+# @register_job(scheduler, "interval", seconds=2)
+# def order_check():
+#     jobid = get_scrapyd_cli().schedule('spiders', 'hqlx_order')
+#     print('=' * 30, 'test:::', 'test:::', ':::', jobid)
