@@ -35,6 +35,7 @@ class OtaSpotIdMap(Enum):
                   sp_map(OtaCode.MEITUAN, 1515791),
                   sp_map(OtaCode.LVMAMA, 100025),
                   sp_map(OtaCode.CTRIP, 62931),
+                  sp_map(OtaCode.QUNAR, 706176810),
                   sp_map(OtaCode.FLIGGY, [556487712203, 598531650805, 600223581229])
                   ]
 

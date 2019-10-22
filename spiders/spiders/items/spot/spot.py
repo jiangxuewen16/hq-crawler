@@ -31,6 +31,7 @@ class Spot(BaseItem, mongoengine.Document):
     comment_num = mongoengine.IntField()
     addr = mongoengine.StringField(max_length=100)
     spot_favorable = mongoengine.StringField(max_length=100)  # 好评率
+    tag_list = mongoengine.ListField()  # 评论tag
 
     create_at = mongoengine.DateTimeField(null=True)
     update_at = mongoengine.DateTimeField(null=True)
@@ -61,6 +62,7 @@ class SpotComment(BaseItem, mongoengine.Document):
     c_content = mongoengine.StringField(max_length=2000)  # 评论内容
     c_img = mongoengine.ListField()  # 评论图片列表
     c_from = mongoengine.StringField(max_length=50)  # 评论来源
+    # c_tag_list = mongoengine.ListField()  # 评论tag
 
     create_at = mongoengine.StringField(max_length=50)  # 评论创建时间
 
