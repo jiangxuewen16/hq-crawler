@@ -56,6 +56,12 @@ class Scrapy(BaseView):
         print('=' * 30, '爬虫定时任务:::', '美团景区列表:::', ':::', jobid)
         return self.success({'jobid': jobid})
 
+    @Route.route(path='spot/list/qunar')
+    def spot_list_(self):
+        jobid = get_scrapyd_cli().schedule('spiders', 'qunar_comment')
+        print('=' * 30, '爬虫定时任务:::', '去哪儿列表:::', ':::', jobid)
+        return self.success({'jobid': jobid})
+
     @Route.route(path='hqlx/order')
     def hqlx_order_(self):
         jobid = get_scrapyd_cli().schedule('spiders', 'hqlx_order')

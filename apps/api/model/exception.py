@@ -1,5 +1,9 @@
 import datetime
 import json
+import os
+
+import requests
+from django.core.cache import cache
 
 from apps.models.crawler import ExceptionLog
 from apps.models.passport import DocInterface, DocUser, DocProject
@@ -92,7 +96,7 @@ class ExcLog:
                         },
                         {
                             "create_at": {
-                                "$lte": condition['end_date'] 
+                                "$lte": condition['end_date']
                             }
                         }
                     ]
@@ -151,3 +155,15 @@ class ExcLog:
             pass
         return result
         # ExcLog.find_doc_detail()
+
+    @classmethod
+    def get_token(cls):
+        url = 'https://passport.huiqulx.com/index/permission/login'
+        post_data = '{"u_name":"18508488575","pwd":"123456","app_id":"40","u_type":"1"}'
+        headers = {'content-type': 'application/json'}
+        data = requests.post(url, headers=headers, data=post_data)
+        result = data.json()
+        cache.set('hqlx_token', result['token'])  # 写入key为v，值为555的缓存，有效期30分钟
+        cache.has_key('hqlx_token')  # 判断key为v是否存在
+        token = cache.get('hqlx_token')  # 获取key为v的缓存
+        return token

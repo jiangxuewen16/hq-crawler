@@ -2,6 +2,7 @@ from django_apscheduler.jobstores import register_job
 
 from core.common.helper import get_scrapyd_cli
 from core.lib.task import scheduler
+from apps.api.model.exception import ExcLog
 
 """
 设置定时任务，选择方式为interval，时间间隔为10s
@@ -37,7 +38,7 @@ def spot_comment():
 
 
 # 订单接口检测 每2秒执行一次
-@register_job(scheduler, "interval", seconds=2)
+@register_job(scheduler, "interval", seconds=5 * 60 * 60)
 def order_check():
     jobid = get_scrapyd_cli().schedule('spiders', 'hqlx_order')
-    print('=' * 30, 'test:::', 'test:::', ':::', jobid)
+    print('=' * 30, 'test:::', 'test:::', jobid)
