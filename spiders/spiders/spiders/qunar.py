@@ -143,7 +143,6 @@ class QunarCommentSpider(scrapy.Spider):
                 # spot_comment.c_img = value['imgs']
                 spot_comment.c_img = [item['small'] for item in value['imgs']]
                 spot_comment.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                spot_comment.save(force_insert=False, validate=False, clean=True)
-
+                yield spot_comment
                 # qnr = OTA.OtaCode.QUNAR.value.id
                 # print(qnr, "*" * 20)
