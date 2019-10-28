@@ -207,7 +207,12 @@ class PublicOpinion(BaseView):
             'last_year_month_first': last_year_month_first,
             'last_year_month_last': last_year_month_last
         }
-        result = Spot.spot_complex(condition=condition)
+        spot_complex = Spot.spot_complex(condition=condition)
+        comment_num = Spot.comment_num(condition=condition)
+        now_month = Spot.now_month(condition=condition)
+        star_percent = Spot.star_percent(condition=condition)
+        result = {"spot_complex": spot_complex, "comment_num": comment_num, "now_month": now_month,
+                  "star_percent": star_percent}
         return self.success(result)
 
     # 景区评论数
