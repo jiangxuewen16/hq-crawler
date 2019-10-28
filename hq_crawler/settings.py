@@ -112,15 +112,26 @@ WSGI_APPLICATION = 'hq_crawler.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'hq_crawler',
-        'USER': 'root',
-        'HOST': '127.0.0.1',
-        'PASSWORD': '123456',
-        'PORT': 3306,
-        'OPTIONS': {'charset': 'utf8mb4'},
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'hq_crawler',
+        # 'USER': 'root',
+        # 'HOST': '192.168.56.100',
+        # 'PASSWORD': 'root',
+        # 'PORT': 3306,
+        # 'OPTIONS': {'charset': 'utf8mb4'},
+    }
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # "PASSWORD": "yoursecret",
+        }
     }
 }
 
@@ -169,19 +180,17 @@ STATIC_URL = '/static/'
 mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017', alias='default')  # 连接hq_crawler.mongodb
 mongoengine.connect('passport', host='mongodb://11.75.1.20:27017', alias='passport')  # 连接passport
 
-
-
 """
 定时调度任务业务包
 """
-SCHEDULER_START = True  # 是否开启调度任务
+SCHEDULER_START = False  # 是否开启调度任务
 # 定时任务业务包，定时任务写到这里
 TASK_WORK_PACKAGE = 'apps.scheduler.task'
 
 """
 惠趣采集项目配置
 """
-SPIDER_START = True  # 是否开启采集项目
+SPIDER_START = False  # 是否开启采集项目
 SPIDER_PATH = f'{BASE_DIR}/spiders/'  # 爬虫项目目录
 
 """
