@@ -187,3 +187,46 @@ class PublicOpinion(BaseView):
             return self.success(data['item_detail_id'])
         else:
             return self.success('不存在')
+
+    # 景区综合评分
+    @Route.route(path='/spot/complex')
+    def spot_complex(self):
+        now = time.strftime("%Y-%m-%d", time.localtime())
+        now_month = str(datetime.date(datetime.date.today().year, datetime.date.today().month, 1))
+        month_first = str(datetime.date(datetime.date.today().year, datetime.date.today().month - 1, 1))
+        month_last = str(
+            datetime.date(datetime.date.today().year, datetime.date.today().month, 1) - datetime.timedelta(1))
+        last_year_month_first = str(datetime.date(datetime.date.today().year - 1, datetime.date.today().month, 1))
+        last_year_month_last = str(
+            datetime.date(datetime.date.today().year - 1, datetime.date.today().month + 1, 1) - datetime.timedelta(1))
+        condition = {
+            'now': now,
+            'now_month': now_month,
+            'last_month_first': month_first,
+            'last_month_last': month_last,
+            'last_year_month_first': last_year_month_first,
+            'last_year_month_last': last_year_month_last
+        }
+        result = Spot.spot_complex(condition=condition)
+        return self.success(result)
+
+    # 景区评论数
+    @Route.route(path='/comment/num')
+    def comment_num(self):
+        condition = {}
+        result = Spot.comment_num(condition=condition)
+        return self.success(result)
+
+    # 当月评分走势
+    @Route.route(path='/now/month')
+    def now_month(self):
+        condition = {}
+        result = Spot.now_month(condition=condition)
+        return self.success(result)
+
+    # 评分等级占比数据
+    @Route.route(path='/star/percent')
+    def star_percent(self):
+        condition = {}
+        result = Spot.star_percent(condition=condition)
+        return self.success(result)
