@@ -1072,19 +1072,19 @@ class Spot:
         L = []
         for p in spot_complex:
             L.append(dict(p))
-        tongbi_num = L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score']
-        huanbi_num = L[0]['now_month_per_score'] - L[0]['last_month_per_score']
+        tongbi_num = round(L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score'], 1)
+        huanbi_num = round(L[0]['now_month_per_score'] - L[0]['last_month_per_score'], 1)
         if L[0]['lastyear_month_per_score']:
-            tongbi_per = tongbi_num / L[0]['lastyear_month_per_score']
+            tongbi_per = round(tongbi_num / L[0]['lastyear_month_per_score'], 3)
         else:
             tongbi_per = None
 
         if L[0]['last_month_per_score']:
-            huanbi_per = huanbi_num / L[0]['last_month_per_score']
+            huanbi_per = round(huanbi_num / L[0]['last_month_per_score'], 3)
         else:
             huanbi_per = None
 
-        dic = {"now_month_per_score": L[0]['now_month_per_score'],
+        dic = {"now_month_per_score": round(L[0]['now_month_per_score'], 1),
                "tongbi_num": tongbi_num,
                "huanbi_num": huanbi_num,
                "tongbi_per": tongbi_per,
@@ -1149,8 +1149,8 @@ class Spot:
             L.append(dict(p))
         up_score_count = L[0]['up_score_count']
         down_score_count = L[0]['down_score_count']
-        up_score_per = up_score_count / (up_score_count + down_score_count)
-        down_score_per = down_score_count / (up_score_count + down_score_count)
+        up_score_per = round(up_score_count / (up_score_count + down_score_count), 3)
+        down_score_per = round(down_score_count / (up_score_count + down_score_count), 3)
         dic = {"up_score_count": up_score_count, "down_score_count": down_score_count, "up_score_per": up_score_per,
                "down_score_per": down_score_per}
         return dic
@@ -1211,6 +1211,7 @@ class Spot:
         spot_complex = spot.Spot.objects.aggregate(*pipeline)
         L = []
         for p in spot_complex:
+            p['avg_score'] = round(p['avg_score'], 3)
             L.append(dict(p))
         return L
 
@@ -1272,7 +1273,7 @@ class Spot:
             total = total + dict(p)['count']
         result = []
         for m in L:
-            m['percent'] = m['count'] / total
+            m['percent'] = round(m['count'] / total, 3)
             result.append(m)
 
         return result  # 15221
