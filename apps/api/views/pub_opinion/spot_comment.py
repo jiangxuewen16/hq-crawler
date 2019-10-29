@@ -153,6 +153,45 @@ class PublicOpinion(BaseView):
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
         return self.success(data)
 
+    # 实时点评
+    @Route.route(path='/spot/reviews')
+    def real_reviews(self):
+        param = self.request_param
+        condition = {
+            'check_name': Spot.get_param(param=param, in_name='check_name', default=''),
+            'begin_date': Spot.get_param(param=param, in_name='begin_date', default='1990-07-18'),
+            'end_date': Spot.get_param(param=param, in_name='end_date', default=str(datetime.datetime.now())),
+            'up_score': Spot.get_param(param=param, in_name='up_score', default=6),
+            'down_score': Spot.get_param(param=param, in_name='down_score', default=0),
+            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=[10001, 10002, 10003, 10004, 10005])
+        }
+        # c_score: 根据评分排序 create_at 根据时间排序
+        sort = Spot.get_param(param=param, in_name='sort', default='c_score')
+        #  labId= 1：全部  2：最新 3：好评   4：差评
+        labId = Spot.get_param(param=param, in_name='labId', default=1)
+        page = Spot.get_param(param=param, in_name='page', default=1)
+        limit = Spot.get_param(param=param, in_name='limit', default=5)
+        skip = (page - 1) * limit
+
+        if isinstance(condition['ota_id'], list):
+            condition['ota_id'] = condition['ota_id']
+        else:
+            condition['ota_id'] = [int(condition['ota_id'])]
+
+        if labId == 2:
+            sort = 'create_at'
+        elif labId == 3:
+            condition['up_score'] = 5
+            condition['down_score'] = 4
+        elif labId == 4:
+            condition['up_score'] = 1
+
+        result = SpotComment.list_comment(condition=condition, skip=skip, limit=limit, sort=sort)
+        total = SpotComment.total_comment(condition=condition)
+        last_page = math.ceil(total / limit)
+        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
+        return self.success(data)
+
     # 景区详情
     @Route.route(path='/spot/detail')
     def detail_spot(self):
