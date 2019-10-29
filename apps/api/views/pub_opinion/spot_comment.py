@@ -215,8 +215,11 @@ class PublicOpinion(BaseView):
         now_month = Spot.now_month(condition=condition)
         # 评分等级占比数据
         star_percent = Spot.star_percent(condition=condition)
+        # 舆情标签
+        comment_tags = Spot.comment_tags(condition=condition)
+
         result = {"spot_complex": spot_complex, "comment_num": comment_num, "now_month": now_month,
-                  "star_percent": star_percent}
+                  "star_percent": star_percent,"comment_tags":comment_tags}
         return self.success(result)
 
     # 景区评论数
@@ -238,4 +241,11 @@ class PublicOpinion(BaseView):
     def star_percent(self):
         condition = {}
         result = Spot.star_percent(condition=condition)
+        return self.success(result)
+
+    # 舆情标签
+    @Route.route(path='/comment/tags')
+    def comment_tags(self):
+        condition = {}
+        result = Spot.comment_tags(condition=condition)
         return self.success(result)
