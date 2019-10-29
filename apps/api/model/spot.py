@@ -113,6 +113,7 @@ class SpotComment:
                     'c_score': "$c_score",
                     'c_content': "$c_content",
                     'c_img': "$c_img",
+                    'c_from': "$c_from",
                     'create_at': "$create_at",
                     'update_at': "$update_at",
                     'spot_name': "$spot.spot_name"
