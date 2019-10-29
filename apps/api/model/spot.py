@@ -1273,10 +1273,43 @@ class Spot:
             total = total + dict(p)['count']
         result = []
         for m in L:
-            m['percent'] = m['count']/total
+            m['percent'] = m['count'] / total
             result.append(m)
 
         return result  # 15221
+
+    @classmethod
+    def comment_tags(cls, condition):
+        pipeline = [{
+            "$unwind": {
+                "path": "$tag_list",
+                "preserveNullAndEmptyArrays": True
+            }
+        },
+            {
+                "$match": {
+                    "tag_list.tag_type": 1
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$tag_list.tag_name",
+                    "count": {
+                        "$sum": "$tag_list.tag_num"
+                    }
+                }
+            },
+            {
+                "$sort": {
+                    "count": - 1
+                }
+            }
+        ]
+        comment_tags = spot.Spot.objects.aggregate(*pipeline)
+        L = []
+        for p in comment_tags:
+            L.append(dict(p))
+        return L
 
     @classmethod
     def get_param(cls, param, in_name, default):

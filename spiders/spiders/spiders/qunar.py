@@ -66,13 +66,15 @@ class QunarTagSpider(scrapy.Spider):
             for key, value in enumerate(comment['data']['tagList']):
                 # print(value['tagName'])
 
-                if value['tagType'] in [0, 1, 41, 44]:
+                if value['tagType'] in [0, 1, 41, 43, 44]:
                     tag_type = QunarSpider.sys_tags  # 属于系统标签
                 else:
                     tag_type = QunarSpider.user_tags  # 属于用户标签
                 tag = {'tag_name': value['tagName'], 'tag_num': value['tagNum'], 'tag_score': value['tagScore'],
                        'tag_type': tag_type}
                 spot_tag.append(tag)
+            print(spot_tag, "#" * 20)
+            print('-' * 20, 'ota_id', OTA.OtaCode.QUNAR.value.id, 'ota_spot_id', response.meta['ota_spot_id'])
             spot.Spot.objects(ota_id=OTA.OtaCode.QUNAR.value.id,
                               ota_spot_id=response.meta['ota_spot_id']).update(
                 set__tag_list=spot_tag)
