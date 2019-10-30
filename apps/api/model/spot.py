@@ -1501,12 +1501,14 @@ class Spot:
         tongbi_num = round(L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score'], 1)
         huanbi_num = round(L[0]['now_month_per_score'] - L[0]['last_month_per_score'], 1)
         if L[0]['lastyear_month_per_score']:
-            tongbi_per = round(L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score'] / L[0]['lastyear_month_per_score'], 3)
+            tongbi_per = round(
+                (L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score']) / L[0]['lastyear_month_per_score'], 3)
         else:
             tongbi_per = None
 
         if L[0]['last_month_per_score']:
-            huanbi_per = round(L[0]['now_month_per_score'] - L[0]['last_month_per_score'] / L[0]['last_month_per_score'], 3)
+            huanbi_per = round(
+                (L[0]['now_month_per_score'] - L[0]['last_month_per_score']) / L[0]['last_month_per_score'], 3)
         else:
             huanbi_per = None
 

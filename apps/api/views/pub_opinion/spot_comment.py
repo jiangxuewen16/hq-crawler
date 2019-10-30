@@ -70,7 +70,7 @@ class PublicOpinion(BaseView):
     @Route.route(path='/comment/all')
     def all_comment(self):
         param = self.request_param
-        condition = {
+        con = {
             'begin_date': Spot.get_param(param=param, in_name='begin_date',
                                          default="2000-01-01"),
             'end_date': Spot.get_param(param=param, in_name='end_date',
@@ -78,11 +78,21 @@ class PublicOpinion(BaseView):
             'ota_spot_id': Spot.get_param(param=param, in_name='ota_spot_id',
                                           default=Spot.list_spot_array())
         }
-        if isinstance(condition['ota_spot_id'], list):
-            condition['ota_spot_id'] = condition['ota_spot_id']
+        if isinstance(con['ota_spot_id'], list):
+            con['ota_spot_id'] = con['ota_spot_id']
         else:
-            condition['ota_spot_id'] = [int(condition['ota_spot_id'])]
+            con['ota_spot_id'] = [int(con['ota_spot_id'])]
 
+        end_date_pre = con['begin_date']
+        delta = (datetime.datetime.strptime(con['end_date'], '%Y-%m-%d') - datetime.datetime.strptime(
+            con['begin_date'],
+            '%Y-%m-%d')).days
+        print(delta, "#" * 10)
+        off_day = datetime.timedelta(days=delta)
+        begin_date_pre = (datetime.datetime.strptime(con['begin_date'], '%Y-%m-%d') - off_day).strftime("%Y-%m-%d")
+        condition = {'begin_date': con['begin_date'], 'end_date': con['end_date'], 'end_date_pre': end_date_pre,
+                     'begin_date_pre': begin_date_pre,
+                     'ota_spot_id': con['ota_spot_id']}
         page = Spot.get_param(param=param, in_name='page', default=1)
         limit = Spot.get_param(param=param, in_name='limit', default=5)
         skip = (page - 1) * limit
@@ -92,7 +102,7 @@ class PublicOpinion(BaseView):
         total = len(result_count)
         last_page = math.ceil(total / limit)
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
-        return self.success(data)
+        return self.success(condition)
 
     # 运营中心数据 景区评论统计
     @Route.route(path='/spot/score')
@@ -201,7 +211,8 @@ class PublicOpinion(BaseView):
         # 差评数量
         bad_total = SpotComment.total_comment(condition=condition)
         last_page = math.ceil(total / limit)
-        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'newest_total': total, 'praise_total': praise_total, 'bad_total': bad_total, 'list': result}
+        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'newest_total': total,
+                'praise_total': praise_total, 'bad_total': bad_total, 'list': result}
         return self.success(data)
 
     # 景区详情
@@ -270,7 +281,7 @@ class PublicOpinion(BaseView):
         comment_tags = Spot.comment_tags(condition=condition)
 
         result = {"spot_complex": spot_complex, "comment_num": comment_num, "now_month": now_month,
-                  "star_percent": star_percent,"comment_tags":comment_tags}
+                  "star_percent": star_percent, "comment_tags": comment_tags}
         return self.success(result)
 
     # 景区评论数
