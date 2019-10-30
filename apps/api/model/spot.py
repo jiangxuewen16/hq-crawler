@@ -645,91 +645,325 @@ class Spot:
                     "sum_score_ota_id_10000": {
                         "$sum": {
                             "$cond": [{
-                                "$eq": ["$ota_id", 10000]
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10000]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
                             }, "$c_score", 0]
                         }
                     },
                     "count_score_ota_id_10000": {
                         "$sum": {
                             "$cond": [{
-                                "$eq": ["$ota_id", 10000]
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10000]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10000_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10000]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2011-11-11"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10000_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10000]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2011-11-11"]
+                                }]
                             }, 1, 0]
                         }
                     },
                     "sum_score_ota_id_10001": {
                         "$sum": {
                             "$cond": [{
-                                "$eq": ["$ota_id", 10001]
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10001]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
                             }, "$c_score", 0]
                         }
                     },
                     "count_score_ota_id_10001": {
                         "$sum": {
                             "$cond": [{
-                                "$eq": ["$ota_id", 10001]
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10001]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10001_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10001]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2011-11-11"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10001_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10001]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2011-11-11"]
+                                }]
                             }, 1, 0]
                         }
                     },
                     "sum_score_ota_id_10002": {
                         "$sum": {
                             "$cond": [{
-                                "$eq": ["$ota_id", 10002]
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10002]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
                             }, "$c_score", 0]
                         }
                     },
                     "count_score_ota_id_10002": {
                         "$sum": {
                             "$cond": [{
-                                "$eq": ["$ota_id", 10002]
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10002]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10002_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10002]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2011-11-11"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10002_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10002]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2011-11-11"]
+                                }]
                             }, 1, 0]
                         }
                     },
                     "sum_score_ota_id_10003": {
                         "$sum": {
                             "$cond": [{
-                                "$eq": ["$ota_id", 10003]
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10003]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
                             }, "$c_score", 0]
                         }
                     },
                     "count_score_ota_id_10003": {
                         "$sum": {
                             "$cond": [{
-                                "$eq": ["$ota_id", 10003]
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10003]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10003_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10003]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2011-11-11"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10003_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10003]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2011-11-11"]
+                                }]
                             }, 1, 0]
                         }
                     },
                     "sum_score_ota_id_10004": {
                         "$sum": {
                             "$cond": [{
-                                "$eq": ["$ota_id", 10004]
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10004]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
                             }, "$c_score", 0]
                         }
                     },
                     "count_score_ota_id_10004": {
                         "$sum": {
                             "$cond": [{
-                                "$eq": ["$ota_id", 10004]
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10004]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10004_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10004]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2011-11-11"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10004_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10004]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2011-11-11"]
+                                }]
                             }, 1, 0]
                         }
                     },
                     "sum_score_ota_id_10005": {
                         "$sum": {
                             "$cond": [{
-                                "$eq": ["$ota_id", 10005]
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10005]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
                             }, "$c_score", 0]
                         }
                     },
                     "count_score_ota_id_10005": {
                         "$sum": {
                             "$cond": [{
-                                "$eq": ["$ota_id", 10005]
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10005]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10005_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10005]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2011-11-11"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10005_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10005]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2011-11-11"]
+                                }]
                             }, 1, 0]
                         }
                     },
                     "count_start_5": {
                         "$sum": {
                             "$cond": [{
-                                "$gte": ["$c_score", 5]
+                                "$and": [{
+                                    "$gte": ["$c_score", 5]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
                             }, 1, 0]
                         }
                     },
@@ -740,6 +974,10 @@ class Spot:
                                     "$gte": ["$c_score", 4]
                                 }, {
                                     "$lt": ["$c_score", 5]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
                                 }]
                             }, 1, 0]
                         }
@@ -751,6 +989,10 @@ class Spot:
                                     "$gte": ["$c_score", 3]
                                 }, {
                                     "$lt": ["$c_score", 4]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
                                 }]
                             }, 1, 0]
                         }
@@ -762,6 +1004,10 @@ class Spot:
                                     "$gte": ["$c_score", 2]
                                 }, {
                                     "$lt": ["$c_score", 3]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
                                 }]
                             }, 1, 0]
                         }
@@ -773,15 +1019,57 @@ class Spot:
                                     "$gte": ["$c_score", 1]
                                 }, {
                                     "$lt": ["$c_score", 2]
+                                }, {
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
                                 }]
                             }, 1, 0]
                         }
                     },
                     "sum_score": {
-                        "$sum": "$c_score"
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
+                            }, "$c_score", 0]
+                        }
                     },
                     "count_comment": {
-                        "$sum": 1
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2000-10-23"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2011-11-11"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_comment_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$lte": ["$create_at", "2020-10-23"]
+                                }, {
+                                    "$gte": ["$create_at", "2011-11-11"]
+                                }]
+                            }, 1, 0]
+                        }
                     }
                 }
             },
@@ -794,11 +1082,25 @@ class Spot:
                             "$divide": ["$sum_score", "$count_comment"]
                         }]
                     },
+                    "avg_total_pre": {
+                        "$cond": [{
+                            "$eq": ["$count_comment_pre", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_pre", "$count_comment_pre"]
+                        }]
+                    },
                     "avg_10000": {
                         "$cond": [{
                             "$eq": ["$count_score_ota_id_10000", 0]
                         }, 0, {
                             "$divide": ["$sum_score_ota_id_10000", "$count_score_ota_id_10000"]
+                        }]
+                    },
+                    "avg_10000_pre": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10000_pre", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10000_pre", "$count_score_ota_id_10000_pre"]
                         }]
                     },
                     "avg_10001": {
@@ -808,11 +1110,25 @@ class Spot:
                             "$divide": ["$sum_score_ota_id_10001", "$count_score_ota_id_10001"]
                         }]
                     },
+                    "avg_10001_pre": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10001_pre", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10001_pre", "$count_score_ota_id_10001_pre"]
+                        }]
+                    },
                     "avg_10002": {
                         "$cond": [{
                             "$eq": ["$count_score_ota_id_10002", 0]
                         }, 0, {
                             "$divide": ["$sum_score_ota_id_10002", "$count_score_ota_id_10002"]
+                        }]
+                    },
+                    "avg_10002_pre": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10002_pre", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10002_pre", "$count_score_ota_id_10002_pre"]
                         }]
                     },
                     "avg_10003": {
@@ -822,6 +1138,13 @@ class Spot:
                             "$divide": ["$sum_score_ota_id_10003", "$count_score_ota_id_10003"]
                         }]
                     },
+                    "avg_10003_pre": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10003_pre", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10003_pre", "$count_score_ota_id_10003_pre"]
+                        }]
+                    },
                     "avg_10004": {
                         "$cond": [{
                             "$eq": ["$count_score_ota_id_10004", 0]
@@ -829,11 +1152,106 @@ class Spot:
                             "$divide": ["$sum_score_ota_id_10004", "$count_score_ota_id_10004"]
                         }]
                     },
+                    "avg_10004_pre": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10004_pre", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10004_pre", "$count_score_ota_id_10004_pre"]
+                        }]
+                    },
                     "avg_10005": {
                         "$cond": [{
                             "$eq": ["$count_score_ota_id_10005", 0]
                         }, 0, {
                             "$divide": ["$sum_score_ota_id_10005", "$count_score_ota_id_10005"]
+                        }]
+                    },
+                    "avg_10005_pre": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10005_pre", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10005_pre", "$count_score_ota_id_10005_pre"]
+                        }]
+                    },
+                    "count_start_5": "$count_start_5",
+                    "count_start_4": "$count_start_4",
+                    "count_start_3": "$count_start_3",
+                    "count_start_2": "$count_start_2",
+                    "count_start_1": "$count_start_1",
+                    "count_comment": "$count_comment",
+
+                }
+            },
+            {
+                "$project": {
+                    "avg_total": "$avg_total",
+                    "avg_total_percent": {
+                        "$cond": [{
+                            "$eq": ["$avg_total_pre", 0]
+                        }, 0, {
+                            "$divide": [{
+                                "$subtract": ["$avg_total", "$avg_total_pre"]
+                            }, "$avg_total_pre"]
+                        }]
+                    },
+                    "avg_10000": "$avg_10000",
+                    "avg_10000_percent": {
+                        "$cond": [{
+                            "$eq": ["$avg_10000_pre", 0]
+                        }, 0, {
+                            "$divide": [{
+                                "$subtract": ["$avg_10000", "$avg_10000_pre"]
+                            }, "$avg_10000_pre"]
+                        }]
+                    },
+                    "avg_10001": "$avg_10001",
+                    "avg_10001_percent": {
+                        "$cond": [{
+                            "$eq": ["$avg_10001_pre", 0]
+                        }, 0, {
+                            "$divide": [{
+                                "$subtract": ["$avg_10001", "$avg_10001_pre"]
+                            }, "$avg_10001_pre"]
+                        }]
+                    },
+                    "avg_10002": "$avg_10002",
+                    "avg_10002_percent": {
+                        "$cond": [{
+                            "$eq": ["$avg_10002_pre", 0]
+                        }, 0, {
+                            "$divide": [{
+                                "$subtract": ["$avg_10002", "$avg_10002_pre"]
+                            }, "$avg_10002_pre"]
+                        }]
+                    },
+                    "avg_10003": "$avg_10003",
+                    "avg_10003_percent": {
+                        "$cond": [{
+                            "$eq": ["$avg_10003_pre", 0]
+                        }, 0, {
+                            "$divide": [{
+                                "$subtract": ["$avg_10003", "$avg_10003_pre"]
+                            }, "$avg_10003_pre"]
+                        }]
+                    },
+                    "avg_10004": "$avg_10004",
+                    "avg_10004_percent": {
+                        "$cond": [{
+                            "$eq": ["$avg_10004_pre", 0]
+                        }, 0, {
+                            "$divide": [{
+                                "$subtract": ["$avg_10004", "$avg_10004_pre"]
+                            }, "$avg_10004_pre"]
+                        }]
+                    },
+                    "avg_10005": "$avg_10005",
+                    "avg_10005_percent": {
+                        "$cond": [{
+                            "$eq": ["$avg_10005_pre", 0]
+                        }, 0, {
+                            "$divide": [{
+                                "$subtract": ["$avg_10005", "$avg_10005_pre"]
+                            }, "$avg_10005_pre"]
                         }]
                     },
                     "count_start_5": "$count_start_5",
@@ -863,12 +1281,19 @@ class Spot:
         for p in spot_comment_s:
             p['sort'] = i
             p['avg_total'] = round(p['avg_total'], 1)
+            p['avg_total_percent'] = round(p['avg_total_percent'], 1)
             p['avg_10000'] = round(p['avg_10000'], 1)
+            p['avg_10000_percent'] = round(p['avg_10000_percent'], 1)
             p['avg_10001'] = round(p['avg_10001'], 1)
+            p['avg_10001_percent'] = round(p['avg_10001_percent'], 1)
             p['avg_10002'] = round(p['avg_10002'], 1)
+            p['avg_10002_percent'] = round(p['avg_10002_percent'], 1)
             p['avg_10003'] = round(p['avg_10003'], 1)
+            p['avg_10003_percent'] = round(p['avg_10003_percent'], 1)
             p['avg_10004'] = round(p['avg_10004'], 1)
+            p['avg_10004_percent'] = round(p['avg_10004_percent'], 1)
             p['avg_10005'] = round(p['avg_10005'], 1)
+            p['avg_10005_percent'] = round(p['avg_10005_percent'], 1)
             if p['avg_total'] >= 4:
                 p['tags'] = '优秀'
             elif p['avg_total'] < 3.0:
@@ -1076,12 +1501,12 @@ class Spot:
         tongbi_num = round(L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score'], 1)
         huanbi_num = round(L[0]['now_month_per_score'] - L[0]['last_month_per_score'], 1)
         if L[0]['lastyear_month_per_score']:
-            tongbi_per = round(tongbi_num / L[0]['lastyear_month_per_score'], 3)
+            tongbi_per = round(L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score'] / L[0]['lastyear_month_per_score'], 3)
         else:
             tongbi_per = None
 
         if L[0]['last_month_per_score']:
-            huanbi_per = round(huanbi_num / L[0]['last_month_per_score'], 3)
+            huanbi_per = round(L[0]['now_month_per_score'] - L[0]['last_month_per_score'] / L[0]['last_month_per_score'], 3)
         else:
             huanbi_per = None
 
