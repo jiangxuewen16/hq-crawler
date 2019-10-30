@@ -102,7 +102,7 @@ class PublicOpinion(BaseView):
         total = len(result_count)
         last_page = math.ceil(total / limit)
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
-        return self.success(condition)
+        return self.success(data)
 
     # 运营中心数据 景区评论统计
     @Route.route(path='/spot/score')
