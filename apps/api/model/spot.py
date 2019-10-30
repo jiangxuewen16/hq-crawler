@@ -622,6 +622,12 @@ class Spot:
                             "ota_spot_id": {
                                 "$in": condition['ota_spot_id']
                             }
+                        },
+                        {
+                            "c_score": {
+                                "$ne": None
+                            }
+
                         }
                         # {
                         #     "create_at": {
@@ -947,9 +953,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10005]
                                 }, {
-                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -1189,9 +1195,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_total_pre", 0]
                         }, 0, {
-                            "$divide": [{
                                 "$subtract": ["$avg_total", "$avg_total_pre"]
-                            }, "$avg_total_pre"]
                         }]
                     },
                     "avg_10000": "$avg_10000",
@@ -1199,9 +1203,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10000_pre", 0]
                         }, 0, {
-                            "$divide": [{
                                 "$subtract": ["$avg_10000", "$avg_10000_pre"]
-                            }, "$avg_10000_pre"]
                         }]
                     },
                     "avg_10001": "$avg_10001",
@@ -1209,9 +1211,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10001_pre", 0]
                         }, 0, {
-                            "$divide": [{
                                 "$subtract": ["$avg_10001", "$avg_10001_pre"]
-                            }, "$avg_10001_pre"]
                         }]
                     },
                     "avg_10002": "$avg_10002",
@@ -1219,9 +1219,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10002_pre", 0]
                         }, 0, {
-                            "$divide": [{
                                 "$subtract": ["$avg_10002", "$avg_10002_pre"]
-                            }, "$avg_10002_pre"]
                         }]
                     },
                     "avg_10003": "$avg_10003",
@@ -1229,9 +1227,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10003_pre", 0]
                         }, 0, {
-                            "$divide": [{
                                 "$subtract": ["$avg_10003", "$avg_10003_pre"]
-                            }, "$avg_10003_pre"]
                         }]
                     },
                     "avg_10004": "$avg_10004",
@@ -1239,9 +1235,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10004_pre", 0]
                         }, 0, {
-                            "$divide": [{
                                 "$subtract": ["$avg_10004", "$avg_10004_pre"]
-                            }, "$avg_10004_pre"]
                         }]
                     },
                     "avg_10005": "$avg_10005",
@@ -1249,9 +1243,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10005_pre", 0]
                         }, 0, {
-                            "$divide": [{
                                 "$subtract": ["$avg_10005", "$avg_10005_pre"]
-                            }, "$avg_10005_pre"]
                         }]
                     },
                     "count_start_5": "$count_start_5",
@@ -1509,7 +1501,7 @@ class Spot:
 
         if L[0]['last_month_per_score']:
             huanbi_per = round(
-                (L[0]['now_month_per_score'] - L[0]['last_month_per_score'])*100 / L[0]['last_month_per_score'], 1)
+                (L[0]['now_month_per_score'] - L[0]['last_month_per_score']) * 100 / L[0]['last_month_per_score'], 1)
         else:
             huanbi_per = None
 
@@ -1578,8 +1570,8 @@ class Spot:
             L.append(dict(p))
         up_score_count = L[0]['up_score_count']
         down_score_count = L[0]['down_score_count']
-        up_score_per = round(up_score_count*100 / (up_score_count + down_score_count), 1)
-        down_score_per = round(down_score_count*100 / (up_score_count + down_score_count), 1)
+        up_score_per = round(up_score_count * 100 / (up_score_count + down_score_count), 1)
+        down_score_per = round(down_score_count * 100 / (up_score_count + down_score_count), 1)
         dic = {"up_score_count": up_score_count, "down_score_count": down_score_count, "up_score_per": up_score_per,
                "down_score_per": down_score_per}
         return dic
@@ -1702,7 +1694,7 @@ class Spot:
             total = total + dict(p)['count']
         result = []
         for m in L:
-            m['percent'] = round(m['count']*100 / total, 1)
+            m['percent'] = round(m['count'] * 100 / total, 1)
             result.append(m)
 
         return result  # 15221
