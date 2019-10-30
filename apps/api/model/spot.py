@@ -1688,7 +1688,7 @@ class Spot:
             },
             {
                 "$sort": {
-                    "_id": 1
+                    "_id": -1
                 }
             }]
         star_percent = spot.Spot.objects.aggregate(*pipeline)
