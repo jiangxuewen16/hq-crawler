@@ -182,14 +182,26 @@ class PublicOpinion(BaseView):
             sort = 'create_at'
         elif labId == 3:
             condition['up_score'] = 5
-            condition['down_score'] = 4
+            condition['down_score'] = 3
         elif labId == 4:
-            condition['up_score'] = 1
+            condition['up_score'] = 2
+            condition['down_score'] = 0
 
         result = SpotComment.list_comment(condition=condition, skip=skip, limit=limit, sort=sort)
+        # 所有评论数量
+        condition['up_score'] = 6
+        condition['down_score'] = 0
         total = SpotComment.total_comment(condition=condition)
+        condition['up_score'] = 6
+        condition['down_score'] = 3
+        # 好评数量
+        praise_total = SpotComment.total_comment(condition=condition)
+        condition['up_score'] = 2
+        condition['down_score'] = 0
+        # 差评数量
+        bad_total = SpotComment.total_comment(condition=condition)
         last_page = math.ceil(total / limit)
-        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
+        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'newest_total': total, 'praise_total': praise_total, 'bad_total': bad_total, 'list': result}
         return self.success(data)
 
     # 景区详情
