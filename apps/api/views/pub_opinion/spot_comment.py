@@ -72,7 +72,7 @@ class PublicOpinion(BaseView):
         param = self.request_param
         con = {
             'begin_date': Spot.get_param(param=param, in_name='begin_date',
-                                         default="2000-01-01"),
+                                         default="2019-01-01"),
             'end_date': Spot.get_param(param=param, in_name='end_date',
                                        default=time.strftime("%Y-%m-%d", time.localtime())),
             'ota_spot_id': Spot.get_param(param=param, in_name='ota_spot_id',
