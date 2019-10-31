@@ -1,3 +1,4 @@
+import csv
 import datetime
 import math
 import time
@@ -311,3 +312,39 @@ class PublicOpinion(BaseView):
         condition = {}
         result = Spot.comment_tags(condition=condition)
         return self.success(result)
+
+    # 导出数据
+    @Route.route(path='/star/export')
+    def star_export(self):
+        condition = {
+            'begin_date': "2019-01-01",
+            'end_date': time.strftime("%Y-%m-%d", time.localtime()),
+            'begin_date_pre': "2019-01-01",
+            'end_date_pre': time.strftime("%Y-%m-%d", time.localtime()),
+            'ota_spot_id': Spot.list_spot_array()
+        }
+        with open('test.csv', "w", encoding='utf8', newline='') as outFileCsv:
+            # 设置csv表头
+            fileheader = ['全部景区', '美团', '携程', '去哪儿', '驴妈妈', '同程', '平均评分', '考核级别', '5星评论数', '4星评论数', '3星评论数', '2星评论数',
+                          '1星评论数', '总评论数', '排名']
+            outDictWriter = csv.DictWriter(outFileCsv, fileheader)
+            outDictWriter.writeheader()
+            # 设置csv数据,这里的数据格式是字典型
+            result_count = Spot.all_comment(condition=condition, skip=0, limit=10000)
+            for key, value in enumerate(result_count):
+                print(value['_id']['spot_name'], "-" * 20)
+
+                print(value['avg_10001'], "+" * 20)
+                print(value['avg_10001_percent'], "+" * 20)
+                # pass
+                result = [{'全部景区': value['_id']['spot_name'], '美团': value['avg_10001']},
+                          {'携程': value['_id']['spot_name'], '去哪儿': value['avg_10001']},
+                          {'驴妈妈': value['_id']['spot_name'], '同程': value['avg_10001']},
+                          {'平均评分': value['_id']['spot_name'], '考核级别': value['avg_10001']},
+                          {'5星评论数': value['_id']['spot_name'], '4星评论数': value['avg_10001']},
+                          {'3星评论数': value['_id']['spot_name'], '2星评论数': value['avg_10001']},
+                          {'1星评论数': value['_id']['spot_name'], '总评论数': value['avg_10001']},
+                          {'排名': value['_id']['spot_name']}]
+                outDictWriter.writerows(result)
+            outFileCsv.close()
+        return self.success(1)
