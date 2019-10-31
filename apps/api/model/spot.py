@@ -960,6 +960,110 @@ class Spot:
                             }, 1, 0]
                         }
                     },
+                    "sum_score_ota_id_10006": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10006]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10006": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10006]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10006_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10006]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10006_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10006]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10007": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10007]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10007": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10007]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10007_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10007]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10007_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10007]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
                     "count_start_5": {
                         "$sum": {
                             "$cond": [{
@@ -1179,6 +1283,34 @@ class Spot:
                             "$divide": ["$sum_score_ota_id_10005_pre", "$count_score_ota_id_10005_pre"]
                         }]
                     },
+                    "avg_10006": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10006", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10006", "$count_score_ota_id_10006"]
+                        }]
+                    },
+                    "avg_10006_pre": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10006_pre", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10006_pre", "$count_score_ota_id_10006_pre"]
+                        }]
+                    },
+                    "avg_10007": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10007", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10007", "$count_score_ota_id_10007"]
+                        }]
+                    },
+                    "avg_10007_pre": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10007_pre", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10007_pre", "$count_score_ota_id_10007_pre"]
+                        }]
+                    },
                     "count_start_5": "$count_start_5",
                     "count_start_4": "$count_start_4",
                     "count_start_3": "$count_start_3",
@@ -1246,6 +1378,22 @@ class Spot:
                                 "$subtract": ["$avg_10005", "$avg_10005_pre"]
                         }]
                     },
+                    "avg_10006": "$avg_10006",
+                    "avg_10006_percent": {
+                        "$cond": [{
+                            "$eq": ["$avg_10006_pre", 0]
+                        }, 0, {
+                            "$subtract": ["$avg_10006", "$avg_10006_pre"]
+                        }]
+                    },
+                    "avg_10007": "$avg_10007",
+                    "avg_10007_percent": {
+                        "$cond": [{
+                            "$eq": ["$avg_10006_pre", 0]
+                        }, 0, {
+                            "$subtract": ["$avg_10007", "$avg_10007_pre"]
+                        }]
+                    },
                     "count_start_5": "$count_start_5",
                     "count_start_4": "$count_start_4",
                     "count_start_3": "$count_start_3",
@@ -1286,6 +1434,10 @@ class Spot:
             p['avg_10004_percent'] = round(p['avg_10004_percent'], 1)
             p['avg_10005'] = round(p['avg_10005'], 1)
             p['avg_10005_percent'] = round(p['avg_10005_percent'], 1)
+            p['avg_10006'] = round(p['avg_10006'], 1)
+            p['avg_10006_percent'] = round(p['avg_10006_percent'], 1)
+            p['avg_10007'] = round(p['avg_10007'], 1)
+            p['avg_10007_percent'] = round(p['avg_10007_percent'], 1)
             if p['avg_total'] >= 4:
                 p['tags'] = '优秀'
             elif p['avg_total'] < 3.0:
