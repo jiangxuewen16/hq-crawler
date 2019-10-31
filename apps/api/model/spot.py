@@ -624,15 +624,21 @@ class Spot:
                             }
                         },
                         {
-                            "create_at": {
-                                "$gte": condition['begin_date'] + " 00:00:00"
+                            "c_score": {
+                                "$ne": None
                             }
-                        },
-                        {
-                            "create_at": {
-                                "$lte": condition['end_date'] + " 23:59:59"
-                            }
+
                         }
+                        # {
+                        #     "create_at": {
+                        #         "$gte": condition['begin_date'] + " 00:00:00"
+                        #     }
+                        # },
+                        # {
+                        #     "create_at": {
+                        #         "$lte": condition['end_date'] + " 23:59:59"
+                        #     }
+                        # }
                     ]
                 }
             },
@@ -648,9 +654,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10000]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, "$c_score", 0]
                         }
@@ -661,9 +667,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10000]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -674,9 +680,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10000]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2011-11-11"]
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
                                 }]
                             }, "$c_score", 0]
                         }
@@ -687,9 +693,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10000]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2011-11-11"]
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -700,9 +706,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10001]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, "$c_score", 0]
                         }
@@ -713,9 +719,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10001]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -726,9 +732,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10001]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2011-11-11"]
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
                                 }]
                             }, "$c_score", 0]
                         }
@@ -739,9 +745,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10001]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2011-11-11"]
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -752,9 +758,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10002]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, "$c_score", 0]
                         }
@@ -765,9 +771,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10002]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -778,9 +784,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10002]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2011-11-11"]
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
                                 }]
                             }, "$c_score", 0]
                         }
@@ -791,9 +797,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10002]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2011-11-11"]
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -804,9 +810,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10003]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, "$c_score", 0]
                         }
@@ -817,9 +823,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10003]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -830,9 +836,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10003]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2011-11-11"]
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
                                 }]
                             }, "$c_score", 0]
                         }
@@ -843,9 +849,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10003]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2011-11-11"]
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -856,9 +862,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10004]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, "$c_score", 0]
                         }
@@ -869,9 +875,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10004]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -882,9 +888,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10004]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2011-11-11"]
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
                                 }]
                             }, "$c_score", 0]
                         }
@@ -895,9 +901,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10004]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2011-11-11"]
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -908,9 +914,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10005]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, "$c_score", 0]
                         }
@@ -921,9 +927,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10005]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -934,9 +940,9 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10005]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2011-11-11"]
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
                                 }]
                             }, "$c_score", 0]
                         }
@@ -947,9 +953,113 @@ class Spot:
                                 "$and": [{
                                     "$eq": ["$ota_id", 10005]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2011-11-11"]
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10006": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10006]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10006": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10006]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10006_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10006]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10006_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10006]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10007": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10007]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10007": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10007]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
+                                }]
+                            }, 1, 0]
+                        }
+                    },
+                    "sum_score_ota_id_10007_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10007]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
+                                }]
+                            }, "$c_score", 0]
+                        }
+                    },
+                    "count_score_ota_id_10007_pre": {
+                        "$sum": {
+                            "$cond": [{
+                                "$and": [{
+                                    "$eq": ["$ota_id", 10007]
+                                }, {
+                                    "$lte": ["$create_at", condition['end_date_pre'] + " 23:59:59"]
+                                }, {
+                                    "$gte": ["$create_at", condition['begin_date_pre'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -960,9 +1070,9 @@ class Spot:
                                 "$and": [{
                                     "$gte": ["$c_score", 5]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -975,9 +1085,9 @@ class Spot:
                                 }, {
                                     "$lt": ["$c_score", 5]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -990,9 +1100,9 @@ class Spot:
                                 }, {
                                     "$lt": ["$c_score", 4]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -1005,9 +1115,9 @@ class Spot:
                                 }, {
                                     "$lt": ["$c_score", 3]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -1020,9 +1130,9 @@ class Spot:
                                 }, {
                                     "$lt": ["$c_score", 2]
                                 }, {
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -1031,9 +1141,9 @@ class Spot:
                         "$sum": {
                             "$cond": [{
                                 "$and": [{
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, "$c_score", 0]
                         }
@@ -1042,9 +1152,9 @@ class Spot:
                         "$sum": {
                             "$cond": [{
                                 "$and": [{
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2000-10-23"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -1053,9 +1163,9 @@ class Spot:
                         "$sum": {
                             "$cond": [{
                                 "$and": [{
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2011-11-11"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, "$c_score", 0]
                         }
@@ -1064,9 +1174,9 @@ class Spot:
                         "$sum": {
                             "$cond": [{
                                 "$and": [{
-                                    "$lte": ["$create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['end_date'] + " 23:59:59"]
                                 }, {
-                                    "$gte": ["$create_at", "2011-11-11"]
+                                    "$gte": ["$create_at", condition['begin_date'] + " 00:00:00"]
                                 }]
                             }, 1, 0]
                         }
@@ -1173,6 +1283,34 @@ class Spot:
                             "$divide": ["$sum_score_ota_id_10005_pre", "$count_score_ota_id_10005_pre"]
                         }]
                     },
+                    "avg_10006": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10006", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10006", "$count_score_ota_id_10006"]
+                        }]
+                    },
+                    "avg_10006_pre": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10006_pre", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10006_pre", "$count_score_ota_id_10006_pre"]
+                        }]
+                    },
+                    "avg_10007": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10007", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10007", "$count_score_ota_id_10007"]
+                        }]
+                    },
+                    "avg_10007_pre": {
+                        "$cond": [{
+                            "$eq": ["$count_score_ota_id_10007_pre", 0]
+                        }, 0, {
+                            "$divide": ["$sum_score_ota_id_10007_pre", "$count_score_ota_id_10007_pre"]
+                        }]
+                    },
                     "count_start_5": "$count_start_5",
                     "count_start_4": "$count_start_4",
                     "count_start_3": "$count_start_3",
@@ -1189,9 +1327,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_total_pre", 0]
                         }, 0, {
-                            "$divide": [{
-                                "$subtract": ["$avg_total", "$avg_total_pre"]
-                            }, "$avg_total_pre"]
+                            "$subtract": ["$avg_total", "$avg_total_pre"]
                         }]
                     },
                     "avg_10000": "$avg_10000",
@@ -1199,9 +1335,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10000_pre", 0]
                         }, 0, {
-                            "$divide": [{
-                                "$subtract": ["$avg_10000", "$avg_10000_pre"]
-                            }, "$avg_10000_pre"]
+                            "$subtract": ["$avg_10000", "$avg_10000_pre"]
                         }]
                     },
                     "avg_10001": "$avg_10001",
@@ -1209,9 +1343,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10001_pre", 0]
                         }, 0, {
-                            "$divide": [{
-                                "$subtract": ["$avg_10001", "$avg_10001_pre"]
-                            }, "$avg_10001_pre"]
+                            "$subtract": ["$avg_10001", "$avg_10001_pre"]
                         }]
                     },
                     "avg_10002": "$avg_10002",
@@ -1219,9 +1351,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10002_pre", 0]
                         }, 0, {
-                            "$divide": [{
-                                "$subtract": ["$avg_10002", "$avg_10002_pre"]
-                            }, "$avg_10002_pre"]
+                            "$subtract": ["$avg_10002", "$avg_10002_pre"]
                         }]
                     },
                     "avg_10003": "$avg_10003",
@@ -1229,9 +1359,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10003_pre", 0]
                         }, 0, {
-                            "$divide": [{
-                                "$subtract": ["$avg_10003", "$avg_10003_pre"]
-                            }, "$avg_10003_pre"]
+                            "$subtract": ["$avg_10003", "$avg_10003_pre"]
                         }]
                     },
                     "avg_10004": "$avg_10004",
@@ -1239,9 +1367,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10004_pre", 0]
                         }, 0, {
-                            "$divide": [{
-                                "$subtract": ["$avg_10004", "$avg_10004_pre"]
-                            }, "$avg_10004_pre"]
+                            "$subtract": ["$avg_10004", "$avg_10004_pre"]
                         }]
                     },
                     "avg_10005": "$avg_10005",
@@ -1249,9 +1375,23 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10005_pre", 0]
                         }, 0, {
-                            "$divide": [{
-                                "$subtract": ["$avg_10005", "$avg_10005_pre"]
-                            }, "$avg_10005_pre"]
+                            "$subtract": ["$avg_10005", "$avg_10005_pre"]
+                        }]
+                    },
+                    "avg_10006": "$avg_10006",
+                    "avg_10006_percent": {
+                        "$cond": [{
+                            "$eq": ["$avg_10006_pre", 0]
+                        }, 0, {
+                            "$subtract": ["$avg_10006", "$avg_10006_pre"]
+                        }]
+                    },
+                    "avg_10007": "$avg_10007",
+                    "avg_10007_percent": {
+                        "$cond": [{
+                            "$eq": ["$avg_10006_pre", 0]
+                        }, 0, {
+                            "$subtract": ["$avg_10007", "$avg_10007_pre"]
                         }]
                     },
                     "count_start_5": "$count_start_5",
@@ -1294,12 +1434,18 @@ class Spot:
             p['avg_10004_percent'] = round(p['avg_10004_percent'], 1)
             p['avg_10005'] = round(p['avg_10005'], 1)
             p['avg_10005_percent'] = round(p['avg_10005_percent'], 1)
+            p['avg_10006'] = round(p['avg_10006'], 1)
+            p['avg_10006_percent'] = round(p['avg_10006_percent'], 1)
+            p['avg_10007'] = round(p['avg_10007'], 1)
+            p['avg_10007_percent'] = round(p['avg_10007_percent'], 1)
             if p['avg_total'] >= 4:
                 p['tags'] = '优秀'
+            elif p['avg_total'] is 0:
+                p['tags'] = '未知'
             elif p['avg_total'] < 3.0:
                 p['tags'] = '差评'
             else:
-                p['tags'] = '良好'
+                p['tags'] = '合格'
 
             L.append(dict(p))
             i = i + 1
@@ -1501,12 +1647,15 @@ class Spot:
         tongbi_num = round(L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score'], 1)
         huanbi_num = round(L[0]['now_month_per_score'] - L[0]['last_month_per_score'], 1)
         if L[0]['lastyear_month_per_score']:
-            tongbi_per = round(L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score'] / L[0]['lastyear_month_per_score'], 3)
+            tongbi_per = round(
+                (L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score']) * 100 / L[0][
+                    'lastyear_month_per_score'], 1)
         else:
             tongbi_per = None
 
         if L[0]['last_month_per_score']:
-            huanbi_per = round(L[0]['now_month_per_score'] - L[0]['last_month_per_score'] / L[0]['last_month_per_score'], 3)
+            huanbi_per = round(
+                (L[0]['now_month_per_score'] - L[0]['last_month_per_score']) * 100 / L[0]['last_month_per_score'], 1)
         else:
             huanbi_per = None
 
@@ -1575,8 +1724,8 @@ class Spot:
             L.append(dict(p))
         up_score_count = L[0]['up_score_count']
         down_score_count = L[0]['down_score_count']
-        up_score_per = round(up_score_count / (up_score_count + down_score_count), 3)
-        down_score_per = round(down_score_count / (up_score_count + down_score_count), 3)
+        up_score_per = round(up_score_count * 100 / (up_score_count + down_score_count), 1)
+        down_score_per = round(down_score_count * 100 / (up_score_count + down_score_count), 1)
         dic = {"up_score_count": up_score_count, "down_score_count": down_score_count, "up_score_per": up_score_per,
                "down_score_per": down_score_per}
         return dic
@@ -1634,10 +1783,10 @@ class Spot:
                 }
             }
         ]
-        spot_complex = spot.Spot.objects.aggregate(*pipeline)
+        now_month = spot.Spot.objects.aggregate(*pipeline)
         L = []
-        for p in spot_complex:
-            p['avg_score'] = round(p['avg_score'], 3)
+        for p in now_month:
+            p['avg_score'] = round(p['avg_score'], 1)
             L.append(dict(p))
         return L
 
@@ -1688,7 +1837,7 @@ class Spot:
             },
             {
                 "$sort": {
-                    "_id": 1
+                    "_id": -1
                 }
             }]
         star_percent = spot.Spot.objects.aggregate(*pipeline)
@@ -1699,7 +1848,7 @@ class Spot:
             total = total + dict(p)['count']
         result = []
         for m in L:
-            m['percent'] = round(m['count'] / total, 3)
+            m['percent'] = round(m['count'] * 100 / total, 1)
             result.append(m)
 
         return result  # 15221

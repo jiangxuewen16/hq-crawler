@@ -3,6 +3,7 @@ import json
 import math
 import time
 
+import requests
 import scrapy
 from scrapy.http import HtmlResponse
 from scrapy import Request
@@ -148,3 +149,41 @@ class QunarCommentSpider(scrapy.Spider):
                 yield spot_comment
                 # qnr = OTA.OtaCode.QUNAR.value.id
                 # print(qnr, "*" * 20)
+
+
+class QunarTest(scrapy.Spider):
+    name = 'qunar_test'
+    allowed_domains = ['www.qunar.com']
+
+    total_num = 0  # 总评论
+    page_size = 20  # 默认爬取每页100条
+    # base_url = r'https://touch.piao.qunar.com/touch/queryCommentsAndTravelTips.json?type=mp&pageSize={page_size}&fromType=SIGHT&pageNum={page_num}&sightId={ota_spot_id}&tagType=44&tagName=%E6%9C%80%E6%96%B0'
+    base_url = r'https://touch.piao.qunar.com/touch/queryCommentsAndTravelTips.json?type=mp&pageSize=10&fromType=SIGHT&pageNum=1&sightId=706176810'
+    start_urls = [
+        'https://touch.piao.qunar.com/touch/queryCommentsAndTravelTips.json?type=mp&pageSize=1&fromType=SIGHT&pageNum=1&sightId=706176810']
+
+    def parse(self, response: HtmlResponse):
+        url = self.base_url.format(ota_spot_id=706176810, page_num=1, page_size=10)
+        print(url, "@" * 20)
+        headers = {'content-type': 'application/json'}
+        data = requests.get(self.base_url, headers=headers)
+        comment = data.json()
+        print(comment['data']['tagList'])
+        if 'data' in comment and 'tagList' in comment['data']:
+            spot_tag = []
+            for key, value in enumerate(comment['data']['tagList']):
+                # print(value['tagName'])
+
+                if value['tagType'] in [0, 1, 41, 43, 44]:
+                    tag_type = QunarSpider.sys_tags  # 属于系统标签
+                else:
+                    tag_type = QunarSpider.user_tags  # 属于用户标签
+                tag = {'tag_name': value['tagName'], 'tag_num': value['tagNum'], 'tag_score': value['tagScore'],
+                       'tag_type': tag_type}
+                spot_tag.append(tag)
+            print(spot_tag, "#" * 20)
+            spot.Spot.objects(ota_id=10004,
+                              ota_spot_id=1515791).update(
+                set__tag_list=spot_tag)
+            pass
+
