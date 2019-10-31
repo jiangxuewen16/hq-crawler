@@ -6,9 +6,9 @@ import time
 
 from apps.api.common import helper
 from apps.api.model.spot import SpotComment, Spot, SpotCity
-from common import OTA
 from core.lib.view import BaseView
 from core.lib.route import Route
+from spiders.common import OTA
 from spiders.items.spot import spot
 
 
