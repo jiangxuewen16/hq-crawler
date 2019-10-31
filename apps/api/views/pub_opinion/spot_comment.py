@@ -1,10 +1,12 @@
 import csv
 import datetime
+import json
 import math
 import time
 
 from apps.api.common import helper
 from apps.api.model.spot import SpotComment, Spot, SpotCity
+from common import OTA
 from core.lib.view import BaseView
 from core.lib.route import Route
 from spiders.items.spot import spot
@@ -215,6 +217,13 @@ class PublicOpinion(BaseView):
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'newest_total': total,
                 'praise_total': praise_total, 'bad_total': bad_total, 'list': result}
         return self.success(data)
+
+    # 口碑榜
+    @Route.route(path='/spot/praiseList')
+    def praise_list(self):
+        ota_spot_ids = OTA.OtaSpotIdMap.get_ota_spot_list(OTA.OtaCode.MEITUAN)
+        data = spot.Spot.objects(ota_spot_id__in=ota_spot_ids, spot_rank__exists='').fields(spot_introduction=1, spot_rank=1, spot_name=1, spot_img=1).to_json()
+        return self.success(json.loads(data))
 
     # 景区详情
     @Route.route(path='/spot/detail')

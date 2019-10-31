@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
-import base64
 import json
 import time
-import zlib
-from urllib import parse
 
 import scrapy
-from datetime import datetime
 from scrapy import Request
 from scrapy.http import HtmlResponse
 

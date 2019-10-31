@@ -157,6 +157,24 @@ class MeituanCommentSpider(scrapy.Spider):
                             'page_size': page_size})
 
 
+class MeituanBiwanList(scrapy.Spider):
+    name = 'meituan_biwan_list'
+    allowed_domains = ['i.meituan.com']
+    base_page_url = r'https://i.meituan.com/awp/h5/trip-scenes/travellist/master/index.html?cityId=70&billboardId=250&source=mt'
+    start_urls = [
+        'https://itrip.meituan.com/volga/api/v1/trip/billboard/worthPlay?cityId=70&source=mt&billboardId=250&inner_source=mtshare&utm_term=AiphoneBgroupC10.3.400DcopyEpromotionG0583CF80FA64E9F4545989328001235F01A3DE3FB11F3E6F16F1D332BAAD750720191021205730351&utm_source=appshare&utm_medium=iOSweb&utm_fromapp=copy&utm_sharesource=promotion&lch=appshare_k20fd27fpbn5&ci=70&feclient=lvyou_wap&uuid=3F1B3AB7262A309B279A62C912513D18CEF869AD324DF8263D921F91967B162B&client=wap']
+
+    def parse(self, response: HtmlResponse):
+        response_str = response.body.decode('utf-8')
+        json_data = json.loads(response_str)
+        ota_spot_id = OTA.OtaSpotIdMap.get_ota_spot_list(OTA.OtaCode.MEITUAN)
+        for items in json_data['data']['poiList']:
+            if items['poiId'] in ota_spot_id:
+                print('=========已找到必玩榜中目标景区排行=========', items['rank'])
+                spot_info = spot.Spot.objects(ota_spot_id=items['poiId']).update(set__spot_rank=items['rank']+1, set__spot_introduction=items['introduction'])
+                print('=========更新成功=========', spot_info)
+
+
 class MeituanCitySpot(scrapy.Spider):
     name = 'meituan_city_spot'
     allowed_domains = ['www.meituan.com', 'i.meituan.com', 'itrip.meituan.com']
