@@ -1327,7 +1327,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_total_pre", 0]
                         }, 0, {
-                                "$subtract": ["$avg_total", "$avg_total_pre"]
+                            "$subtract": ["$avg_total", "$avg_total_pre"]
                         }]
                     },
                     "avg_10000": "$avg_10000",
@@ -1335,7 +1335,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10000_pre", 0]
                         }, 0, {
-                                "$subtract": ["$avg_10000", "$avg_10000_pre"]
+                            "$subtract": ["$avg_10000", "$avg_10000_pre"]
                         }]
                     },
                     "avg_10001": "$avg_10001",
@@ -1343,7 +1343,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10001_pre", 0]
                         }, 0, {
-                                "$subtract": ["$avg_10001", "$avg_10001_pre"]
+                            "$subtract": ["$avg_10001", "$avg_10001_pre"]
                         }]
                     },
                     "avg_10002": "$avg_10002",
@@ -1351,7 +1351,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10002_pre", 0]
                         }, 0, {
-                                "$subtract": ["$avg_10002", "$avg_10002_pre"]
+                            "$subtract": ["$avg_10002", "$avg_10002_pre"]
                         }]
                     },
                     "avg_10003": "$avg_10003",
@@ -1359,7 +1359,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10003_pre", 0]
                         }, 0, {
-                                "$subtract": ["$avg_10003", "$avg_10003_pre"]
+                            "$subtract": ["$avg_10003", "$avg_10003_pre"]
                         }]
                     },
                     "avg_10004": "$avg_10004",
@@ -1367,7 +1367,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10004_pre", 0]
                         }, 0, {
-                                "$subtract": ["$avg_10004", "$avg_10004_pre"]
+                            "$subtract": ["$avg_10004", "$avg_10004_pre"]
                         }]
                     },
                     "avg_10005": "$avg_10005",
@@ -1375,7 +1375,7 @@ class Spot:
                         "$cond": [{
                             "$eq": ["$avg_10005_pre", 0]
                         }, 0, {
-                                "$subtract": ["$avg_10005", "$avg_10005_pre"]
+                            "$subtract": ["$avg_10005", "$avg_10005_pre"]
                         }]
                     },
                     "avg_10006": "$avg_10006",
@@ -1440,10 +1440,12 @@ class Spot:
             p['avg_10007_percent'] = round(p['avg_10007_percent'], 1)
             if p['avg_total'] >= 4:
                 p['tags'] = '优秀'
+            elif p['avg_total'] is 0:
+                p['tags'] = '未知'
             elif p['avg_total'] < 3.0:
                 p['tags'] = '差评'
             else:
-                p['tags'] = '良好'
+                p['tags'] = '合格'
 
             L.append(dict(p))
             i = i + 1
