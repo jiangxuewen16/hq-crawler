@@ -31,6 +31,8 @@ class Spot(BaseItem, mongoengine.Document):
     comment_num = mongoengine.IntField()
     addr = mongoengine.StringField(max_length=100)
     spot_favorable = mongoengine.StringField(max_length=100)  # 好评率
+    spot_rank = mongoengine.IntField()  # 必玩榜排名
+    spot_introduction = mongoengine.StringField()  # 必玩理由
     tag_list = mongoengine.ListField()  # 评论tag
 
     create_at = mongoengine.DateTimeField(null=True)
