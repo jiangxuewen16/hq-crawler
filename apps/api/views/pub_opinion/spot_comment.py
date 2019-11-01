@@ -1,10 +1,12 @@
 import csv
 import datetime
+import io
 import json
 import math
 import os
 import time
-
+import numpy as np
+import operator
 from django.http import HttpResponse, Http404
 
 from apps.api.common import helper
@@ -105,6 +107,12 @@ class PublicOpinion(BaseView):
 
         result = Spot.all_comment(condition=condition, skip=skip, limit=limit)
         result_count = Spot.all_comment(condition=condition, skip=0, limit=10000)
+        for v1 in result:
+            for v2 in result_count:
+                if v1['_id']['ota_spot_id'] == v2['_id']['ota_spot_id']:
+                    v1['sort'] = v2['sort']
+                    # print(v1['sort'])
+        # sorted(result, key=lambda x: x['sort'])
         total = len(result_count)
         last_page = math.ceil(total / limit)
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
@@ -373,7 +381,7 @@ class PublicOpinion(BaseView):
 
         # return self.success('export success')
 
-    # 导出数据
+    # 直接导出流示例
     @Route.route(path='/star/export2')
     def star_export(self):
         # do something...
