@@ -20,7 +20,6 @@ class BaseView(View):
 
     def __init(self):
         request = json.loads(self.request.body)
-        print(type(request))
         self._request_param = request['data']
         self.version = request['head']['version']
         self.time = request['head']['time']
@@ -42,7 +41,9 @@ class BaseView(View):
     """
 
     def get(self, request: WSGIRequest) -> HttpResponse:
-        pass
+        if request.path_info not in Route.routeList:
+            pass
+        return methodcaller(Route.routeList[request.path_info.lstrip('/')])(self)  # 自调方法
 
     @property
     def request_param(self):
