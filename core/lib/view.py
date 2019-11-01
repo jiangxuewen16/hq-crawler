@@ -36,7 +36,7 @@ class BaseView(View):
         if request.path_info not in Route.routeList:
             pass
         # print('='*20,request.path_info.lstrip('/').lstrip('crawler'))
-        return methodcaller(Route.routeList[request.path_info.lstrip('/').lstrip('/crawler/')])(self)  # 自调方法
+        return methodcaller(Route.routeList[request.path_info.replace('/crawler/', '', 1)])(self)  # 自调方法
 
     """
     get 处理
@@ -47,7 +47,7 @@ class BaseView(View):
             pass
         print(Route.routeList, request.path_info)
 
-        return methodcaller(Route.routeList[request.path_info.lstrip('/').lstrip('/crawler/')])(self)  # 自调方法
+        return methodcaller(Route.routeList[request.path_info.replace('/crawler/', '', 1)])(self)  # 自调方法
 
     @property
     def request_param(self):
