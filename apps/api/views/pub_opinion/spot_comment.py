@@ -222,7 +222,9 @@ class PublicOpinion(BaseView):
     @Route.route(path='/spot/praiseList')
     def praise_list(self):
         ota_spot_ids = OTA.OtaSpotIdMap.get_ota_spot_list(OTA.OtaCode.MEITUAN)
-        data = spot.Spot.objects(ota_spot_id__in=ota_spot_ids, spot_rank__exists='').fields(spot_introduction=1, spot_rank=1, spot_name=1, spot_img=1).to_json()
+        data = spot.Spot.objects(ota_spot_id__in=ota_spot_ids, spot_rank__exists='').fields(spot_introduction=1,
+                                                                                            spot_rank=1, spot_name=1,
+                                                                                            spot_img=1).to_json()
         return self.success(json.loads(data))
 
     # 景区详情
@@ -332,7 +334,7 @@ class PublicOpinion(BaseView):
             'end_date_pre': time.strftime("%Y-%m-%d", time.localtime()),
             'ota_spot_id': Spot.list_spot_array()
         }
-        with open('test.csv', "w", encoding='utf8', newline='') as outFileCsv:
+        with open('test.csv', "w", encoding='gbk', newline='') as outFileCsv:
             # 设置csv表头
             fileheader = ['全部景区', '美团', '携程', '去哪儿', '驴妈妈', '同程', '平均评分', '考核级别', '5星评论数', '4星评论数', '3星评论数', '2星评论数',
                           '1星评论数', '总评论数', '排名']
@@ -346,14 +348,14 @@ class PublicOpinion(BaseView):
                 print(value['avg_10001'], "+" * 20)
                 print(value['avg_10001_percent'], "+" * 20)
                 # pass
-                result = [{'全部景区': value['_id']['spot_name'], '美团': value['avg_10001']},
-                          {'携程': value['_id']['spot_name'], '去哪儿': value['avg_10001']},
-                          {'驴妈妈': value['_id']['spot_name'], '同程': value['avg_10001']},
-                          {'平均评分': value['_id']['spot_name'], '考核级别': value['avg_10001']},
-                          {'5星评论数': value['_id']['spot_name'], '4星评论数': value['avg_10001']},
-                          {'3星评论数': value['_id']['spot_name'], '2星评论数': value['avg_10001']},
-                          {'1星评论数': value['_id']['spot_name'], '总评论数': value['avg_10001']},
-                          {'排名': value['_id']['spot_name']}]
+                result = [{'全部景区': value['_id']['spot_name'], '美团': value['avg_10004'],
+                           '去哪儿': value['avg_10006'], '携程': value['avg_10002'],
+                           '驴妈妈': value['avg_10005'], '同程': value['avg_10007'],
+                           '平均评分': value['avg_total'], '考核级别': value['tags'],
+                           '5星评论数': value['count_start_5'], '4星评论数': value['count_start_4'],
+                           '3星评论数': value['count_start_3'], '2星评论数': value['count_start_2'],
+                           '1星评论数': value['count_start_1'], '总评论数': value['count_comment'],
+                           '排名': value['sort']}]
                 outDictWriter.writerows(result)
             outFileCsv.close()
-        return self.success(1)
+        return self.success('export success')
