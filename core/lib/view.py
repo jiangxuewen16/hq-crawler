@@ -35,6 +35,7 @@ class BaseView(View):
         self.__init()
         if request.path_info not in Route.routeList:
             pass
+        print('='*20,request.path_info.lstrip('/').lstrip('crawler'))
         return methodcaller(Route.routeList[request.path_info.lstrip('/').lstrip('crawler')])(self)  # 自调方法
 
     """
