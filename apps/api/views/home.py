@@ -1,3 +1,5 @@
+from django.http import FileResponse
+
 from core.common.service_code import ServiceCode
 from core.lib.view import BaseView
 from core.lib.route import Route
@@ -8,8 +10,10 @@ from apps.scheduler.app import add
 class Home(BaseView):
     @Route.route(path='index')
     def index(self):
-        a = add.delay()
-        return self.success({'sum': 1})
+        # a = add.delay()
+        file = open('README.md', 'rb')
+        print(type(file))
+        return self.file_response(file)
 
     @Route.route(path='home/1')
     def home(self):

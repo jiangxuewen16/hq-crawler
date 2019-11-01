@@ -2,6 +2,8 @@ import configparser
 import importlib
 import os
 import pkgutil
+import random
+import string
 import sys
 
 from scrapyd_api import ScrapydAPI
@@ -55,3 +57,8 @@ def get_scrapyd_cli() -> ScrapydAPI:
     spiderConf.read(f'{settings.BASE_DIR}/spiders/scrapy.cfg', encoding="utf-8")
     SCRAPYD_URL = spiderConf.get('deploy', 'url')  # scrapyd地址
     return ScrapydAPI(SCRAPYD_URL)
+
+
+def get_random_str(num: int = 16, mod: int = 1) -> str:
+    return ''.join(random.sample(string.ascii_letters, num))
+    # return ''.join(random.sample(string.ascii_letters + string.digits + string.punctuation, 15))

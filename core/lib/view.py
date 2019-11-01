@@ -3,9 +3,10 @@ import time
 from operator import methodcaller
 
 from django.core.handlers.wsgi import WSGIRequest
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from django.views import View
 
+from core.common import helper
 from core.common.service_code import ServiceCode
 from core.lib.route import Route
 
@@ -43,6 +44,8 @@ class BaseView(View):
     def get(self, request: WSGIRequest) -> HttpResponse:
         if request.path_info not in Route.routeList:
             pass
+        print(Route.routeList, request.path_info)
+
         return methodcaller(Route.routeList[request.path_info.lstrip('/')])(self)  # 自调方法
 
     @property
@@ -72,3 +75,15 @@ class BaseView(View):
 
     def failure(self, service_code: ServiceCode = ServiceCode.other_failure, data: dict = None) -> HttpResponse:
         return self.__response(data, service_code)
+
+    """
+    文件返回
+    """
+
+    def file_response(self, content, file_name: str = None) -> FileResponse:
+        if file_name is None:
+            file_name = helper.get_random_str()
+        response = FileResponse(content)
+        response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
+        response['Content-Disposition'] = f'attachment;filename="{file_name}"'
+        return response
