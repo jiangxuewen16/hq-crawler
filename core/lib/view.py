@@ -82,7 +82,7 @@ class BaseView(View):
 
     def file_response(self, content, file_name: str = None) -> FileResponse:
         if file_name is None:
-            file_name = helper.get_random_str()
+            file_name = helper.random_str()
         response = FileResponse(content)
         response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
         response['Content-Disposition'] = f'attachment;filename="{file_name}"'

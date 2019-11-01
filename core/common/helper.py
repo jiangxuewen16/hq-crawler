@@ -59,6 +59,20 @@ def get_scrapyd_cli() -> ScrapydAPI:
     return ScrapydAPI(SCRAPYD_URL)
 
 
-def get_random_str(num: int = 16, mod: int = 1) -> str:
-    return ''.join(random.sample(string.ascii_letters, num))
-    # return ''.join(random.sample(string.ascii_letters + string.digits + string.punctuation, 15))
+"""
+获取一个随机字符串
+length 字符串长度
+mod 模式 1：字符 2：数字 3：符号 4：字符+数字 5：字符+符号 6：数字+符号 7：字符+数字+符号
+"""
+
+
+def random_str(length: int = 16, mod: int = 1) -> str:
+    return {
+        1: lambda x: ''.join(random.sample(string.ascii_letters, x)),
+        2: lambda x: ''.join(random.sample(string.digits, x)),
+        3: lambda x: ''.join(random.sample(string.ascii_letters + string.digits, x)),
+        4: lambda x: ''.join(random.sample(string.punctuation, x)),
+        5: lambda x: ''.join(random.sample(string.ascii_letters + string.punctuation, x)),
+        6: lambda x: ''.join(random.sample(string.digits + string.punctuation, x)),
+        7: lambda x: ''.join(random.sample(string.ascii_letters + string.digits + string.punctuation, x)),
+    }[mod](length)
