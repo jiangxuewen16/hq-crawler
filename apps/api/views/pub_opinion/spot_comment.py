@@ -2,7 +2,10 @@ import csv
 import datetime
 import json
 import math
+import os
 import time
+
+from django.http import HttpResponse, Http404
 
 from apps.api.common import helper
 from apps.api.model.spot import SpotComment, Spot, SpotCity
@@ -334,7 +337,7 @@ class PublicOpinion(BaseView):
             'end_date_pre': time.strftime("%Y-%m-%d", time.localtime()),
             'ota_spot_id': Spot.list_spot_array()
         }
-        with open('test.csv', "w", encoding='gbk', newline='') as outFileCsv:
+        with open('export.csv', "w", encoding='gbk', newline='') as outFileCsv:
             # 设置csv表头
             fileheader = ['全部景区', '美团', '携程', '去哪儿', '驴妈妈', '同程', '平均评分', '考核级别', '5星评论数', '4星评论数', '3星评论数', '2星评论数',
                           '1星评论数', '总评论数', '排名']
@@ -358,4 +361,28 @@ class PublicOpinion(BaseView):
                            '排名': value['sort']}]
                 outDictWriter.writerows(result)
             outFileCsv.close()
-        return self.success('export success')
+            file_path = 'export.csv'
+            with open(file_path, 'rb') as f:
+                try:
+                    response = HttpResponse(f)
+                    response['content_type'] = "application/octet-stream"
+                    response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_path)
+                    return response
+                except Exception:
+                    raise Http404
+
+        # return self.success('export success')
+
+    # 导出数据
+    @Route.route(path='/star/export2')
+    def star_export(self):
+        # do something...
+        file_path = 'test.csv'
+        with open(file_path, 'rb') as f:
+            try:
+                response = HttpResponse(f)
+                response['content_type'] = "application/octet-stream"
+                response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_path)
+                return response
+            except Exception:
+                raise Http404
