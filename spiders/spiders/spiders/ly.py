@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import math
 import time
 
 import scrapy
@@ -92,6 +93,26 @@ class LyCommentSpider(scrapy.Spider):
             url = self.base_url.format(ota_spot_id=ota_spot_id, page_num=self.page_num, page_size=self.page_size)
             yield Request(url=url, callback=self.parse_item, dont_filter=True,
                           meta={'ota_spot_id': ota_spot_id, 'page_num': self.page_num})
+
+    def spot_comment(self, response: HtmlResponse):
+        response_str = response.body.decode('utf-8')
+        comment = json.loads(response_str)
+        ly_total = 0
+        if 'dpList' in comment:
+            ly_total = comment['totalNum']
+        now_total = spot.SpotComment.objects(ota_id=OTA.OtaCode.LY.value.id,
+                                             ota_spot_id=response.meta['ota_spot_id']).count()
+        to_save_total = ly_total - now_total
+        page_size = LyCommentSpider.page_size
+        if to_save_total > 0:
+            total_page = math.ceil(to_save_total / page_size)
+            for page_num in range(1, total_page + 1):
+                print('当前页 ', page_num, "-", '总页数 ', total_page, "-" * 20)
+
+                url = self.base_url.format(ota_spot_id=response.meta['ota_spot_id'], page_num=page_num,
+                                           page_size=page_size)
+                yield Request(url=url, callback=self.parse_item, dont_filter=True,
+                              meta={'page_num': page_num, 'ota_spot_id': response.meta['ota_spot_id']})
 
     def parse_item(self, response: HtmlResponse):
         response_str = response.body.decode('utf-8')
