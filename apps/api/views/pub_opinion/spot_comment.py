@@ -4,12 +4,13 @@ import io
 import json
 import math
 import os
+import threading
 import time
 import operator
 from django.http import HttpResponse, Http404
 
 from apps.api.common import helper
-from apps.api.model.spot import SpotComment, Spot, SpotCity
+from apps.api.model.spot import SpotComment, Spot, SpotCity, spot_queue, spot_queue_list
 from core.lib.view import BaseView
 from core.lib.route import Route
 from spiders.common import OTA
@@ -104,17 +105,28 @@ class PublicOpinion(BaseView):
         limit = Spot.get_param(param=param, in_name='limit', default=5)
         skip = (page - 1) * limit
 
-        result = Spot.all_comment(condition=condition, skip=skip, limit=limit)
-        result_count = Spot.all_comment(condition=condition, skip=0, limit=10000)
-        for v1 in result:
-            for v2 in result_count:
-                if v1['_id']['ota_spot_id'] == v2['_id']['ota_spot_id']:
-                    v1['sort'] = v2['sort']
-                    # print(v1['sort'])
-        # sorted(result, key=lambda x: x['sort'])
-        total = len(result_count)
-        last_page = math.ceil(total / limit)
-        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
+        # result = Spot.all_comment(condition=condition, skip=skip, limit=limit)
+        # result_count = Spot.all_comment(condition=condition, skip=0, limit=10000)
+        # total = len(result_count)
+        # last_page = math.ceil(total / limit)
+        # data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
+        # return self.success(data)
+        topic = "list"
+        result = list()
+        t1 = threading.Thread(target=Spot.all_comment, name='thread1', args=(condition, skip, limit, topic))
+        t2 = threading.Thread(target=Spot.all_comment, name='thread1', args=(condition, 0, 200, "total"))
+        t1.start()
+        t2.start()
+        t1.join()
+        t2.join()
+        data = {}
+        while not spot_queue_list.empty():
+            result.append(spot_queue_list.get())
+        for item in result:
+            data[item[1]] = item[0]
+        data['current_page'] = page
+        data['last_page'] = math.ceil(data["total"] / limit)
+        data['per_page'] = limit
         return self.success(data)
 
     # 运营中心数据 景区评论统计
@@ -291,29 +303,63 @@ class PublicOpinion(BaseView):
             'last_year_month_first': last_year_month_first,
             'last_year_month_last': last_year_month_last
         }
-        # 景区综合评分
-        spot_complex = Spot.spot_complex(condition=condition)
-        # 景区评论数
-        comment_num = Spot.comment_num(condition=condition)
-        # 当月评分走势
-        now_month = Spot.now_month(condition=condition)
-        # 评分等级占比数据
-        star_percent = Spot.star_percent(condition=condition)
-        # 舆情标签
-        comment_tags = Spot.comment_tags(condition=condition)
-
-        result = {"spot_complex": spot_complex, "comment_num": comment_num, "now_month": now_month,
-                  "star_percent": star_percent, "comment_tags": comment_tags}
-        return self.success(result)
+        # # 景区综合评分
+        # spot_complex = Spot.spot_complex(condition=condition)
+        # # 景区评论数
+        # comment_num = Spot.comment_num(condition=condition)
+        # # 当月评分走势
+        # now_month = Spot.now_month(condition=condition)
+        # # 评分等级占比数据
+        # star_percent = Spot.star_percent(condition=condition)
+        # # 舆情标签
+        # comment_tags = Spot.comment_tags(condition=condition)
+        #
+        # result = {"spot_complex": spot_complex, "comment_num": comment_num, "now_month": now_month,
+        #           "star_percent": star_percent, "comment_tags": comment_tags}
+        result = list()
+        t1 = threading.Thread(target=Spot.comment_num, name='thread1', args=(condition,))
+        t2 = threading.Thread(target=Spot.now_month, name='thread2', args=(condition,))
+        t3 = threading.Thread(target=Spot.star_percent, name='thread3', args=(condition,))
+        t4 = threading.Thread(target=Spot.comment_tags, name='thread4', args=(condition,))
+        t5 = threading.Thread(target=Spot.spot_complex, name='thread4', args=(condition,))
+        t1.start()
+        t2.start()
+        t3.start()
+        t4.start()
+        t5.start()
+        t1.join()
+        t2.join()
+        t3.join()
+        t4.join()
+        t5.join()
+        data = {}
+        while not spot_queue.empty():
+            result.append(spot_queue.get())
+        for item in result:
+            data[item[1]] = item[0]
+        return self.success(data)
 
     # 景区评论数
     @Route.route(path='/comment/num')
     def comment_num(self):
         condition = {}
-        result = Spot.comment_num(condition=condition)
+        # result = Spot.comment_num(condition=condition)
+        import threading
+        result = list()
+        t1 = threading.Thread(target=Spot.comment_num, name='thread1', args=(condition,))
+        t2 = threading.Thread(target=Spot.now_month, name='thread2', args=(condition,))
+        t1.start()
+        t2.start()
+        t1.join()
+        t1.join()
+        while not spot_queue.empty():
+            result.append(spot_queue.get())
+        for item in result:
+            print("+" * 20, item, "-" * 20)
         return self.success(result)
 
-    # 当月评分走势
+        # 当月评分走势
+
     @Route.route(path='/now/month')
     def now_month(self):
         condition = {}
@@ -383,13 +429,13 @@ class PublicOpinion(BaseView):
     # 直接导出流示例
     @Route.route(path='/star/export2')
     def star_export(self):
-        # do something...
-        file_path = 'test.csv'
-        with open(file_path, 'rb') as f:
-            try:
-                response = HttpResponse(f)
-                response['content_type'] = "application/octet-stream"
-                response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_path)
-                return response
-            except Exception:
-                raise Http404
+        # coding=gbk
+        output = io.StringIO()
+        header = ['全部景区', '美团', '携程', '去哪儿', '驴妈妈', '同程', '平均评分', '考核级别', '5星评论数', '4星评论数', '3星评论数', '2星评论数',
+                  '1星评论数', '总评论数', '排名']
+
+        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+        writer.writerow(header)
+        writer.writerow(header)
+        out = output.getvalue()
+        return self.file_response(out)
