@@ -32,7 +32,7 @@ def start_deploy_scrapy(scrapyd_deploy: str = ''):
         if status != 0:
             raise Exception('windows环境执行注册scrapyd项目错误，请检查目录路径、python环境，是否已安装scrapyd、scrapyd client')
     else:
-        os.system(f'cd ./spiders && scrapyd-deploy -p {scrapy_project_name}')
+        os.system(f'cd ./spiders && source /etc/profile && scrapyd-deploy -p {scrapy_project_name}')
 
 
 """

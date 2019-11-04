@@ -115,7 +115,7 @@ DATABASES = {
         # 'ENGINE': 'django.db.backends.sqlite3',
         # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'huiqulx_mall',
+        'NAME': 'huiqulx_crawler',
         'USER': 'mall',
         'HOST': 'rm-wz9nc4b599n2ec13u.mysql.rds.aliyuncs.com',
         'PASSWORD': 'jPsbwvQiDGwoCRr0',
@@ -190,7 +190,7 @@ TASK_WORK_PACKAGE = 'apps.scheduler.task'
 """
 惠趣采集项目配置
 """
-SPIDER_START = False  # 是否开启采集项目
+SPIDER_START = True  # 是否开启采集项目
 SPIDER_PATH = f'{BASE_DIR}/spiders/'  # 爬虫项目目录
 
 """
