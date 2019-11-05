@@ -36,6 +36,8 @@ CACHES = {
 下面是项目自定义配置
 """
 
+BASE_URL = 'crawler/'
+
 """mongodb连接"""
 mongoengine.connect('hq_data_cloud', username='hq_data_cloud', password='hqlxhqdatacloud2019',
                     host='mongodb://dds-wz9542ab304a64a41.mongodb.rds.aliyuncs.com:3717',

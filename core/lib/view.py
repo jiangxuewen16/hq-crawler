@@ -9,6 +9,7 @@ from django.views import View
 from core.common import helper
 from core.common.service_code import ServiceCode
 from core.lib.route import Route
+from hq_crawler import settings
 
 """
 基础view类型
@@ -36,7 +37,7 @@ class BaseView(View):
         if request.path_info not in Route.routeList:
             pass
         # print('='*20,request.path_info.lstrip('/').lstrip('crawler'))
-        return methodcaller(Route.routeList[request.path_info.replace('/crawler/', '', 1)])(self)  # 自调方法
+        return methodcaller(self._route_url(request.path_info))(self)  # 自调方法
 
     """
     get 处理
@@ -47,7 +48,11 @@ class BaseView(View):
             pass
         print(Route.routeList, request.path_info)
 
-        return methodcaller(Route.routeList[request.path_info.replace('/crawler/', '', 1)])(self)  # 自调方法
+        return methodcaller(self._route_url(request.path_info))(self)  # 自调方法
+
+    @classmethod
+    def _route_url(cls, url):
+        return Route.routeList[url.replace('/' + settings.BASE_URL, '', 1)]
 
     @property
     def request_param(self):

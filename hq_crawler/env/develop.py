@@ -36,6 +36,8 @@ CACHES = {
 下面是项目自定义配置
 """
 
+BASE_URL = ''
+
 mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017', alias='default')  # 连接hq_crawler.mongodb
 mongoengine.connect('passport', host='mongodb://11.75.1.20:27017', alias='passport')  # 连接passport
 
