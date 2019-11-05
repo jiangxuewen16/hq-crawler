@@ -224,17 +224,17 @@ class PublicOpinion(BaseView):
 
         result = SpotComment.list_comment(condition=condition, skip=skip, limit=limit, sort=sort)
         for v1 in result:
-            if v1['ota_id'] == 10001 and v1['c_from'] is None:
+            if v1['ota_id'] == 10001:
                 v1['c_from'] = '马蜂窝'
-            elif v1['ota_id'] == 10002 and v1['c_from'] is None:
+            elif v1['ota_id'] == 10002:
                 v1['c_from'] = '携程网'
-            elif v1['ota_id'] == 10003 and v1['c_from'] is None:
+            elif v1['ota_id'] == 10003:
                 v1['c_from'] = '飞猪'
-            elif v1['ota_id'] == 10004 and v1['c_from'] is None:
+            elif v1['ota_id'] == 10004:
                 v1['c_from'] = '美团网'
-            elif v1['ota_id'] == 10005 and v1['c_from'] is None:
+            elif v1['ota_id'] == 10005:
                 v1['c_from'] = '驴妈妈'
-            elif v1['ota_id'] == 10006 and v1['c_from'] is None:
+            elif v1['ota_id'] == 10006:
                 v1['c_from'] = '同程网'
         # 所有评论数量
         condition['up_score'] = 6
