@@ -155,7 +155,7 @@ USE_TZ = True
 # 项目目录路径
 STATIC_URL = '/static/'
 
-APP_ENV = os.getenv('APP_ENV')
+APP_ENV = 'develop'
 if APP_ENV == 'prod':
     from .env.product import *
 elif APP_ENV == 'develop':
