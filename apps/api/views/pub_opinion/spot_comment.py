@@ -186,7 +186,7 @@ class PublicOpinion(BaseView):
             'end_date': Spot.get_param(param=param, in_name='end_date', default=str(datetime.datetime.now())),
             'up_score': Spot.get_param(param=param, in_name='up_score', default=6),
             'down_score': Spot.get_param(param=param, in_name='down_score', default=0),
-            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=[10001, 10002, 10003, 10004, 10005])
+            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=[10001, 10002, 10003, 10004, 10005,10006,10007])
         }
         # c_score: 根据评分排序 create_at 根据时间排序
         sort = Spot.get_param(param=param, in_name='sort', default='c_score')
@@ -211,6 +211,19 @@ class PublicOpinion(BaseView):
             condition['down_score'] = 0
 
         result = SpotComment.list_comment(condition=condition, skip=skip, limit=limit, sort=sort)
+        for v1 in result:
+            if v1['ota_id'] == 10001 and v1['c_from'] is None:
+                v1['c_from'] = '马蜂窝'
+            elif v1['ota_id'] == 10002 and v1['c_from'] is None:
+                v1['c_from'] = '携程网'
+            elif v1['ota_id'] == 10003 and v1['c_from'] is None:
+                v1['c_from'] = '飞猪'
+            elif v1['ota_id'] == 10004 and v1['c_from'] is None:
+                v1['c_from'] = '美团网'
+            elif v1['ota_id'] == 10005 and v1['c_from'] is None:
+                v1['c_from'] = '驴妈妈'
+            elif v1['ota_id'] == 10006 and v1['c_from'] is None:
+                v1['c_from'] = '同程网'
         # 所有评论数量
         condition['up_score'] = 6
         condition['down_score'] = 0
@@ -224,7 +237,7 @@ class PublicOpinion(BaseView):
         # 差评数量
         bad_total = SpotComment.total_comment(condition=condition)
         last_page = math.ceil(total / limit)
-        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'newest_total': total,
+        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'newest_total': 100,
                 'praise_total': praise_total, 'bad_total': bad_total, 'list': result}
         return self.success(data)
 
