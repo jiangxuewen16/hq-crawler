@@ -1865,7 +1865,7 @@ class Spot:
         # return result  # 15221
 
     @classmethod
-    def comment_tags(cls, condition):
+    def comment_tags(cls, condition, topic):
         pipeline = [{
             "$unwind": {
                 "path": "$tag_list",
@@ -1874,7 +1874,8 @@ class Spot:
         },
             {
                 "$match": {
-                    "tag_list.tag_type": 1
+                    # "tag_list.tag_type": 1
+                    'tag_list.tag_type': {'$in': condition}
                 }
             },
             {
@@ -1895,7 +1896,7 @@ class Spot:
         L = []
         for p in comment_tags:
             L.append(dict(p))
-        return spot_queue.put((L, 'comment_tags'))
+        return spot_queue.put((L, topic))
         # return L
 
     @classmethod

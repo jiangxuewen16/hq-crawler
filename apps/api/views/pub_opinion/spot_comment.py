@@ -301,7 +301,10 @@ class PublicOpinion(BaseView):
             'last_month_first': month_first,
             'last_month_last': month_last,
             'last_year_month_first': last_year_month_first,
-            'last_year_month_last': last_year_month_last
+            'last_year_month_last': last_year_month_last,
+            'comment_tags': [1, 2],
+            'comment_tags_true': [1],
+            'comment_tags_false': [2]
         }
         # # 景区综合评分
         # spot_complex = Spot.spot_complex(condition=condition)
@@ -320,17 +323,26 @@ class PublicOpinion(BaseView):
         t1 = threading.Thread(target=Spot.comment_num, name='thread1', args=(condition,))
         t2 = threading.Thread(target=Spot.now_month, name='thread2', args=(condition,))
         t3 = threading.Thread(target=Spot.star_percent, name='thread3', args=(condition,))
-        t4 = threading.Thread(target=Spot.comment_tags, name='thread4', args=(condition,))
+        t4 = threading.Thread(target=Spot.comment_tags, name='thread4',
+                              args=(condition['comment_tags'], 'comment_tags'))
+        t41 = threading.Thread(target=Spot.comment_tags, name='thread4',
+                               args=(condition['comment_tags_true'], 'comment_tags_true'))
+        t42 = threading.Thread(target=Spot.comment_tags, name='thread4',
+                               args=(condition['comment_tags_false'], 'comment_tags_false'))
         t5 = threading.Thread(target=Spot.spot_complex, name='thread4', args=(condition,))
         t1.start()
         t2.start()
         t3.start()
         t4.start()
+        t41.start()
+        t42.start()
         t5.start()
         t1.join()
         t2.join()
         t3.join()
         t4.join()
+        t41.join()
+        t42.join()
         t5.join()
         data = {}
         while not spot_queue.empty():
