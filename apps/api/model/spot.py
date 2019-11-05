@@ -2,9 +2,13 @@
 import datetime
 import json
 import re
+import queue
 
 from spiders.common import OTA
 from spiders.items.spot import spot
+
+spot_queue = queue.Queue()
+spot_queue_list = queue.Queue()
 
 
 def get_yesterday():
@@ -585,7 +589,7 @@ class Spot:
         return L
 
     @classmethod
-    def all_comment(cls, condition, skip, limit):
+    def all_comment(cls, condition, skip, limit, topic):
         pipeline = [
             {
                 "$lookup": {
@@ -1449,7 +1453,11 @@ class Spot:
 
             L.append(dict(p))
             i = i + 1
-        return L
+        if topic == "list":
+            return spot_queue_list.put((L, topic))
+        else:
+            return spot_queue_list.put((len(L), topic))
+        # return L
 
     @classmethod
     def spot_score_count(cls, condition):
@@ -1665,7 +1673,8 @@ class Spot:
                "tongbi_per": tongbi_per,
                "huanbi_per": huanbi_per
                }
-        return dic
+        return spot_queue.put((dic, 'spot_complex'))
+        # return dic
 
     @classmethod
     def comment_num(cls, condition):
@@ -1728,7 +1737,8 @@ class Spot:
         down_score_per = round(down_score_count * 100 / (up_score_count + down_score_count), 1)
         dic = {"up_score_count": up_score_count, "down_score_count": down_score_count, "up_score_per": up_score_per,
                "down_score_per": down_score_per}
-        return dic
+        spot_queue.put((dic, 'comment_num'))
+        # return dic
 
     @classmethod
     def now_month(cls, condition):
@@ -1788,7 +1798,8 @@ class Spot:
         for p in now_month:
             p['avg_score'] = round(p['avg_score'], 1)
             L.append(dict(p))
-        return L
+        spot_queue.put((L, 'now_month'))
+        # return L
 
     @classmethod
     def star_percent(cls, condition):
@@ -1850,11 +1861,11 @@ class Spot:
         for m in L:
             m['percent'] = round(m['count'] * 100 / total, 1)
             result.append(m)
-
-        return result  # 15221
+        spot_queue.put((L, 'star_percent'))
+        # return result  # 15221
 
     @classmethod
-    def comment_tags(cls, condition):
+    def comment_tags(cls, condition, topic):
         pipeline = [{
             "$unwind": {
                 "path": "$tag_list",
@@ -1863,7 +1874,8 @@ class Spot:
         },
             {
                 "$match": {
-                    "tag_list.tag_type": 1
+                    # "tag_list.tag_type": 1
+                    'tag_list.tag_type': {'$in': condition}
                 }
             },
             {
@@ -1884,7 +1896,8 @@ class Spot:
         L = []
         for p in comment_tags:
             L.append(dict(p))
-        return L
+        return spot_queue.put((L, topic))
+        # return L
 
     @classmethod
     def get_param(cls, param, in_name, default):

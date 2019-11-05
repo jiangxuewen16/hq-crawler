@@ -114,12 +114,12 @@ DATABASES = {
     'default': {
         # 'ENGINE': 'django.db.backends.sqlite3',
         # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'huiqulx_crawler',
-        'USER': 'mall',
-        'HOST': 'rm-wz9nc4b599n2ec13u.mysql.rds.aliyuncs.com',
-        'PASSWORD': 'jPsbwvQiDGwoCRr0',
-        'PORT': 3306,
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'hq_crawler',
+        # 'USER': 'root',
+        # 'HOST': '192.168.56.100',
+        # 'PASSWORD': 'root',
+        # 'PORT': 3306,
         # 'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
@@ -177,8 +177,8 @@ STATIC_URL = '/static/'
 下面是项目自定义配置
 """
 
-mongoengine.connect('hq_data_cloud', username='hq_data_cloud', password='hqlxhqdatacloud2019', host='mongodb://dds-wz9542ab304a64a41.mongodb.rds.aliyuncs.com:3717', alias='default')  # 连接hq_crawler.mongodb
-mongoengine.connect('passport', username='passport', password='hqlxpassport2019', host='mongodb://dds-wz9542ab304a64a41.mongodb.rds.aliyuncs.com:3717', alias='passport')  # 连接passport
+mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017', alias='default')  # 连接hq_crawler.mongodb
+mongoengine.connect('passport', host='mongodb://11.75.1.20:27017', alias='passport')  # 连接passport
 
 """
 定时调度任务业务包
@@ -190,7 +190,7 @@ TASK_WORK_PACKAGE = 'apps.scheduler.task'
 """
 惠趣采集项目配置
 """
-SPIDER_START = True  # 是否开启采集项目
+SPIDER_START = False  # 是否开启采集项目
 SPIDER_PATH = f'{BASE_DIR}/spiders/'  # 爬虫项目目录
 
 """
