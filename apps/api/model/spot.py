@@ -1442,12 +1442,12 @@ class Spot:
             p['avg_10006_percent'] = round(p['avg_10006_percent'], 1)
             p['avg_10007'] = round(p['avg_10007'], 1)
             p['avg_10007_percent'] = round(p['avg_10007_percent'], 1)
-            if p['avg_total'] >= 4:
+            if p['avg_total'] >= 4.5:
                 p['tags'] = '优秀'
             elif p['avg_total'] is 0:
                 p['tags'] = '未知'
-            elif p['avg_total'] < 3.0:
-                p['tags'] = '差评'
+            elif p['avg_total'] < 4.0:
+                p['tags'] = '不及格'
             else:
                 p['tags'] = '合格'
 
