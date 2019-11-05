@@ -99,10 +99,13 @@ COOKIES_ENABLES = False
 # 代理ip列表
 PROXIES = ['118.126.105.239:8008', '106.15.39.21:8008', '193.112.181.35:8008']
 
-# 连接mongodb
-import mongoengine
-
-mongoengine.connect('hq_data_cloud', username='hq_data_cloud', password='hqlxhqdatacloud2019', host='mongodb://dds-wz9542ab304a64a41.mongodb.rds.aliyuncs.com:3717', alias='default')  # 连接hq_crawler.mongodb
+APP_ENV = os.getenv('APP_ENV')
+if APP_ENV == 'product':
+    from .env.product import *
+elif APP_ENV == 'develop':
+    from .env.develop import *
+else:
+    raise Exception('环境不存在')
 
 
 

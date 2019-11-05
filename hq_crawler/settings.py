@@ -161,7 +161,7 @@ if APP_ENV == 'prod':
 elif APP_ENV == 'develop':
     from .env.develop import *
 else:
-    from .env.dev_settings import *
+    raise Exception('环境不存在')
 
 # importlib.import_module('env.develop')
 # importlib.__import__('.env.develop')
