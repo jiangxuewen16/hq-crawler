@@ -61,7 +61,7 @@ for classItem in Route.classRoute:  # 类路由
             if classItem.path in routeKeyList:
                 continue
             path_str = f'^{settings.BASE_URL}/' + classItem.path
-            urlpatterns.append(re_path(r'^crawler/' + classItem.path, routeClass.as_view())),
+            urlpatterns.append(re_path(path_str, routeClass.as_view())),
             routeKeyList.append(classItem.path)
 
 print('总路由:', urlpatterns)
