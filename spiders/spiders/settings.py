@@ -107,7 +107,7 @@ elif APP_ENV == 'develop':
 else:
     raise Exception('环境不存在')
 
-
+SCRAPYD_DEPLOY = 'http://172.18.113.141:6800/'
 
 """
 引入django配置

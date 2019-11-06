@@ -84,7 +84,7 @@ CORS_ALLOW_HEADERS = (
     'Pragma',
 )
 
-ROOT_URLCONF = 'hq_crawler.urls'
+ROOT_URLCONF = 'hq_crawler.start'
 
 TEMPLATES = [
     {

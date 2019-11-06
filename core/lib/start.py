@@ -13,7 +13,7 @@ from hq_crawler import settings
 
 
 def start_deploy_scrapy(scrapyd_deploy: str = ''):
-    scrapyd_project_list = get_scrapyd_cli().list_projects()
+    # scrapyd_project_list = get_scrapyd_cli().list_projects()
 
     spiderConf = configparser.ConfigParser()  # 爬虫项目配置
     spiderConf.read(f'{settings.BASE_DIR}/spiders/scrapy.cfg', encoding="utf-8")
@@ -34,14 +34,3 @@ def start_deploy_scrapy(scrapyd_deploy: str = ''):
     else:
         os.system(f'cd ./spiders && source /etc/profile && scrapyd-deploy -p {scrapy_project_name}')
 
-
-"""
-项目环境配置:根据环境来自动切换项目环境配
-"""
-
-
-def project_env():
-    env_dist = os.environ
-    current_env = 'develop'
-    if 'APP_ENV' in env_dist:
-        current_env = env_dist['APP_ENV']

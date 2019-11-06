@@ -95,7 +95,6 @@ class Decorator(object):
     @classmethod
     def listen(cls, routing_key: str, queue_name: str, exchange: str, no_ack: bool = False):
         def my_decorator(func):
-            print('=' * 30, func)
             receive_item = mq_receive_item(routing_key, queue_name, exchange, func, no_ack)
             cls.RECEIVE_FUNC_LIST.append(receive_item)
 
