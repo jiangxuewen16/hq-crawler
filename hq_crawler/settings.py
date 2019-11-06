@@ -156,7 +156,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 APP_ENV = os.getenv('APP_ENV')
-if APP_ENV == 'prod':
+if APP_ENV == 'production':
     from .env.production import *
 elif APP_ENV == 'develop':
     from .env.develop import *
