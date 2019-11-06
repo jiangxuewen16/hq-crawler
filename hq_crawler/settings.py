@@ -157,11 +157,9 @@ STATIC_URL = '/static/'
 
 APP_ENV = os.getenv('APP_ENV')
 if APP_ENV == 'prod':
-    from .env.product import *
+    from .env.production import *
 elif APP_ENV == 'develop':
     from .env.develop import *
 else:
     raise Exception('环境不存在')
 
-# importlib.import_module('env.develop')
-# importlib.__import__('.env.develop')
