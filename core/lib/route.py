@@ -54,7 +54,7 @@ class Route:
                     Route.routeList[path] = routeItem.func_name
                     if classItem.path in routeKeyList:
                         continue
-                    path_str = f'^{settings.BASE_URL}' + classItem.path if settings.BASE_URL else f'^'
+                    path_str = '^' + settings.BASE_URL
                     urlpatterns.append(re_path(path_str + classItem.path, routeClass.as_view())),
                     routeKeyList.append(classItem.path)
 
