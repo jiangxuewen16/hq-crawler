@@ -51,7 +51,7 @@ TASK_WORK_PACKAGE = 'apps.scheduler.task'
 """
 惠趣采集项目配置
 """
-SPIDER_START = False  # 是否开启采集项目
+SPIDER_START = True  # 是否开启采集项目
 SPIDER_PATH = f'{settings.BASE_DIR}/spiders/'  # 爬虫项目目录
 
 """

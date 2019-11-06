@@ -1,5 +1,11 @@
+import importlib
 from collections import namedtuple
 from types import FunctionType
+
+# from django.urls import re_path
+from django.urls import re_path
+from hq_crawler import settings
+
 
 """
 注解路由核心类
@@ -32,3 +38,24 @@ class Route:
             return wrapper
 
         return my_decorator
+
+    @classmethod
+    def register(cls, urlpatterns: list):
+        routeKeyList = []
+        for classItem in Route.classRoute:  # 类路由
+            module = importlib.import_module(classItem.module)
+            routeClass = getattr(module, classItem.class_name)
+            for routeItem in Route.ROUTER:  # 方法路由
+                if routeItem.module + routeItem.class_name == classItem.module + classItem.class_name:  # 是不是同一个类
+                    path = classItem.path + routeItem.path  # 路由路径
+                    if path in Route.routeList:
+                        exceptionStr = f'路由重复：{routeItem.module + routeItem.class_name} -> {routeItem.func_name}, 路径：{path}'
+                        raise Exception(exceptionStr)
+                    Route.routeList[path] = routeItem.func_name
+                    if classItem.path in routeKeyList:
+                        continue
+                    path_str = f'^{settings.BASE_URL}/' + classItem.path if settings.BASE_URL else f'^'
+                    urlpatterns.append(re_path(path_str + classItem.path, routeClass.as_view())),
+                    routeKeyList.append(classItem.path)
+
+        print('总路由:', urlpatterns)
