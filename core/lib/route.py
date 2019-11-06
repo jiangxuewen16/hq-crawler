@@ -41,6 +41,7 @@ class Route:
 
     @classmethod
     def register(cls, urlpatterns: list):
+        print('='*30, '注册路由')
         routeKeyList = []
         for classItem in Route.classRoute:  # 类路由
             module = importlib.import_module(classItem.module)
