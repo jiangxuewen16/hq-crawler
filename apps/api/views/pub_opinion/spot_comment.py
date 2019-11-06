@@ -198,7 +198,7 @@ class PublicOpinion(BaseView):
             'end_date': Spot.get_param(param=param, in_name='end_date', default=str(datetime.datetime.now())),
             'up_score': Spot.get_param(param=param, in_name='up_score', default=6),
             'down_score': Spot.get_param(param=param, in_name='down_score', default=0),
-            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=[10001, 10002, 10003, 10004, 10005,10006,10007])
+            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=[10001, 10002, 10003, 10004, 10005, 10006, 10007])
         }
         # c_score: 根据评分排序 create_at 根据时间排序
         sort = Spot.get_param(param=param, in_name='sort', default='c_score')
@@ -219,7 +219,7 @@ class PublicOpinion(BaseView):
             condition['up_score'] = 5
             condition['down_score'] = 3
         elif labId == 4:
-            condition['up_score'] = 2
+            condition['up_score'] = 1
             condition['down_score'] = 0
 
         result = SpotComment.list_comment(condition=condition, skip=skip, limit=limit, sort=sort)
@@ -235,18 +235,25 @@ class PublicOpinion(BaseView):
             elif v1['ota_id'] == 10005:
                 v1['c_from'] = '驴妈妈'
             elif v1['ota_id'] == 10006:
-                v1['c_from'] = '同程网'
+                v1['c_from'] = '去哪儿'
+            elif v1['ota_id'] == 10007:
+                v1['c_from'] = '同程'
+
+            if v1['u_avatar'] =='':
+                v1['u_avatar'] = 'https://dimg04.c-ctrip.com/images/t1/headphoto/699/910/854/683dab66bb374136af9930ea204dfc7e_C_180_180.jpg'
         # 所有评论数量
         condition['up_score'] = 6
         condition['down_score'] = 0
         total = SpotComment.total_comment(condition=condition)
+
+        # 好评数量
         condition['up_score'] = 6
         condition['down_score'] = 3
-        # 好评数量
         praise_total = SpotComment.total_comment(condition=condition)
+
+        # 差评数量
         condition['up_score'] = 2
         condition['down_score'] = 0
-        # 差评数量
         bad_total = SpotComment.total_comment(condition=condition)
         last_page = math.ceil(total / limit)
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'newest_total': 100,
