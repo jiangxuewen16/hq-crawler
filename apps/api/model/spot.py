@@ -4,6 +4,7 @@ import json
 import re
 import queue
 
+from apps.api.common.helper.helper import getDayList
 from spiders.common import OTA
 from spiders.items.spot import spot
 
@@ -1793,9 +1794,18 @@ class Spot:
                 }
             }
         ]
+        now_month_bak = getDayList()
         now_month = spot.Spot.objects.aggregate(*pipeline)
-        L = []
+
         for p in now_month:
+            for b in now_month_bak:
+                if b['_id'] == p['_id']:
+                    b['avg_score'] = p['avg_score']
+                else:
+                    pass
+
+        L = []
+        for p in now_month_bak:
             p['avg_score'] = round(p['avg_score'], 1)
             L.append(dict(p))
         spot_queue.put((L, 'now_month'))

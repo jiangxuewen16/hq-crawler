@@ -10,6 +10,7 @@ import operator
 from django.http import HttpResponse, Http404
 
 from apps.api.common import helper
+from apps.api.common.helper.helper import dateRange, getDayList
 from apps.api.model.spot import SpotComment, Spot, SpotCity, spot_queue, spot_queue_list
 from core.lib.view import BaseView
 from core.lib.route import Route
@@ -198,7 +199,8 @@ class PublicOpinion(BaseView):
             'end_date': Spot.get_param(param=param, in_name='end_date', default=str(datetime.datetime.now())),
             'up_score': Spot.get_param(param=param, in_name='up_score', default=6),
             'down_score': Spot.get_param(param=param, in_name='down_score', default=0),
-            'ota_id': Spot.get_param(param=param, in_name='ota_id', default=[10001, 10002, 10003, 10004, 10005, 10006, 10007])
+            'ota_id': Spot.get_param(param=param, in_name='ota_id',
+                                     default=[10001, 10002, 10003, 10004, 10005, 10006, 10007])
         }
         # c_score: 根据评分排序 create_at 根据时间排序
         sort = Spot.get_param(param=param, in_name='sort', default='c_score')
@@ -239,8 +241,9 @@ class PublicOpinion(BaseView):
             elif v1['ota_id'] == 10007:
                 v1['c_from'] = '同程'
 
-            if v1['u_avatar'] =='':
-                v1['u_avatar'] = 'https://dimg04.c-ctrip.com/images/t1/headphoto/699/910/854/683dab66bb374136af9930ea204dfc7e_C_180_180.jpg'
+            if v1['u_avatar'] == '':
+                v1[
+                    'u_avatar'] = 'https://dimg04.c-ctrip.com/images/t1/headphoto/699/910/854/683dab66bb374136af9930ea204dfc7e_C_180_180.jpg'
         # 所有评论数量
         condition['up_score'] = 6
         condition['down_score'] = 0
@@ -471,3 +474,10 @@ class PublicOpinion(BaseView):
         writer.writerow(header)
         out = output.getvalue()
         return self.file_response(out)
+
+        # 直接导出流示例
+
+    @Route.route(path='/day/list')
+    def day_list(self):
+        result = getDayList()
+        return self.success(result)
