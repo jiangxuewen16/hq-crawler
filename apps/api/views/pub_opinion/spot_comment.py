@@ -463,18 +463,18 @@ class PublicOpinion(BaseView):
         # return self.success('export success')
 
     # 直接导出流示例
-    @Route.route(path='/star/test')
-    def star_export(self):
-        # coding=gbk
-        output = io.StringIO()
-        header = ['全部景区', '美团', '携程', '去哪儿', '驴妈妈', '同程', '平均评分', '考核级别', '5星评论数', '4星评论数', '3星评论数', '2星评论数',
-                  '1星评论数', '总评论数', '排名']
-
-        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
-        writer.writerow(header)
-        writer.writerow(header)
-        out = output.getvalue()
-        return self.file_response(out)
+    # @Route.route(path='/star/test')
+    # def star_export(self):
+    #     # coding=gbk
+    #     output = io.StringIO()
+    #     header = ['全部景区', '美团', '携程', '去哪儿', '驴妈妈', '同程', '平均评分', '考核级别', '5星评论数', '4星评论数', '3星评论数', '2星评论数',
+    #               '1星评论数', '总评论数', '排名']
+    #
+    #     writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+    #     writer.writerow(header)
+    #     writer.writerow(header)
+    #     out = output.getvalue()
+    #     return self.file_response(out)
 
         # 直接导出流示例
 
