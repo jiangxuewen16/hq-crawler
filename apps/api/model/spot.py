@@ -1776,7 +1776,7 @@ class Spot:
             {
                 "$match": {
                     "create_at": {
-                        "$gte": "2019-11-01"
+                        "$gte": condition['now_month']
                     }
                 }
             },
