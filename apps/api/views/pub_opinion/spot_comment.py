@@ -425,6 +425,7 @@ class PublicOpinion(BaseView):
             'end_date_pre': time.strftime("%Y-%m-%d", time.localtime()),
             'ota_spot_id': Spot.list_spot_array()
         }
+        result_count = Spot.all_comment(condition=condition, skip=0, limit=10000, topic='export')
         with open('export.csv', "w", encoding='gbk', newline='') as outFileCsv:
             # 设置csv表头
             fileheader = ['全部景区', '美团', '携程', '去哪儿', '驴妈妈', '同程', '平均评分', '考核级别', '5星评论数', '4星评论数', '3星评论数', '2星评论数',
@@ -432,7 +433,7 @@ class PublicOpinion(BaseView):
             outDictWriter = csv.DictWriter(outFileCsv, fileheader)
             outDictWriter.writeheader()
             # 设置csv数据,这里的数据格式是字典型
-            result_count = Spot.all_comment(condition=condition, skip=0, limit=10000)
+            result_count = Spot.all_comment(condition=condition, skip=0, limit=10000, topic='export')
             for key, value in enumerate(result_count):
                 print(value['_id']['spot_name'], "-" * 20)
 
@@ -462,7 +463,7 @@ class PublicOpinion(BaseView):
         # return self.success('export success')
 
     # 直接导出流示例
-    @Route.route(path='/star/export2')
+    @Route.route(path='/star/test')
     def star_export(self):
         # coding=gbk
         output = io.StringIO()

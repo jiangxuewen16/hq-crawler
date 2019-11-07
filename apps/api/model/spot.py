@@ -1455,10 +1455,11 @@ class Spot:
             L.append(dict(p))
             i = i + 1
         if topic == "list":
-            return spot_queue_list.put((L, topic))
+            spot_queue_list.put((L, topic))
+        elif topic == 'total':
+            spot_queue_list.put((len(L), topic))
         else:
-            return spot_queue_list.put((len(L), topic))
-        # return L
+            return L
 
     @classmethod
     def spot_score_count(cls, condition):
