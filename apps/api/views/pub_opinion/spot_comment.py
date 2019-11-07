@@ -425,7 +425,7 @@ class PublicOpinion(BaseView):
             'end_date_pre': time.strftime("%Y-%m-%d", time.localtime()),
             'ota_spot_id': Spot.list_spot_array()
         }
-        result_count = Spot.all_comment(condition=condition, skip=0, limit=10000, topic='export')
+        # result_count = Spot.all_comment(condition=condition, skip=0, limit=10000, topic='export')
         with open('export.csv', "w", encoding='gbk', newline='') as outFileCsv:
             # 设置csv表头
             fileheader = ['全部景区', '美团', '携程', '去哪儿', '驴妈妈', '同程', '平均评分', '考核级别', '5星评论数', '4星评论数', '3星评论数', '2星评论数',
