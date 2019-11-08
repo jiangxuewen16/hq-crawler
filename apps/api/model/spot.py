@@ -1738,7 +1738,7 @@ class Spot:
         up_score_per = round(up_score_count * 100 / (up_score_count + down_score_count), 1)
         down_score_per = round(down_score_count * 100 / (up_score_count + down_score_count), 1)
         dic = {"up_score_count": up_score_count, "down_score_count": down_score_count, "up_score_per": up_score_per,
-               "down_score_per": down_score_per}
+               "down_score_per": down_score_per, "total": up_score_count + down_score_count}
         spot_queue.put((dic, 'comment_num'))
         # return dic
 
