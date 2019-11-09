@@ -89,7 +89,7 @@ class QunarTagSpider(scrapy.Spider):
 
 
 class QunarCommentSpider(scrapy.Spider):
-    name = 'qunar_comment'
+    name = 'comment_test'
     allowed_domains = ['www.qunar.com']
 
     total_num = 0  # 总评论
@@ -193,7 +193,7 @@ class QunarTest(scrapy.Spider):
 
 
 class CommentTest(scrapy.Spider):
-    name = 'comment_test'
+    name = 'qunar_comment'
     allowed_domains = ['www.qunar.com']
 
     total_num = 0  # 总评论
