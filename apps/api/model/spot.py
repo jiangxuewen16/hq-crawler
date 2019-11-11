@@ -1654,8 +1654,8 @@ class Spot:
         L = []
         for p in spot_complex:
             L.append(dict(p))
-        tongbi_num = round(L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score'], 1)
-        huanbi_num = round(L[0]['now_month_per_score'] - L[0]['last_month_per_score'], 1)
+        tongbi_num = round(L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score'], 2)
+        huanbi_num = round(L[0]['now_month_per_score'] - L[0]['last_month_per_score'], 2)
         if L[0]['lastyear_month_per_score']:
             tongbi_per = round(
                 (L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score']) * 100 / L[0][
