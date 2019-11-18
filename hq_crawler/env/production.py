@@ -40,10 +40,10 @@ BASE_URL = 'crawler/'
 
 """mongodb连接"""
 mongoengine.connect('hq_data_cloud', username='hq_data_cloud', password='hqlxhqdatacloud2019',
-                    host='mongodb://dds-wz9542ab304a64a41.mongodb.rds.aliyuncs.com:3717',
+                    host='mongodb://dds-wz9542ab304a64a42.mongodb.rds.aliyuncs.com:3717',
                     alias='default')  # 连接hq_crawler.mongodb
 mongoengine.connect('passport', username='passport', password='hqlxpassport2019',
-                    host='mongodb://dds-wz9542ab304a64a41.mongodb.rds.aliyuncs.com:3717',
+                    host='mongodb://dds-wz9542ab304a64a42.mongodb.rds.aliyuncs.com:3717',
                     alias='passport')  # 连接passport
 
 """
