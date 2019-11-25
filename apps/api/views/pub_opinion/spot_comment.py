@@ -242,8 +242,7 @@ class PublicOpinion(BaseView):
                 v1['c_from'] = '同程'
 
             if v1['u_avatar'] == '':
-                v1[
-                    'u_avatar'] = 'https://dimg04.c-ctrip.com/images/t1/headphoto/699/910/854/683dab66bb374136af9930ea204dfc7e_C_180_180.jpg'
+                v1['u_avatar'] = 'https://dimg04.c-ctrip.com/images/t1/headphoto/699/910/854/683dab66bb374136af9930ea204dfc7e_C_180_180.jpg'
         # 所有评论数量
         condition['up_score'] = 6
         condition['down_score'] = 0
@@ -258,7 +257,7 @@ class PublicOpinion(BaseView):
         condition['up_score'] = 2
         condition['down_score'] = 0
         bad_total = SpotComment.total_comment(condition=condition)
-        last_page = math.ceil(total / limit)
+        last_page = math.ceil(result / limit)
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'newest_total': 100,
                 'praise_total': praise_total, 'bad_total': bad_total, 'list': result}
         return self.success(data)
