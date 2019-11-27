@@ -231,7 +231,7 @@ class PublicOpinion(BaseView):
         condition['down_score'] = 0
         bad_total = SpotComment.total_comment(condition=condition)
         last_page = math.ceil(whole / limit)
-
+        total = whole
         if labId == 2:
             sort = 'create_at'
             total = 100
