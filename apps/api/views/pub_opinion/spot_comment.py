@@ -221,15 +221,16 @@ class PublicOpinion(BaseView):
         condition['down_score'] = 0
         whole = SpotComment.total_comment(condition=condition)
 
+        # 差评数量
+        condition['up_score'] = 2
+        condition['down_score'] = 0
+        bad_total = SpotComment.total_comment(condition=condition)
+
         # 好评数量
         condition['up_score'] = 6
         condition['down_score'] = 3
         praise_total = SpotComment.total_comment(condition=condition)
 
-        # 差评数量
-        condition['up_score'] = 2
-        condition['down_score'] = 0
-        bad_total = SpotComment.total_comment(condition=condition)
         last_page = math.ceil(whole / limit)
         total = whole
         if labId == 2:
