@@ -260,7 +260,7 @@ class PublicOpinion(BaseView):
             elif v1['ota_id'] == 10007:
                 v1['c_from'] = '同程'
 
-            if v1['u_avatar'] == '' or not v1['u_avatar']:
+            if 'u_avatar' not in result or v1['u_avatar'] == '' :
                 v1['u_avatar'] = 'https://dimg04.c-ctrip.com/images/t1/headphoto/699/910/854/683dab66bb374136af9930ea204dfc7e_C_180_180.jpg'
 
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'whole': whole, 'total': total, 'newest_total': 100,
