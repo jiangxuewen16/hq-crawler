@@ -215,15 +215,34 @@ class PublicOpinion(BaseView):
         else:
             condition['ota_id'] = [int(condition['ota_id'])]
 
+
+        # 所有评论数量
+        condition['up_score'] = 6
+        condition['down_score'] = 0
+        whole = SpotComment.total_comment(condition=condition)
+
+        # 好评数量
+        condition['up_score'] = 6
+        condition['down_score'] = 3
+        praise_total = SpotComment.total_comment(condition=condition)
+
+        # 差评数量
+        condition['up_score'] = 2
+        condition['down_score'] = 0
+        bad_total = SpotComment.total_comment(condition=condition)
+        last_page = math.ceil(whole / limit)
+
         if labId == 2:
             sort = 'create_at'
+            total = 100
         elif labId == 3:
             condition['up_score'] = 5
             condition['down_score'] = 3
+            total = praise_total
         elif labId == 4:
             condition['up_score'] = 1
             condition['down_score'] = 0
-
+            total = bad_total
         result = SpotComment.list_comment(condition=condition, skip=skip, limit=limit, sort=sort)
         for v1 in result:
             if v1['ota_id'] == 10001:
@@ -241,24 +260,10 @@ class PublicOpinion(BaseView):
             elif v1['ota_id'] == 10007:
                 v1['c_from'] = '同程'
 
-            if v1['u_avatar'] == '':
+            if v1['u_avatar'] == '' or not v1['u_avatar']:
                 v1['u_avatar'] = 'https://dimg04.c-ctrip.com/images/t1/headphoto/699/910/854/683dab66bb374136af9930ea204dfc7e_C_180_180.jpg'
-        # 所有评论数量
-        condition['up_score'] = 6
-        condition['down_score'] = 0
-        total = SpotComment.total_comment(condition=condition)
 
-        # 好评数量
-        condition['up_score'] = 6
-        condition['down_score'] = 3
-        praise_total = SpotComment.total_comment(condition=condition)
-
-        # 差评数量
-        condition['up_score'] = 2
-        condition['down_score'] = 0
-        bad_total = SpotComment.total_comment(condition=condition)
-        last_page = math.ceil(len(result) / limit)
-        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'newest_total': 100,
+        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'whole': whole, 'total': total, 'newest_total': 100,
                 'praise_total': praise_total, 'bad_total': bad_total, 'list': result}
         return self.success(data)
 
