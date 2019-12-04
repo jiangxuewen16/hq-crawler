@@ -322,7 +322,7 @@ class PublicOpinion(BaseView):
             datetime.date(datetime.date.today().year, datetime.date.today().month, 1) - datetime.timedelta(1))
         last_year_month_first = str(datetime.date(datetime.date.today().year - 1, datetime.date.today().month, 1))
         last_year_month_last = str(
-            datetime.date(datetime.date.today().year - 1, datetime.date.today().month + 1, 1) - datetime.timedelta(1))
+            datetime.date(datetime.date.today().year - 1, datetime.date.today().month - 1, 1) - datetime.timedelta(1))
         condition = {
             'now': now,
             'now_month': now_month,

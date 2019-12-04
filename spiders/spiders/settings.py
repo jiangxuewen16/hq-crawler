@@ -55,9 +55,20 @@ DOWNLOAD_DELAY = 1
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    'spiders.middlewares.RandomUserAgentMiddlware': 333,  # 随机User-Agent
-    'spiders.middlewares.ProxyMiddleware': 334,  # 随机ip代理
-    # 'spiders.middlewares.SpidersDownloaderMiddleware': 542,
+    'scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': 100,
+    'scrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware': 300,
+    'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware': 350,
+    'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware': 400,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
+    'scrapy.downloadermiddlewares.ajaxcrawl.AjaxCrawlMiddleware': 560,
+    'scrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware': 580,
+    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 590,
+    'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': 600,
+    'scrapy.downloadermiddlewares.cookies.CookiesMiddleware': 700,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 750,
+    'scrapy.downloadermiddlewares.stats.DownloaderStats': 850,
+    'scrapy.downloadermiddlewares.httpcache.HttpCacheMiddleware': 900,
 }
 
 # Enable or disable extensions
@@ -99,7 +110,7 @@ COOKIES_ENABLES = False
 # 代理ip列表
 PROXIES = ['118.126.105.239:8008', '106.15.39.21:8008', '193.112.181.35:8008']
 
-APP_ENV = os.getenv('APP_ENV')
+APP_ENV = 'develop'
 if APP_ENV == 'production':
     from .env.production import *
 elif APP_ENV == 'develop':
