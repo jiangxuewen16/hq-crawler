@@ -110,7 +110,7 @@ COOKIES_ENABLES = False
 # 代理ip列表
 PROXIES = ['118.126.105.239:8008', '106.15.39.21:8008', '193.112.181.35:8008']
 
-APP_ENV = 'develop'
+APP_ENV = 'APP_ENV'
 if APP_ENV == 'production':
     from .env.production import *
 elif APP_ENV == 'develop':
