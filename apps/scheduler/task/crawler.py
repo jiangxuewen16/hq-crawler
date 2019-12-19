@@ -35,6 +35,8 @@ def spot_comment():
     print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
     jobid = get_scrapyd_cli().schedule('spiders', 'fliggy_comment')
     print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
+    jobid = get_scrapyd_cli().schedule('spiders', 'qunar_comment')
+    print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
 
 
 # 订单接口检测 每2秒执行一次
