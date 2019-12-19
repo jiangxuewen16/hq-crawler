@@ -13,7 +13,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'hq_crawler',
         'USER': 'root',
-        'HOST': '11.75.1.20',
+        'HOST': '11.75.1.124',
         'PASSWORD': '123456',
         'PORT': 3306,
         'OPTIONS': {'charset': 'utf8mb4'},
@@ -38,8 +38,8 @@ CACHES = {
 
 BASE_URL = ''
 
-mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017', alias='default')  # 连接hq_crawler.mongodb
-mongoengine.connect('passport', host='mongodb://11.75.1.20:27017', alias='passport')  # 连接passport
+mongoengine.connect('hq_crawler', host='mongodb://11.75.1.124:27017', alias='default')  # 连接hq_crawler.mongodb
+mongoengine.connect('passport', host='mongodb://11.75.1.124:27017', alias='passport')  # 连接passport
 
 """
 定时调度任务业务包
