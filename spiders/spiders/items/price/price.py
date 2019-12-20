@@ -1,0 +1,19 @@
+import mongoengine
+from bson import ObjectId
+from scrapy.item import BaseItem
+
+
+class OPrice(BaseItem, mongoengine.Document):
+    pk = 1  # 必须定义
+    id = ObjectId()  # 必须定义
+
+    ota_id = mongoengine.IntField()  # ota 的 id @see spiders.common.OTA
+    ota_spot_id = mongoengine.IntField()  # ota 景区id
+
+    low_price = mongoengine.DecimalField()  # 最低价
+    high_price = mongoengine.DecimalField()  # 最高价
+    low_cut = mongoengine.DecimalField()  # 最低立减
+    high_back = mongoengine.DecimalField()  # 最多赠券
+    ota_product = mongoengine.ListField()  # 产品详情列表
+    create_at = mongoengine.DateTimeField()  # 创建时间
+    update_at = mongoengine.DateTimeField()  # 更新时间
