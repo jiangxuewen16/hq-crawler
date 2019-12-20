@@ -28,3 +28,4 @@ class PriceCalendar(BaseItem, mongoengine.Document):  # 价格日历
     type_id = mongoengine.IntField()  # 票型id
     pre_price = mongoengine.DecimalField()  # 均价
     create_at = mongoengine.DateTimeField()  # 创建时间
+    type_key = mongoengine.StringField()  # 类型关键字
