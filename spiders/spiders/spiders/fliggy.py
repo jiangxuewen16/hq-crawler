@@ -103,24 +103,33 @@ class FliggySpotSpider(scrapy.Spider):
         yield Request(url=request_url, callback=self.parse_data, dont_filter=True, headers=self.sign_header,
                       meta={'ota_spot_id': response.meta['ota_spot_id'], 'data': data})
 
-    def parse_data(self, response: HtmlResponse):
+    @staticmethod
+    def parse_data(response: HtmlResponse):
         response_str = response.body.decode('utf-8')
         products_detail = json.loads(response_str)['data']['itemInfos']
+        data = response.meta['data']
         o_price = price.OPrice()
-        o_price.ota_id = OTA.OtaCode.FLIGGY
+        o_price.ota_id = OTA.OtaCode.FLIGGY.value.id
         o_price.ota_spot_id = response.meta['ota_spot_id']
-        o_price.create_at = time.strftime("%Y-%m-%d", time.localtime())
-        o_price.ota_product = []
-        for product in products_detail:
-            product_info = {
-                'product_id': product['itemId'],
-                'title': product['title'],
-                'price': product['price'],
+        o_price.create_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
+        o_price.ota_product = {
+                'type_id': 0,
+                'type_key': data['ticketKindName'],
+                'type_name': data['productName'],
+                'tickets': []
+            }
+        for ticket in products_detail:
+            ticket_info = {
+                'product_id': ticket['itemId'],
+                'title': ticket['title'],
+                'price': ticket['price'],
                 'cash_back': 0,
                 'cut_price': 0,
-                'sale_num': product['']
+                'sale_num': ticket['soldRecent'] if 'soldRecent' in ticket else 0,
+                'seller_nick': ticket['sellerNick']
             }
-
+            o_price.ota_product['tickets'].append(ticket_info)
+        yield o_price
 
     def get_cook_list(self, response: HtmlResponse):
         cookie_list = response.headers.getlist('Set-Cookie')
