@@ -25,6 +25,6 @@ class PriceCalendar(BaseItem, mongoengine.Document):  # 价格日历
 
     ota_id = mongoengine.IntField()  # ota 的 id @see spiders.common.OTA
     ota_spot_id = mongoengine.IntField()  # ota 景区id
-    type_id = mongoengine.IntField()  # 产品类型id
+    type_id = mongoengine.IntField()  # 票型id
     pre_price = mongoengine.DecimalField()  # 均价
     create_at = mongoengine.DateTimeField()  # 创建时间
