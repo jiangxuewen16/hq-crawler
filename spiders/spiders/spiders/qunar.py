@@ -11,6 +11,7 @@ from scrapy import Request
 
 from spiders.common import OTA
 from spiders.items.spot import spot
+from spiders.items.price import price
 
 
 class QunarSpider(scrapy.Spider):
@@ -26,18 +27,6 @@ class QunarSpider(scrapy.Spider):
 
     def parse(self, response):
         pass
-
-
-# class QunarSpotSpider(scrapy.Spider):
-#     name = 'qunar_spot'
-#     allowed_domains = ['www.qunar.com']
-#     base_url = r'https://www.meituan.com/zhoubianyou/{ota_spot_id}'
-#     start_urls = ['https://www.meituan.com/zhoubianyou/1515791']
-#
-#     def parse(self, response: HtmlResponse):
-#         base_url = r'https://touch.piao.qunar.com/touch/queryCommentsAndTravelTips.json?type=mp&pageSize={page_size}&fromType=SIGHT&pageNum={page_num}&sightId={ota_spot_id}&tagType=44&tagName=%E6%9C%80%E6%96%B0'
-#         start_urls = [
-#             'https://touch.piao.qunar.com/touch/queryCommentsAndTravelTips.json?type=mp&pageSize=1&fromType=SIGHT&pageNum=1&sightId=706176810']
 
 
 class QunarTagSpider(scrapy.Spider):
@@ -255,3 +244,85 @@ class CommentTest(scrapy.Spider):
                         spot_comment.c_img = [item['small'] for item in value['imgs']]
                         spot_comment.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                         yield spot_comment
+
+
+class PriceSpider(scrapy.Spider):
+    ota_map = [{'ota_spot_id': 706176810, 'sightId': '14407'}  # 石燕湖
+        , {'ota_spot_id': 1915618311, 'sightId': '187730'}  # 石牛寨
+        , {'ota_spot_id': 2877753081, 'sightId': '469141'}  # 益阳嘉年华
+        , {'ota_spot_id': 2554926827, 'sightId': '470541'}  # 花田溪谷
+        , {'ota_spot_id': 225118749, 'sightId': '461232'}  # 东浒寨
+        , {'ota_spot_id': 3821817759, 'sightId': '11829'}  # 马仁奇峰
+        , {'ota_spot_id': 420237024, 'sightId': '39499'}  # 大茅山
+        , {'ota_spot_id': 4123349957, 'sightId': '35473'}  # 九龙江
+        , {'ota_spot_id': 2333288470, 'sightId': '196586'}  # 侠天下
+        , {'ota_spot_id': 3333064220, 'sightId': '461903'}  # 三翁花园
+               ]
+    name = 'qunar_price'
+    allowed_domains = ['piao.qunar.com']
+    login_url = 'http://piao.qunar.com/ticket/detail/getTickets.json'
+
+    def start_requests(self):
+        price.OPrice.objects(ota_id=10006).delete()
+        price.OPriceCalendar.objects(ota_id=10006, create_at=time.strftime("%Y-%m-%d", time.localtime())).delete()
+        print('start_request')
+        for value in self.ota_map:
+            # print(value['sightId'], "*" * 20)
+            yield scrapy.FormRequest(self.login_url
+                                     , formdata={'sightId': value['sightId'], 'from': 'detail'}
+                                     , meta={'ota_spot_id': value['ota_spot_id']}
+                                     , callback=self.after_login)
+
+    def after_login(self, response):
+        print('-' * 20)
+        result = json.loads(response.body)
+        if 'data' in result and 'groups' in result['data']:
+            for k1, v1 in enumerate(result['data']['groups']):  # group数据   sightId
+                ota_product = []
+                for k2, v2 in enumerate(v1):  # 票型数据
+                    tickets = []
+                    typeId = v2['typeId']
+                    typeKey = v2['ticketZoneName']
+                    ticketZoneName = v2['typeName']
+                    total_count = v2['totalCount']  # 总共票数
+                    total_price = 0  # 总共票数
+
+                    normal_price = v2['qunarPrice']
+                    if 'tickets' in v2:
+                        print(v2['qunarPrice'])
+                        for k3, v3 in enumerate(v2['tickets']):
+                            tickets_list = {'price_id': v3['priceId']
+                                , 'title': v3['title']
+                                , 'price': v3['qunarPrice']
+                                , 'cash_back': v3['cashBack']
+                                , 'cut_price': v3['cutPrice']
+                                , 'sale_num': 0
+                                            }
+                            tickets.append(tickets_list)
+                            total_price = total_price + v3['qunarPrice']
+                            # print(v3['title'])  # priceId qunarPrice cashBack cutPrice supplierId supplierName
+                    ota_product_list = {'type_id': typeId, 'type_key': typeKey, 'type_name': ticketZoneName,
+                                        'normal_price': normal_price,
+                                        'tickets': tickets}
+                    ota_product.append(ota_product_list)
+                    pre_price = round(total_price / total_count, 2)
+                    print(pre_price, "+" * 20)
+                # print(ota_product)
+                '''
+                价格日历保存
+                '''
+                price_calendar = price.OPriceCalendar()
+
+                price_calendar.ota_id = OTA.OtaCode.QUNAR.value.id
+                price_calendar.ota_spot_id = response.meta['ota_spot_id']
+                price_calendar.pre_price = pre_price
+                price_calendar.type_key = typeKey
+                price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime())
+
+                o_price = price.OPrice()
+                o_price.ota_id = OTA.OtaCode.QUNAR.value.id
+                o_price.ota_spot_id = response.meta['ota_spot_id']
+
+                o_price.ota_product = ota_product  # typeId typeName qunarPrice
+                price_calendar.save(force_insert=False, validate=False, clean=True)
+                yield o_price
