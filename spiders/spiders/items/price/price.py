@@ -17,3 +17,14 @@ class OPrice(BaseItem, mongoengine.Document):
     ota_product = mongoengine.ListField()  # 产品详情列表
     create_at = mongoengine.DateTimeField()  # 创建时间
     update_at = mongoengine.DateTimeField()  # 更新时间
+
+
+class PriceCalendar(BaseItem, mongoengine.Document):  # 价格日历
+    pk = 1  # 必须定义
+    id = ObjectId()  # 必须定义
+
+    ota_id = mongoengine.IntField()  # ota 的 id @see spiders.common.OTA
+    ota_spot_id = mongoengine.IntField()  # ota 景区id
+    type_id = mongoengine.IntField()  # 产品类型id
+    pre_price = mongoengine.DecimalField()  # 均价
+    create_at = mongoengine.DateTimeField()  # 创建时间
