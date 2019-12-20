@@ -112,6 +112,7 @@ class FliggySpotSpider(scrapy.Spider):
         o_price.ota_id = OTA.OtaCode.FLIGGY.value.id
         o_price.ota_spot_id = response.meta['ota_spot_id']
         o_price.create_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
+        total_price = i = 0
         o_price.ota_product = {
                 'type_id': 0,
                 'type_key': data['ticketKindName'],
@@ -125,11 +126,21 @@ class FliggySpotSpider(scrapy.Spider):
                 'price': ticket['price'],
                 'cash_back': 0,
                 'cut_price': 0,
-                'sale_num': ticket['soldRecent'] if 'soldRecent' in ticket else 0,
+                'sale_num': int(ticket['soldRecent'][2:-1]) if 'soldRecent' in ticket else 0,
                 'seller_nick': ticket['sellerNick']
             }
+            i = i+1
+            total_price = total_price + float(ticket['price'])
             o_price.ota_product['tickets'].append(ticket_info)
         yield o_price
+        o_price_calendar = price.OPriceCalendar()
+        o_price_calendar.ota_id = OTA.OtaCode.FLIGGY.value.id
+        o_price_calendar.ota_spot_id = response.meta['ota_spot_id']
+        o_price_calendar.type_key = data['ticketKindName']
+        o_price_calendar.type_name = data['productName']
+        o_price_calendar.pre_price = total_price / i
+        o_price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
+        yield o_price_calendar
 
     def get_cook_list(self, response: HtmlResponse):
         cookie_list = response.headers.getlist('Set-Cookie')

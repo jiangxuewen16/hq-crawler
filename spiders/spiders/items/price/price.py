@@ -30,3 +30,4 @@ class OPriceCalendar(BaseItem, mongoengine.Document):  # 价格日历
     pre_price = mongoengine.DecimalField()  # 均价
     create_at = mongoengine.DateTimeField()  # 创建时间
     type_key = mongoengine.StringField()  # 类型关键字
+    type_name = mongoengine.StringField()  # 类型关键字
