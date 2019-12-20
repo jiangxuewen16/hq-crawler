@@ -19,7 +19,7 @@ class OPrice(BaseItem, mongoengine.Document):
     update_at = mongoengine.DateTimeField()  # 更新时间
 
 
-class PriceCalendar(BaseItem, mongoengine.Document):  # 价格日历
+class OPriceCalendar(BaseItem, mongoengine.Document):  # 价格日历
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
 
