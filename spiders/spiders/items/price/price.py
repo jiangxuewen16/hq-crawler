@@ -17,6 +17,7 @@ class OPrice(BaseItem, mongoengine.Document):
     ota_product = mongoengine.ListField()  # 产品详情列表
     create_at = mongoengine.DateTimeField()  # 创建时间
     update_at = mongoengine.DateTimeField()  # 更新时间
+    seller_nick = mongoengine.StringField()  # 旅行社名称
 
 
 class OPriceCalendar(BaseItem, mongoengine.Document):  # 价格日历
