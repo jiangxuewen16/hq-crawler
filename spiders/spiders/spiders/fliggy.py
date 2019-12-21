@@ -103,14 +103,14 @@ class FliggySpotSpider(scrapy.Spider):
         yield Request(url=request_url, callback=self.parse_data, dont_filter=True, headers=self.sign_header,
                       meta={'ota_spot_id': response.meta['ota_spot_id'], 'data': data})
 
-    @staticmethod
-    def parse_data(response: HtmlResponse):
+    def parse_data(self, response: HtmlResponse):
         response_str = response.body.decode('utf-8')
         products_detail = json.loads(response_str)['data']['itemInfos']
         data = response.meta['data']
         o_price = price.OPrice()
         o_price.ota_id = OTA.OtaCode.FLIGGY.value.id
         o_price.ota_spot_id = response.meta['ota_spot_id']
+        o_price.ota_spot_name = self.get_spot_name(response.meta['ota_spot_id'])
         o_price.create_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
         total_price = i = 0
         o_price.ota_product = {
@@ -136,6 +136,7 @@ class FliggySpotSpider(scrapy.Spider):
         o_price_calendar = price.OPriceCalendar()
         o_price_calendar.ota_id = OTA.OtaCode.FLIGGY.value.id
         o_price_calendar.ota_spot_id = response.meta['ota_spot_id']
+        o_price_calendar.ota_spot_name = self.get_spot_name(response.meta['ota_spot_id'])
         o_price_calendar.type_key = data['ticketKindName']
         o_price_calendar.type_name = data['productName']
         o_price_calendar.pre_price = total_price / i
@@ -169,6 +170,21 @@ class FliggySpotSpider(scrapy.Spider):
                                                                                                 )).replace(' ', '')
         return hashlib.md5(md_str.encode()).hexdigest()
 
+    @staticmethod
+    def get_spot_name(ota_spot_id):
+        spot_name = {
+            '11481': '石燕湖',
+            '33966': '石牛寨',
+            '140975087': '花田溪谷',
+            '32659156': '东浒寨',
+            '103590': '马仁奇峰',
+            '61484': '大茅山',
+            '191470': '九龙江',
+            '140626417': '天空之城',
+            '17165564': '侠天下',
+            '33559796': '三翁花园'
+        }
+        return spot_name.get(ota_spot_id)
 
 class FliggyCommentSpider(scrapy.Spider):
     name = 'fliggy_comment'

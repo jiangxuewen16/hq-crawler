@@ -9,6 +9,7 @@ class OPrice(BaseItem, mongoengine.Document):
 
     ota_id = mongoengine.IntField()  # ota 的 id @see spiders.common.OTA
     ota_spot_id = mongoengine.IntField()  # ota 景区id
+    ota_spot_name = mongoengine.IntField()  # ota 景区名
 
     low_price = mongoengine.DecimalField()  # 最低价
     high_price = mongoengine.DecimalField()  # 最高价
@@ -26,6 +27,7 @@ class OPriceCalendar(BaseItem, mongoengine.Document):  # 价格日历
 
     ota_id = mongoengine.IntField()  # ota 的 id @see spiders.common.OTA
     ota_spot_id = mongoengine.IntField()  # ota 景区id
+    ota_spot_name = mongoengine.IntField()  # ota 景区名
     type_id = mongoengine.IntField()  # 票型id
     pre_price = mongoengine.DecimalField()  # 均价
     create_at = mongoengine.DateTimeField()  # 创建时间
