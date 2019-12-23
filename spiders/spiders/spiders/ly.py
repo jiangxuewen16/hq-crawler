@@ -165,68 +165,69 @@ class LyCommentSpider(scrapy.Spider):
 
 
 class LySpotCity(scrapy.Spider):
-    name = 'ly_city'
+    name = 'ly_price'
     allowed_domains = ['www.ly.com']
     base_url = r'https://www.ly.com/scenery/AjaxHelper/SceneryPriceFrame.aspx?action=GETNEWPRICEFRAMEFORLAST&ids={ota_spot_id}&isSimple=1&isShowAppThree=0&widthtype=1&isGrap=1&nobookid=&isyry=1&YpState=1&lon=null&lat=null&isforegin=null&iid=0.9687010629933097'
-    # 景区基本信息
-    # base_detail_basic_url = r'https://m.ly.com/scenery/Json/SimilarSceneryRecommend.html?SceneryId={ota_spot_id}'  # 景区信息
     start_urls = ['https://m.ly.com/scenery/scenerydetail_9513_0_0.html']
 
     def parse(self, response: HtmlResponse):
-        response_data = json.loads(response.body.decode('utf-8'))
+        price.OPrice.objects(ota_id=OTA.OtaCode.LY.value.id).delete()
+        price.OPriceCalendar.objects(ota_id=OTA.OtaCode.LY.value.id, create_at=time.strftime("%Y-%m-%d", time.localtime())).delete()
+        print('start_request')
         for ota_spot_id in LySpider.ota_spot_ids:
             # 更新景区的详情
             url = self.base_url.format(ota_spot_id=ota_spot_id)
             yield Request(url=url, callback=self.parse_item, dont_filter=True,
-                          meta={'ota_spot_id': ota_spot_id, 'data': {'detail_basic': response_data}})
-    """
-    爬取：景区列表信息
-    """
-
-    def spot_detail_basic(self, response: HtmlResponse):
-        ota_spot_id = response.meta['ota_spot_id']
-        # response_data = json.loads(response.body.decode('utf-8'))
-
-        # 爬取景点门票列表
-        url = self.base_url.format(ota_spot_id=ota_spot_id)
-        yield Request(url=url, callback=self.base_url, dont_filter=True,
-                      meta={'ota_spot_id': ota_spot_id})
+                          meta={'ota_spot_id': ota_spot_id})
 
     def parse_item(self, response: HtmlResponse):
         ota_spot_id = response.meta['ota_spot_id']
         response_str = response.body.decode('utf-8')
         json_data = json.loads(response_str)
+
         spot_city = spot.SpotCity.objects(ota_id=OTA.OtaCode.LY.value.id,
                                           ota_spot_id=ota_spot_id).first()
 
         # 不存在数据则新增数据,增量爬取
         if not spot_city:
-            if 'SceneryPrices' in json_data and 'ChannelPriceModelEntityList' in json_data['SceneryPrices']:
-                spot_name = json_data['SceneryPrices']['DestinationName']
-                for item in json_data['SceneryPrices']['ChannelPriceModelEntityList']:
-                    print('正在添加 ', item['DestinationName'], ' 的票型详情', "*" * 20)
-                    type_id = item['ConsumersTypeId']
-                    type_name = item['ConsumersTypeName']
-                    tickets = []
-                    ota_product = {'type_id': type_id, 'type_name': type_name,
-                                           'tickets': tickets}
-                    for k1, v1 in enumerate(item['ChannelPriceEntityList']):
-                        priceInSceneryId = v1['PriceInSceneryId']
-                        priceId = v1['PriceId']
-                        ticketName = v1['TicketName']
-                        amount = v1['Amount']
-                        amountAdvice = v1['AmountAdvice']
-                        beginDate = v1['BeginDate']
-                        endDate = v1['EndDate']
-                        ota_entity_list = {'priceIn_scenery_id': priceInSceneryId, 'price_id': priceId, 'ticket_name': ticketName,
-                                            'price': amountAdvice, 'market_price': amount, 'beginDate': beginDate, 'endDate' :endDate}
-                        tickets.append(ota_entity_list)
+            if 'SceneryPrices' in json_data:
+                for k1, v1 in enumerate(json_data['SceneryPrices']):
+                    ota_product = []
+                    spot_name = v1['DestinationName']
+                    for k2, v2 in enumerate(v1['ChannelPriceModelEntityList']):
+                        type_id = v2['ConsumersTypeId']
+                        type_name = v2['ConsumersTypeName']
+                        for k3, v3 in enumerate(v2['ChannelPriceEntityList']):
+                            priceInSceneryId = v3['PriceInSceneryId']
+                            priceId = v3['PriceId']
+                            ticketName = v3['TicketName']
+                            amount = v3['Amount']
+                            amountAdvice = v3['AmountAdvice']
+                            beginDate = v3['BeginDate']
+                            endDate = v3['EndDate']
+                            ota_entity_list = {'priceIn_scenery_id': priceInSceneryId, 'price_id': priceId, 'ticket_name': ticketName,
+                                                'price': amountAdvice, 'market_price': amount, 'beginDate': beginDate, 'type_id': type_id, 'type_name': type_name,
+                                               'endDate': endDate}
+                            ota_product.append(ota_entity_list)
+
+                            price_calendar = price.OPriceCalendar()
+                            price_calendar.ota_id = OTA.OtaCode.LY.value.id
+                            price_calendar.ota_spot_id = response.meta['ota_spot_id']
+                            price_calendar.pre_price = amountAdvice
+                            price_calendar.type_key = type_name
+                            price_calendar.type_name = ticketName
+                            price_calendar.ota_spot_name = spot_name
+                            price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime())
+                            price_calendar.save(force_insert=False, validate=False, clean=True)
+                            print('正在添加 ', v1['DestinationName'], ' 价格日历', "*" * 20)
 
                     o_price = price.OPrice()
                     o_price.ota_id = OTA.OtaCode.LY.value.id
                     o_price.ota_spot_id = response.meta['ota_spot_id']
                     o_price.ota_product = ota_product
                     o_price.ota_spot_name = spot_name
+                    o_price.create_at = time.strftime("%Y-%m-%d", time.localtime())
+                    print('正在添加 ', v1['DestinationName'], ' 的票型详情.OTA_id', OTA.OtaCode.LY.value.id, "*" * 20)
                     yield o_price
 
 
