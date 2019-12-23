@@ -107,18 +107,24 @@ class FliggySpotSpider(scrapy.Spider):
         response_str = response.body.decode('utf-8')
         products_detail = json.loads(response_str)['data']['itemInfos']
         data = response.meta['data']
-        o_price = price.OPrice()
+        o_price = price.OPrice.objects(ota_id=OTA.OtaCode.FLIGGY.value.id, ota_spot_id=response.meta['ota_spot_id'],
+                                       create_at=time.strftime("%Y-%m-%d", time.localtime()).format('')).first()
+        if not o_price:
+            o_price = price.OPrice()
+            o_price.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         o_price.ota_id = OTA.OtaCode.FLIGGY.value.id
         o_price.ota_spot_id = response.meta['ota_spot_id']
         o_price.ota_spot_name = self.get_spot_name(response.meta['ota_spot_id'])
-        o_price.create_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
+        o_price.update_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
         total_price = i = 0
+        init_url = r'https://h5.m.taobao.com/trip/rx-poi/detail/index.html?_wx_tpl=https%3A%2F%2Fh5.m.taobao.com' \
+                   r'%2Ftrip%2Frx-poi%2Fdetail%2Findex.weex.js&_fli_newpage=1&poiId={ota_spot_id}&_projVer=0.5.17'
         o_price.ota_product = {
-                'type_id': 0,
-                'type_key': data['ticketKindName'],
-                'type_name': data['productName'],
-                'tickets': []
-            }
+            'type_id': 0,
+            'type_key': data['ticketKindName'],
+            'type_name': data['productName'],
+            'tickets': []
+        }
         for ticket in products_detail:
             ticket_info = {
                 'product_id': ticket['itemId'],
@@ -127,9 +133,10 @@ class FliggySpotSpider(scrapy.Spider):
                 'cash_back': 0,
                 'cut_price': 0,
                 'sale_num': int(ticket['soldRecent'][2:-1]) if 'soldRecent' in ticket else 0,
-                'seller_nick': ticket['sellerNick']
+                'seller_nick': ticket['sellerNick'],
+                'url': init_url.format(ota_spot_id=response.meta['ota_spot_id'])
             }
-            i = i+1
+            i = i + 1
             total_price = total_price + float(ticket['price'])
             o_price.ota_product['tickets'].append(ticket_info)
         yield o_price
@@ -185,6 +192,7 @@ class FliggySpotSpider(scrapy.Spider):
             '33559796': '三翁花园'
         }
         return spot_name.get(ota_spot_id)
+
 
 class FliggyCommentSpider(scrapy.Spider):
     name = 'fliggy_comment'
