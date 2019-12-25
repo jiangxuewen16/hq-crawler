@@ -247,16 +247,16 @@ class CommentTest(scrapy.Spider):
 
 
 class PriceSpider(scrapy.Spider):
-    ota_map = [{'ota_spot_id': 706176810, 'sightId': '14407'}  # 石燕湖
-        , {'ota_spot_id': 1915618311, 'sightId': '187730'}  # 石牛寨
-        , {'ota_spot_id': 2877753081, 'sightId': '469141'}  # 益阳嘉年华
-        , {'ota_spot_id': 2554926827, 'sightId': '470541'}  # 花田溪谷
-        , {'ota_spot_id': 225118749, 'sightId': '461232'}  # 东浒寨
-        , {'ota_spot_id': 3821817759, 'sightId': '11829'}  # 马仁奇峰
-        , {'ota_spot_id': 420237024, 'sightId': '39499'}  # 大茅山
-        , {'ota_spot_id': 4123349957, 'sightId': '35473'}  # 九龙江
-        , {'ota_spot_id': 2333288470, 'sightId': '196586'}  # 侠天下
-        , {'ota_spot_id': 3333064220, 'sightId': '461903'}  # 三翁花园
+    ota_map = [{'ota_spot_id': 706176810, 'sightId': '14407', 'sightName': '石燕湖'}  # 石燕湖
+        , {'ota_spot_id': 1915618311, 'sightId': '187730', 'sightName': '石牛寨'}  # 石牛寨
+        , {'ota_spot_id': 2877753081, 'sightId': '469141', 'sightName': '益阳嘉年华'}  # 益阳嘉年华
+        , {'ota_spot_id': 2554926827, 'sightId': '470541', 'sightName': '花田溪谷'}  # 花田溪谷
+        , {'ota_spot_id': 225118749, 'sightId': '461232', 'sightName': '东浒寨'}  # 东浒寨
+        , {'ota_spot_id': 3821817759, 'sightId': '11829', 'sightName': '马仁奇峰'}  # 马仁奇峰
+        , {'ota_spot_id': 420237024, 'sightId': '39499', 'sightName': '大茅山'}  # 大茅山
+        , {'ota_spot_id': 4123349957, 'sightId': '35473', 'sightName': '九龙江'}  # 九龙江
+        , {'ota_spot_id': 2333288470, 'sightId': '196586', 'sightName': '侠天下'}  # 侠天下
+        , {'ota_spot_id': 3333064220, 'sightId': '461903', 'sightName': '三翁花园'}  # 三翁花园
                ]
     name = 'qunar_price'
     allowed_domains = ['piao.qunar.com']
@@ -270,7 +270,7 @@ class PriceSpider(scrapy.Spider):
             # print(value['sightId'], "*" * 20)
             yield scrapy.FormRequest(self.login_url
                                      , formdata={'sightId': value['sightId'], 'from': 'detail'}
-                                     , meta={'ota_spot_id': value['ota_spot_id']}
+                                     , meta={'ota_spot_id': value['ota_spot_id'], 'sight_name': value['sightName']}
                                      , callback=self.after_login)
 
     def after_login(self, response):
@@ -282,6 +282,7 @@ class PriceSpider(scrapy.Spider):
                 for k2, v2 in enumerate(v1):  # 票型数据
                     tickets = []
                     typeId = v2['typeId']
+                    ota_spot_name = response.meta['sight_name']
                     typeKey = v2['ticketZoneName']
                     ticketZoneName = v2['typeName']
                     total_count = v2['totalCount']  # 总共票数
@@ -293,6 +294,7 @@ class PriceSpider(scrapy.Spider):
                         for k3, v3 in enumerate(v2['tickets']):
                             tickets_list = {'price_id': v3['priceId']
                                 , 'title': v3['title']
+                                , 'seller_nick': v3['supplierName']
                                 , 'price': v3['qunarPrice']
                                 , 'cash_back': v3['cashBack']
                                 , 'cut_price': v3['cutPrice']
@@ -315,13 +317,16 @@ class PriceSpider(scrapy.Spider):
 
                 price_calendar.ota_id = OTA.OtaCode.QUNAR.value.id
                 price_calendar.ota_spot_id = response.meta['ota_spot_id']
+                price_calendar.ota_spot_name = response.meta['sight_name']
                 price_calendar.pre_price = pre_price
                 price_calendar.type_key = typeKey
+                price_calendar.type_name = ticketZoneName
                 price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime())
 
                 o_price = price.OPrice()
                 o_price.ota_id = OTA.OtaCode.QUNAR.value.id
                 o_price.ota_spot_id = response.meta['ota_spot_id']
+                o_price.ota_spot_name = ota_spot_name
 
                 o_price.ota_product = ota_product  # typeId typeName qunarPrice
                 price_calendar.save(force_insert=False, validate=False, clean=True)

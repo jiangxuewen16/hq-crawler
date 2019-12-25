@@ -451,6 +451,7 @@ class PriceSpider(scrapy.Spider):
 
                                 price_calendar.ota_id = OTA.OtaCode.CTRIP.value.id
                                 price_calendar.ota_spot_id = response.meta['ota_spot_id']
+                                price_calendar.ota_spot_name = response.meta['ota_spot_name']
                                 price_calendar.pre_price = v3['price']
                                 price_calendar.type_key = v3['propleproperty']
                                 price_calendar.type_name = v3['name']
