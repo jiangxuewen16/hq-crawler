@@ -193,29 +193,28 @@ class LySpotCity(scrapy.Spider):
             if 'SceneryPrices' in json_data:
                 for k1, v1 in enumerate(json_data['SceneryPrices']):
                     ota_product = []
+                    type_key = v1['DestinationName']
                     spot_name = v1['DestinationName']
                     for k2, v2 in enumerate(v1['ChannelPriceModelEntityList']):
-                        type_id = v2['ConsumersTypeId']
                         type_name = v2['ConsumersTypeName']
                         for k3, v3 in enumerate(v2['ChannelPriceEntityList']):
-                            priceInSceneryId = v3['PriceInSceneryId']
-                            priceId = v3['PriceId']
-                            ticketName = v3['TicketName']
-                            amount = v3['Amount']
-                            amountAdvice = v3['AmountAdvice']
-                            beginDate = v3['BeginDate']
-                            endDate = v3['EndDate']
-                            ota_entity_list = {'priceIn_scenery_id': priceInSceneryId, 'price_id': priceId, 'ticket_name': ticketName,
-                                                'price': amountAdvice, 'market_price': amount, 'beginDate': beginDate, 'type_id': type_id, 'type_name': type_name,
-                                               'endDate': endDate}
+                            tickets_list = {
+                                'price_id': v3['PriceId'],
+                                'title': v3['TicketName'],
+                                'price': v3['DAmountAdvice'],
+                                'cash_back': 0,
+                                'cut_price': 0
+                                            }
+
+                            ota_entity_list = {'type_key': type_key,'normal_price': v3['AmountAdvice'], 'type_id': v3['TicketTypeId'],
+                                               'type_name': type_name, 'sale_num': v3['OrderNumber'], 'tickets': tickets_list}
                             ota_product.append(ota_entity_list)
 
                             price_calendar = price.OPriceCalendar()
                             price_calendar.ota_id = OTA.OtaCode.LY.value.id
                             price_calendar.ota_spot_id = response.meta['ota_spot_id']
-                            price_calendar.pre_price = amountAdvice
                             price_calendar.type_key = type_name
-                            price_calendar.type_name = ticketName
+                            price_calendar.type_name = v3['TicketName']
                             price_calendar.ota_spot_name = spot_name
                             price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime())
                             price_calendar.save(force_insert=False, validate=False, clean=True)
