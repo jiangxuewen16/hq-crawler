@@ -110,7 +110,8 @@ class DailyReport(BaseItem, mongoengine.Document):
     unfollow_num = mongoengine.IntField()  # 当日取消关注（粉丝）
     add_follow_num = mongoengine.IntField()  # 净增关注（粉丝）[当日关注 - 当日取消关注] [小程序新增用户]
     total_follow_num = mongoengine.IntField()  # 总关注（粉丝）[小程序累计用户]
-    sex_proportion = mongoengine.IntField()  # 总粉丝男女比例
+    sex_proportion = mongoengine.MapField()  # 总粉丝男女比例  {'man':20.00, 'women':60.00, 'unknown':10.00}
+    age_proportion = mongoengine.MapField()  # 年龄比例 {'<24':20.00, '25-39':60.00, '>40':10.00, 'unknown':10.00}
 
     # 文章曝光
     forward_num = mongoengine.IntField()  # 转发
