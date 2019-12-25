@@ -14,6 +14,7 @@ class WeMedia(Enum):
     DOC88 = we_media(10102, '道客巴巴'),
     DOC_360 = we_media(10103, '360图书馆'),
     BAIDU_WEN_KU = we_media(10104, '百度文库'),
+    WECHAT = we_media(10105, '微信公众号'),
 
     # 自媒体
     TOU_TIAO = we_media(20001, '今日头条'),
@@ -37,7 +38,7 @@ class WeMedia(Enum):
     MOP = we_media(30005, '猫扑大杂烩'),
     CNHUBEI = we_media(30006, '东湖社区'),
     XIN_YANG = we_media(30007, '阳新论坛'),
-    WEI_BO = we_media(30008, '微博'),
+    SINA_WEI_BO = we_media(30008, '新浪微博'),
 
     # 问答
     wukong = we_media(40001, '悟空问答'),
@@ -45,3 +46,10 @@ class WeMedia(Enum):
     ZHIHU = we_media(40003, '知乎'),
 
     # 网站
+
+
+@unique
+class WeMediaType(Enum):
+    MP = [10000, WeMedia.WECHAT, '公众号平台'],
+    WEI_BO = [10001, WeMedia.SINA_WEI_BO, '微博平台'],
+    TIE_BA = [10001, WeMedia.SINA_WEI_BO, '微博平台'],

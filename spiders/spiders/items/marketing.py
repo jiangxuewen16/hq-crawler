@@ -26,8 +26,8 @@ class Account(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
 
-    type = mongoengine.StringField(max_length=10)
-    platform = mongoengine.StringField()    # 平台名称
+    type = mongoengine.StringField()
+    platform = mongoengine.IntField()  # 平台Id 详见：
     account_name = mongoengine.StringField()  # 账号名称
 
     # 曝光
@@ -35,17 +35,17 @@ class Account(BaseItem, mongoengine.Document):
     recommend_num = mongoengine.IntField()  # 推荐量
     read_num = mongoengine.IntField()  # 阅读量（小程序访问人数）
     follow_num = mongoengine.IntField()  # 关注（粉丝）
-    sex_proportion = mongoengine.IntField()  # 总粉丝男女比例
+    sex_proportion = mongoengine.DictField()  # 总粉丝男女比例  {'man':20.00, 'women':60.00, 'unknown':10.00}
+    age_proportion = mongoengine.DictField()  # 年龄比例 {'<24':20.00, '25-39':60.00, '>40':10.00, 'unknown':10.00}
+    forward_num = mongoengine.IntField()  # 转发
+    like_num = mongoengine.IntField()  # 点赞
+    comment_num = mongoengine.IntField()  # 评论量
+    publish_num = mongoengine.IntField()  # 发布量
 
     # 收益
     total_income = mongoengine.DecimalField()  # 总收入
     drawing = mongoengine.DecimalField()  # 总提现
     balance = mongoengine.DecimalField()  # 总余额（实时）
-
-    # 文章曝光
-    forward_num = mongoengine.IntField()  # 转发
-    like_num = mongoengine.IntField()  # 点赞
-    comment_num = mongoengine.IntField()  # 评论量
 
     account_home = mongoengine.StringField()  # 个人中心地址
     authorization_information = mongoengine.StringField()  # 授权信息（用于爬虫）
@@ -71,6 +71,7 @@ class Article(BaseItem, mongoengine.Document):
     admin_id = mongoengine.ObjectIdField()  # 管理者id
     admin_name = mongoengine.StringField()  # 管理者名字
 
+    exposure_num = mongoengine.IntField()  # 曝光量（推荐量 + 阅读量）
     recommend_num = mongoengine.IntField()  # 推荐量
     read_num = mongoengine.IntField()  # 阅读量
     forward_num = mongoengine.IntField()  # 转发
@@ -92,6 +93,7 @@ class DailyReport(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
 
+    type = mongoengine.StringField()    # 类型
     platform = mongoengine.StringField()  # 平台类型
     account_id = mongoengine.ObjectIdField()  # 账号id
     account_name = mongoengine.StringField()  # 账号名称
@@ -104,19 +106,20 @@ class DailyReport(BaseItem, mongoengine.Document):
     exposure_num = mongoengine.IntField()  # 曝光量（推荐量 + 阅读量）
     recommend_num = mongoengine.IntField()  # 推荐量
     read_num = mongoengine.IntField()  # 阅读量（小程序访问人数）
-
-    # 粉丝
-    follow_num = mongoengine.IntField()  # 当日关注（粉丝）
-    unfollow_num = mongoengine.IntField()  # 当日取消关注（粉丝）
-    add_follow_num = mongoengine.IntField()  # 净增关注（粉丝）[当日关注 - 当日取消关注] [小程序新增用户]
-    total_follow_num = mongoengine.IntField()  # 总关注（粉丝）[小程序累计用户]
-    sex_proportion = mongoengine.MapField()  # 总粉丝男女比例  {'man':20.00, 'women':60.00, 'unknown':10.00}
-    age_proportion = mongoengine.MapField()  # 年龄比例 {'<24':20.00, '25-39':60.00, '>40':10.00, 'unknown':10.00}
-
-    # 文章曝光
+    day_read_num = mongoengine.IntField()  # 当日阅读量（小程序访问人数）
     forward_num = mongoengine.IntField()  # 转发
     like_num = mongoengine.IntField()  # 点赞
     comment_num = mongoengine.IntField()  # 评论量
+    publish_num = mongoengine.IntField()  # 总发布量
+    day_publish_num = mongoengine.IntField()  # 当日发布量
+
+    # 粉丝
+    follow_num = mongoengine.IntField()  # 总关注（粉丝）[小程序累计用户]
+    day_follow_num = mongoengine.IntField()  # 当日关注（粉丝）
+    day_unfollow_num = mongoengine.IntField()  # 当日取消关注（粉丝）
+    day_add_follow_num = mongoengine.IntField()  # 净增关注（粉丝）[当日关注 - 当日取消关注] [小程序新增用户]
+    sex_proportion = mongoengine.DictField()  # 总粉丝男女比例  {'man':20.00, 'women':60.00, 'unknown':10.00}
+    age_proportion = mongoengine.DictField()  # 年龄比例 {'<24':20.00, '25-39':60.00, '>40':10.00, 'unknown':10.00}
 
     # 平台流量
 
@@ -127,3 +130,5 @@ class DailyReport(BaseItem, mongoengine.Document):
 
     create_at = mongoengine.DateTimeField(null=True)
     update_at = mongoengine.DateTimeField(null=True)
+
+
