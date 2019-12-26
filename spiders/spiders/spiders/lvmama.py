@@ -25,43 +25,44 @@ class LvmamaSpider(scrapy.Spider):
         pass
 
 
-class LvmamaSpotSpider(scrapy.Spider):
-    name = 'lvmama_spot'
-    allowed_domains = ['www.lvmama.com']
-    base_url = r'http://ticket.lvmama.com/scenic-{ota_spot_id}?dropdownlist=true'
-    start_urls = ['http://ticket.lvmama.com/scenic-100025?dropdownlist=true']
-
-    def parse(self, response: HtmlResponse):
-        for ota_spot_id in LvmamaSpider.ota_spot_ids:
-            # 获取景区页面数据
-            url = self.base_url.format(ota_spot_id=ota_spot_id)
-            yield Request(url=url, callback=self.parse_item, dont_filter=True,
-                          meta={'ota_spot_id': ota_spot_id})
-
-    def parse_item(self, response: HtmlResponse):
-        spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.LVMAMA.value.id,
-                                      ota_spot_id=response.meta['ota_spot_id']).first()
-
-        # 不存在数据则新增数据
-        if not spot_data:
-            spot_data = Spot()
-
-        # spot_data.spot_id = OTA.OtaSpotIdMap.get_ota_spot_id(OTA.OtaSpotIdMap.SHI_YAN_HU.name, OTA.OtaCode.HUIQULX)
-        spot_data.ota_id = OTA.OtaCode.LVMAMA.value.id
-        spot_data.ota_spot_id = response.meta['ota_spot_id']
-        spot_data.spot_name = response.xpath('//body/div[4]/div/div[2]/div/div/h1/text()').extract_first()
-        score = response.xpath('//*[@id="comments"]/div[2]/div[1]/div/div[1]/i/text()').extract_first()
-        spot_data.spot_score = float(score) if score else 0
-        comment_num = response.xpath('//*[@id="comments"]/div[2]/div[1]/div/div[1]/em[2]/a/text()').extract_first()
-        spot_data.comment_num = float(comment_num) if comment_num else 0
-        spot_data.spot_favorable = response.xpath('//*[@id="comments"]/div[2]/div[1]/div/div[1]/em[1]/text()') \
-            .extract_first()
-        spot_data.open_time = response.xpath(
-            '/html/body/div[4]/div/div[2]/div[2]/div[2]/div/div/dl[2]/dd/p/text()').extract_first()
-        spot_data.traffic = response.xpath(
-            '//*[@id="traffic"]/div[2]/div[2]//p/text()').extract()
-
-        yield spot_data
+# todo 景区用城市景区的
+# class LvmamaSpotSpider(scrapy.Spider):
+#     name = 'lvmama_spot'
+#     allowed_domains = ['www.lvmama.com']
+#     base_url = r'http://ticket.lvmama.com/scenic-{ota_spot_id}?dropdownlist=true'
+#     start_urls = ['http://ticket.lvmama.com/scenic-100025?dropdownlist=true']
+#
+#     def parse(self, response: HtmlResponse):
+#         for ota_spot_id in LvmamaSpider.ota_spot_ids:
+#             # 获取景区页面数据
+#             url = self.base_url.format(ota_spot_id=ota_spot_id)
+#             yield Request(url=url, callback=self.parse_item, dont_filter=True,
+#                           meta={'ota_spot_id': ota_spot_id})
+#
+#     def parse_item(self, response: HtmlResponse):
+#         spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.LVMAMA.value.id,
+#                                       ota_spot_id=response.meta['ota_spot_id']).first()
+#
+#         # 不存在数据则新增数据
+#         if not spot_data:
+#             spot_data = Spot()
+#
+#         # spot_data.spot_id = OTA.OtaSpotIdMap.get_ota_spot_id(OTA.OtaSpotIdMap.SHI_YAN_HU.name, OTA.OtaCode.HUIQULX)
+#         spot_data.ota_id = OTA.OtaCode.LVMAMA.value.id
+#         spot_data.ota_spot_id = response.meta['ota_spot_id']
+#         spot_data.spot_name = response.xpath('//body/div[4]/div/div[2]/div/div/h1/text()').extract_first()
+#         score = response.xpath('//*[@id="comments"]/div[2]/div[1]/div/div[1]/i/text()').extract_first()
+#         spot_data.spot_score = float(score) if score else 0
+#         comment_num = response.xpath('//*[@id="comments"]/div[2]/div[1]/div/div[1]/em[2]/a/text()').extract_first()
+#         spot_data.comment_num = float(comment_num) if comment_num else 0
+#         spot_data.spot_favorable = response.xpath('//*[@id="comments"]/div[2]/div[1]/div/div[1]/em[1]/text()') \
+#             .extract_first()
+#         spot_data.open_time = response.xpath(
+#             '/html/body/div[4]/div/div[2]/div[2]/div[2]/div/div/dl[2]/dd/p/text()').extract_first()
+#         spot_data.traffic = response.xpath(
+#             '//*[@id="traffic"]/div[2]/div[2]//p/text()').extract()
+#
+#         yield spot_data
 
 
 class LvmamaCommentSpider(scrapy.Spider):

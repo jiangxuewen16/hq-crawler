@@ -60,58 +60,58 @@ class CtripSpider(scrapy.Spider):
 景区数据
 """
 
-
-class CtripSpotSpider(scrapy.Spider):
-    name = 'ctrip_spot'
-    allowed_domains = ['www.ctrip.com']
-    base_url = r'https://piao.ctrip.com/ticket/dest/t{ota_spot_id}.html'
-    start_urls = ['https://piao.ctrip.com/ticket/dest/t62931.html']
-
-    def parse(self, response: HtmlResponse):
-        for ota_spot_id in CtripSpider.ota_spot_ids:
-            # 获取景区页面数据
-            url = self.base_url.format(ota_spot_id=ota_spot_id)
-            yield Request(url=url, callback=self.parse_item, dont_filter=True,
-                          meta={'ota_spot_id': ota_spot_id})
-
-    def parse_item(self, response: HtmlResponse):
-        spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.CTRIP.value.id,
-                                      ota_spot_id=response.meta['ota_spot_id']).first()
-
-        # 不存在数据则新增数据
-        if not spot_data:
-            spot_data = spot.Spot()
-            spot_data.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
-        # spot_data.spot_id = OTA.OtaSpotIdMap.get_ota_spot_id(OTA.OtaSpotIdMap.SHI_YAN_HU.name, OTA.OtaCode.HUIQULX)
-        spot_data.ota_spot_id = response.meta['ota_spot_id']
-
-        spot_data.ota_id = OTA.OtaCode.CTRIP.value.id
-        spot_data.spot_name = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/h2/text()').extract_first()
-
-        spot_imgs = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/ul/li')
-        spot_data.spot_img = []
-        for img in spot_imgs:
-            spot_data.spot_img.append(img.xpath('/a/img[@src]').extract_first())
-
-        spot_data.desc = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[5]/div[1]/div[3]/div[2]').get()
-        # spot_data.tel = ????
-        spot_data.traffic = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[5]/div[1]/div[4]/div[3]/p/text()').extract()
-        spot_data.ticket_num = 1
-        spot.addr = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/ul/li[1]/span/text()').extract_first()
-        spot_data.open_time = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/ul/li[2]/span/text()').extract_first()
-        spot_data.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        spot_data.comment_num = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/a/text()').extract_first().strip(
-            '查看条点评')
-        # print('='*20, spot_data.to_json())
-        yield spot_data
+# todo 景区用城市景区的
+# class CtripSpotSpider(scrapy.Spider):
+#     name = 'ctrip_spot'
+#     allowed_domains = ['www.ctrip.com']
+#     base_url = r'https://piao.ctrip.com/ticket/dest/t{ota_spot_id}.html'
+#     start_urls = ['https://piao.ctrip.com/ticket/dest/t62931.html']
+#
+#     def parse(self, response: HtmlResponse):
+#         for ota_spot_id in CtripSpider.ota_spot_ids:
+#             # 获取景区页面数据
+#             url = self.base_url.format(ota_spot_id=ota_spot_id)
+#             yield Request(url=url, callback=self.parse_item, dont_filter=True,
+#                           meta={'ota_spot_id': ota_spot_id})
+#
+#     def parse_item(self, response: HtmlResponse):
+#         spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.CTRIP.value.id,
+#                                       ota_spot_id=response.meta['ota_spot_id']).first()
+#
+#         # 不存在数据则新增数据
+#         if not spot_data:
+#             spot_data = spot.Spot()
+#             spot_data.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+#
+#         # spot_data.spot_id = OTA.OtaSpotIdMap.get_ota_spot_id(OTA.OtaSpotIdMap.SHI_YAN_HU.name, OTA.OtaCode.HUIQULX)
+#         spot_data.ota_spot_id = response.meta['ota_spot_id']
+#
+#         spot_data.ota_id = OTA.OtaCode.CTRIP.value.id
+#         spot_data.spot_name = response.xpath(
+#             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/h2/text()').extract_first()
+#
+#         spot_imgs = response.xpath(
+#             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/ul/li')
+#         spot_data.spot_img = []
+#         for img in spot_imgs:
+#             spot_data.spot_img.append(img.xpath('/a/img[@src]').extract_first())
+#
+#         spot_data.desc = response.xpath(
+#             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[5]/div[1]/div[3]/div[2]').get()
+#         # spot_data.tel = ????
+#         spot_data.traffic = response.xpath(
+#             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[5]/div[1]/div[4]/div[3]/p/text()').extract()
+#         spot_data.ticket_num = 1
+#         spot.addr = response.xpath(
+#             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/ul/li[1]/span/text()').extract_first()
+#         spot_data.open_time = response.xpath(
+#             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/ul/li[2]/span/text()').extract_first()
+#         spot_data.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+#         spot_data.comment_num = response.xpath(
+#             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/a/text()').extract_first().strip(
+#             '查看条点评')
+#         # print('='*20, spot_data.to_json())
+#         yield spot_data
 
 
 """

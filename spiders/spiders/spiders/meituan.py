@@ -24,44 +24,44 @@ class MeituanSpider(scrapy.Spider):
     def parse(self, response):
         pass
 
-
-class MeituanSpotSpider(scrapy.Spider):
-    name = 'meituan_spot'
-    allowed_domains = ['www.meituan.com']
-    base_url = r'https://www.meituan.com/zhoubianyou/{ota_spot_id}'
-    start_urls = ['https://www.meituan.com/zhoubianyou/1515791']
-
-    def parse(self, response: HtmlResponse):
-        for ota_spot_id in MeituanSpider.ota_spot_ids:
-            # 更新景区的评论数量
-            url = self.base_url.format(ota_spot_id=ota_spot_id)
-            yield Request(url=url, callback=self.parse_item, dont_filter=True,
-                          meta={'ota_spot_id': ota_spot_id})
-
-    def parse_item(self, response: HtmlResponse):
-        spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.MEITUAN.value.id,
-                                      ota_spot_id=response.meta['ota_spot_id']).first()
-
-        # 不存在数据则新增数据
-        if not spot_data:
-            spot_data = Spot()
-            spot_data.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
-        spot_data.ota_spot_id = response.meta['ota_spot_id']
-        spot_data.ota_id = OTA.OtaCode.MEITUAN.value.id
-        spot_data.spot_name = response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/h1/text()').extract_first()
-        # print('++'*20,response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/text()[1]'))
-        spot_data.spot_score = float(
-            response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/text()[1]').extract_first())
-        spot_data.avg_price = float(
-            response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/span/text()[2]').extract_first())
-        spot_data.addr = response.xpath(
-            '//*[@id="react"]/div/div/div[2]/div[1]/div[2]/div[1]/a/span/text()').extract_first()
-        spot_data.tel = response.xpath(
-            '//*[@id="react"]/div/div/div[2]/div[1]/div[2]/div[2]/span[2]/text()').extract_first()
-        spot_data.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
-        yield spot_data
+# todo 景区用城市景区的
+# class MeituanSpotSpider(scrapy.Spider):
+#     name = 'meituan_spot'
+#     allowed_domains = ['www.meituan.com']
+#     base_url = r'https://www.meituan.com/zhoubianyou/{ota_spot_id}'
+#     start_urls = ['https://www.meituan.com/zhoubianyou/1515791']
+#
+#     def parse(self, response: HtmlResponse):
+#         for ota_spot_id in MeituanSpider.ota_spot_ids:
+#             # 更新景区的评论数量
+#             url = self.base_url.format(ota_spot_id=ota_spot_id)
+#             yield Request(url=url, callback=self.parse_item, dont_filter=True,
+#                           meta={'ota_spot_id': ota_spot_id})
+#
+#     def parse_item(self, response: HtmlResponse):
+#         spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.MEITUAN.value.id,
+#                                       ota_spot_id=response.meta['ota_spot_id']).first()
+#
+#         # 不存在数据则新增数据
+#         if not spot_data:
+#             spot_data = Spot()
+#             spot_data.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+#
+#         spot_data.ota_spot_id = response.meta['ota_spot_id']
+#         spot_data.ota_id = OTA.OtaCode.MEITUAN.value.id
+#         spot_data.spot_name = response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/h1/text()').extract_first()
+#         # print('++'*20,response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/text()[1]'))
+#         spot_data.spot_score = float(
+#             response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/text()[1]').extract_first())
+#         spot_data.avg_price = float(
+#             response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/span/text()[2]').extract_first())
+#         spot_data.addr = response.xpath(
+#             '//*[@id="react"]/div/div/div[2]/div[1]/div[2]/div[1]/a/span/text()').extract_first()
+#         spot_data.tel = response.xpath(
+#             '//*[@id="react"]/div/div/div[2]/div[1]/div[2]/div[2]/span[2]/text()').extract_first()
+#         spot_data.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+#
+#         yield spot_data
 
 
 class MeituanCommentSpider(scrapy.Spider):

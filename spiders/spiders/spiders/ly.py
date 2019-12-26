@@ -39,44 +39,45 @@ class LySpider(scrapy.Spider):
         pass
 
 
-class LySpotSpider(scrapy.Spider):
-    name = 'ly_spot'
-    allowed_domains = ['www.ly.com']
-    base_url = r'https://www.ly.com/scenery/BookSceneryTicket_{ota_spot_id}.html'
-    start_urls = ['https://www.ly.com/scenery/BookSceneryTicket_9513.html']
-
-    def parse(self, response: HtmlResponse):
-        for ota_spot_id in LySpider.ota_spot_ids:
-            start_page = 1
-            url = self.base_url.format(ota_spot_id=ota_spot_id)
-            referer = 'https://www.mafengwo.cn/poi/339.html'  # 这里随便马蜂窝任何url
-            yield Request(url=url, headers=LySpider.build_headers(referer), cookies={},
-                          callback=self.parse_item,
-                          dont_filter=True, meta={'page': start_page, 'ota_spot_id': ota_spot_id})
-
-    def parse_item(self, response: HtmlResponse):
-        spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.MAFENGWO.value.id,
-                                      ota_spot_id=response.meta['ota_spot_id']).first()
-        # 不存在数据则新增数据
-        if not spot_data:
-            spot_data = Spot()
-            spot_data.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
-        spot_data.ota_spot_id = response.meta['ota_spot_id']
-
-        spot_data.ota_id = OTA.OtaCode.MAFENGWO.value.id
-        spot_data.spot_name = response.xpath('/html/body/div[2]/div[2]/div/div[3]/h1/text()').extract_first()
-        desc = response.xpath('/html/body/div[2]/div[3]/div[2]/div[1]/text()').extract_first()
-        spot_data.desc = desc.strip() if desc else ''
-        spot_data.tel = response.xpath('/html/body/div[2]/div[3]/div[2]/ul/li[1]/div[2]/text()').extract_first()
-        spot_data.traffic = response.xpath('/html/body/div[2]/div[3]/div[2]/dl[1]/dd/div[1]/text()').extract_first()
-        spot_data.ticket_num = 1
-        spot_data.open_time = response.xpath('/html/body/div[2]/div[3]/div[2]/dl[3]/dd/text()').extract_first()
-        spot_data.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        # spot_data.comment_num = \
-        #    response.xpath('//*[@id="poi-navbar"]/ul/li[3]/a/span/text()').extract_first().split('条')[0].strip('（')
-
-        yield spot_data
+# todo 景区用城市景区的
+# class LySpotSpider(scrapy.Spider):
+#     name = 'ly_spot'
+#     allowed_domains = ['www.ly.com']
+#     base_url = r'https://www.ly.com/scenery/BookSceneryTicket_{ota_spot_id}.html'
+#     start_urls = ['https://www.ly.com/scenery/BookSceneryTicket_9513.html']
+#
+#     def parse(self, response: HtmlResponse):
+#         for ota_spot_id in LySpider.ota_spot_ids:
+#             start_page = 1
+#             url = self.base_url.format(ota_spot_id=ota_spot_id)
+#             referer = 'https://www.mafengwo.cn/poi/339.html'  # 这里随便马蜂窝任何url
+#             yield Request(url=url, headers=LySpider.build_headers(referer), cookies={},
+#                           callback=self.parse_item,
+#                           dont_filter=True, meta={'page': start_page, 'ota_spot_id': ota_spot_id})
+#
+#     def parse_item(self, response: HtmlResponse):
+#         spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.MAFENGWO.value.id,
+#                                       ota_spot_id=response.meta['ota_spot_id']).first()
+#         # 不存在数据则新增数据
+#         if not spot_data:
+#             spot_data = Spot()
+#             spot_data.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+#
+#         spot_data.ota_spot_id = response.meta['ota_spot_id']
+#
+#         spot_data.ota_id = OTA.OtaCode.MAFENGWO.value.id
+#         spot_data.spot_name = response.xpath('/html/body/div[2]/div[2]/div/div[3]/h1/text()').extract_first()
+#         desc = response.xpath('/html/body/div[2]/div[3]/div[2]/div[1]/text()').extract_first()
+#         spot_data.desc = desc.strip() if desc else ''
+#         spot_data.tel = response.xpath('/html/body/div[2]/div[3]/div[2]/ul/li[1]/div[2]/text()').extract_first()
+#         spot_data.traffic = response.xpath('/html/body/div[2]/div[3]/div[2]/dl[1]/dd/div[1]/text()').extract_first()
+#         spot_data.ticket_num = 1
+#         spot_data.open_time = response.xpath('/html/body/div[2]/div[3]/div[2]/dl[3]/dd/text()').extract_first()
+#         spot_data.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+#         # spot_data.comment_num = \
+#         #    response.xpath('//*[@id="poi-navbar"]/ul/li[3]/a/span/text()').extract_first().split('条')[0].strip('（')
+#
+#         yield spot_data
 
 
 class LyCommentSpider(scrapy.Spider):
