@@ -40,6 +40,23 @@ class Spot(BaseItem, mongoengine.Document):
     update_at = mongoengine.DateTimeField(null=True)
 
 
+class CSpot(BaseItem, mongoengine.document):
+    pk = 1  # 必须定义
+    id = ObjectId()  # 必须定义
+    spot_id = mongoengine.StringField()     # 景区ID
+    province = mongoengine.StringField()    # 省
+    city = mongoengine.StringField()        # 市
+    area = mongoengine.StringField()        # 区
+    create_at = mongoengine.IntField()      # 创建时间
+    name = mongoengine.StringField()        # 景区名
+    level = mongoengine.IntField()          # 等级
+    t_id = mongoengine.IntField()           # 租户id
+    c_id = mongoengine.IntField()           # 客户端id
+    is_sale = mongoengine.IntField()        # 是否正在售卖
+    promoter_id = mongoengine.StringField()  # 推广者id
+    self_employed = mongoengine.IntField()   # 是否自营
+
+
 class SpotComment(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
