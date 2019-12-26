@@ -2,19 +2,19 @@ from collections import namedtuple
 from enum import unique, Enum
 
 we_media = namedtuple('we_media', 'id type name')
-we_media_type = namedtuple('we_media_type', 'id name')
+kv = namedtuple('kv', 'id name')
 
 
 @unique
 class WeMediaType(Enum):
-    MP = we_media_type(1001, '公众号平台'),
-    WEI_BO = we_media_type(1002, '微博平台'),
-    TIE_BA = we_media_type(1003, '贴吧平台'),
-    WE_MEDIA = we_media_type(1004, '自媒体平台'),
-    GUIDE = we_media_type(1005, '攻略平台'),
-    KNOW = we_media_type(1006, '问答平台', ),
-    MINI_APPS = we_media_type(1007, '小程序平台'),
-    FORUM = we_media_type(1007, '论坛平台'),
+    MP = kv(1001, '公众号平台'),
+    WEI_BO = kv(1002, '微博平台'),
+    TIE_BA = kv(1003, '贴吧平台'),
+    WE_MEDIA = kv(1004, '自媒体平台'),
+    GUIDE = kv(1005, '攻略平台'),
+    KNOW = kv(1006, '问答平台', ),
+    MINI_APPS = kv(1007, '小程序平台'),
+    FORUM = kv(1007, '论坛平台'),
 
 
 @unique
@@ -64,4 +64,14 @@ class WeMedia(Enum):
 
     # 网站
 
+    @classmethod
+    def get_id_list_by_type(cls, we_media_type: WeMediaType) -> list:
+        return [item.id for _, member in cls.__members__.items() for item in member.value if
+                item.type == we_media_type]
 
+
+@unique
+class ActivityType(Enum):
+    SPORT = kv(2001, '景区活动'),
+    SHOP = kv(2002, '店铺活动'),
+    MP = kv(2003, '店铺活动'),
