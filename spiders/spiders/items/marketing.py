@@ -27,8 +27,10 @@ class Account(BaseItem, mongoengine.Document):
     id = ObjectId()  # 必须定义
 
     type = mongoengine.StringField()
-    platform = mongoengine.IntField()  # 平台Id 详见：
+    platform = mongoengine.IntField()  # 平台id 详见：
     account_name = mongoengine.StringField()  # 账号名称
+    admin_id = ObjectId()  # 管理员id
+    account_id = mongoengine.DictField()  # 平台账号的id  {'id':xxx}
 
     # 曝光
     exposure_num = mongoengine.IntField()  # 曝光量（推荐量 + 阅读量）
@@ -93,7 +95,7 @@ class DailyReport(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
 
-    type = mongoengine.StringField()    # 类型
+    type = mongoengine.StringField()  # 类型
     platform = mongoengine.StringField()  # 平台类型
     account_id = mongoengine.ObjectIdField()  # 账号id
     account_name = mongoengine.StringField()  # 账号名称
@@ -130,5 +132,3 @@ class DailyReport(BaseItem, mongoengine.Document):
 
     create_at = mongoengine.DateTimeField(null=True)
     update_at = mongoengine.DateTimeField(null=True)
-
-
