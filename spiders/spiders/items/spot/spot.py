@@ -40,7 +40,7 @@ class Spot(BaseItem, mongoengine.Document):
     update_at = mongoengine.DateTimeField(null=True)
 
 
-class CSpot(BaseItem, mongoengine.document):
+class CSpot(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
     spot_id = mongoengine.StringField()     # 景区ID
