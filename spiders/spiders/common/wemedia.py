@@ -41,15 +41,25 @@ class WeMedia(Enum):
     SINA_WEI_BO = we_media(30008, '新浪微博'),
 
     # 问答
-    wukong = we_media(40001, '悟空问答'),
+    WUKONG = we_media(40001, '悟空问答'),
     BAIDU_ZHIDAO = we_media(40002, '百度知道'),
     ZHIHU = we_media(40003, '知乎'),
+
+    # 小程序
+    MINI_PROGRAM = we_media(50001, '微信小程序'),
 
     # 网站
 
 
+we_media_type = namedtuple('we_media_type', 'id name list')
+
+
 @unique
 class WeMediaType(Enum):
-    MP = [10000, WeMedia.WECHAT, '公众号平台'],
-    WEI_BO = [10001, WeMedia.SINA_WEI_BO, '微博平台'],
-    TIE_BA = [10001, WeMedia.SINA_WEI_BO, '微博平台'],
+    MP = we_media_type(1001, '公众号平台', [WeMedia.WECHAT]),
+    WEI_BO = we_media_type(1002, '微博平台', [WeMedia.SINA_WEI_BO]),
+    TIE_BA = we_media_type(1003, '贴吧平台', []),
+    WE_MEDIA = we_media_type(1004, '自媒体平台', [WeMedia.TOU_TIAO, WeMedia.YI_DIAN, WeMedia.OM_QQ, WeMedia.DA_YU, WeMedia.SOHU, WeMedia.JIAN_SHU, WeMedia.SOGOU, WeMedia.BAI_JIA_HAO, WeMedia.WANG_YI, WeMedia.QU_TOU_TIAO, WeMedia.DOU_BAN]),
+    GUIDE = we_media_type(1005, '攻略平台', [WeMedia.LVMAMA, WeMedia.MAFENGWO, WeMedia.CTRIP, WeMedia.DOCIN, WeMedia.DOC88, WeMedia.DOC_360]),
+    KNOW = we_media_type(1006, '问答平台', [WeMedia.BAIDU_ZHIDAO, WeMedia.ZHIHU]),
+    MINI_APPS = we_media_type(1007, '小程序平台', []),
