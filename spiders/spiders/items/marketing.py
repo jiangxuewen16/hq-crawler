@@ -82,6 +82,9 @@ class Article(BaseItem, mongoengine.Document):
     like_num = mongoengine.IntField()  # 点赞
     comment_num = mongoengine.IntField()  # 评论量
 
+    spot_id_list = mongoengine.ListField()  # 景区id列表
+    keyword_list = mongoengine.ListField()  # 文章关键字列表
+
     content = mongoengine.StringField()  # 文章内容
 
     create_at = mongoengine.DateTimeField(null=True)  # 文章的创建时间
