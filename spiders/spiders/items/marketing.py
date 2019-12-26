@@ -158,6 +158,8 @@ class MarketingSpotDailyReport(BaseItem, mongoengine.Document):
 
     day_time = mongoengine.DateTimeField(null=True)  # 日期
 
+    spot_id = mongoengine.StringField()  # 景区ID CSpot.spot_id
+
     # 曝光
     exposure_num = mongoengine.IntField()  # 曝光量（推荐量 + 阅读量）
     recommend_num = mongoengine.IntField()  # 推荐量
@@ -173,6 +175,9 @@ class MarketingSpotDailyReport(BaseItem, mongoengine.Document):
 class MarketingActivity(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
+
+    admin_id = mongoengine.ObjectIdField()  # 管理者id
+    admin_name = mongoengine.StringField()  # 管理者名字
 
     title = mongoengine.StringField()  # 活动名称
     type = mongoengine.IntField()  # 活动名称 详见：ActivityType
@@ -190,6 +195,25 @@ class MarketingActivity(BaseItem, mongoengine.Document):
     # 曝光
     exposure_num = mongoengine.IntField()  # 曝光量（推荐量 + 阅读量）
     income = mongoengine.DecimalField()  # 收益金额
+    publish_num = mongoengine.IntField()  # 总发布量
 
     create_at = mongoengine.DateTimeField(null=True)
     update_at = mongoengine.DateTimeField(null=True)
+
+
+class MarketingActivityDailyReport(BaseItem, mongoengine.Document):
+    pk = 1  # 必须定义
+    id = ObjectId()  # 必须定义
+
+    type = mongoengine.IntField()  # 平台类型 详见：WeMediaType.id
+    platform = mongoengine.IntField()  # 平台id 详见：WeMedia.id
+    account_id = mongoengine.ObjectIdField()  # 账号id
+    account_name = mongoengine.StringField()  # 账号名称
+    admin_id = mongoengine.ObjectIdField()  # 管理者id
+    admin_name = mongoengine.StringField()  # 管理者名字
+
+    activity_id = mongoengine.ObjectIdField()  # 活动ID MarketingActivity.id
+
+    exposure_num = mongoengine.IntField()  # 曝光量（推荐量 + 阅读量）
+    income = mongoengine.DecimalField()  # 收益金额
+    publish_num = mongoengine.IntField()  # 发布量
