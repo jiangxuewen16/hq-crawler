@@ -85,6 +85,7 @@ class Article(BaseItem, mongoengine.Document):
     spot_id_list = mongoengine.ListField()  # 景区id列表
     keyword_list = mongoengine.ListField()  # 文章关键字列表
 
+    title = mongoengine.StringField()  # 文章标题
     content = mongoengine.StringField()  # 文章内容
 
     create_at = mongoengine.DateTimeField(null=True)  # 文章的创建时间
@@ -174,4 +175,21 @@ class MarketingActivity(BaseItem, mongoengine.Document):
     id = ObjectId()  # 必须定义
 
     title = mongoengine.StringField()  # 活动名称
-    type = mongoengine.IntField()  # 活动名称
+    type = mongoengine.IntField()  # 活动名称 详见：ActivityType
+    desc = mongoengine.StringField()  # 活动描述
+
+    ticket_id_list = mongoengine.ListField()  # 景区id列表
+
+    start_time = mongoengine.DateTimeField(null=True)  # 活动开始时间
+    end_time = mongoengine.DateTimeField(null=True)  # 活动结束时间
+    promoter_start_time = mongoengine.DateTimeField(null=True)  # 推广开始时间
+    promoter_end_time = mongoengine.DateTimeField(null=True)  # 推广结束时间
+
+    status = mongoengine.IntField()  # 0-未开始 1-进行中 2-已结束
+
+    # 曝光
+    exposure_num = mongoengine.IntField()  # 曝光量（推荐量 + 阅读量）
+    income = mongoengine.DecimalField()  # 收益金额
+
+    create_at = mongoengine.DateTimeField(null=True)
+    update_at = mongoengine.DateTimeField(null=True)

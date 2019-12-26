@@ -64,6 +64,10 @@ class WeMedia(Enum):
 
     # 网站
 
+    """
+    用平台类型获取平台id列表
+    """
+
     @classmethod
     def get_id_list_by_type(cls, we_media_type: WeMediaType) -> list:
         return [item.id for _, member in cls.__members__.items() for item in member.value if
