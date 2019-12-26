@@ -10,7 +10,6 @@ from scrapy.http import HtmlResponse
 from spiders.common import OTA
 from spiders.items.price import price
 from spiders.items.spot import spot
-from spiders.items.spot.spot import Spot
 
 """
 同程旅游

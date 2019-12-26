@@ -11,6 +11,7 @@ from scrapy.item import BaseItem
 """
 
 
+# todo 景区用城市景区的,停止维护
 class Spot(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
