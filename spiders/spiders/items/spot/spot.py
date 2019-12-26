@@ -43,18 +43,24 @@ class Spot(BaseItem, mongoengine.Document):
 class CSpot(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
+
     spot_id = mongoengine.StringField()     # 景区ID
     province = mongoengine.StringField()    # 省
     city = mongoengine.StringField()        # 市
     area = mongoengine.StringField()        # 区
-    create_at = mongoengine.IntField()      # 创建时间
     name = mongoengine.StringField()        # 景区名
     level = mongoengine.IntField()          # 等级
     t_id = mongoengine.IntField()           # 租户id
     c_id = mongoengine.IntField()           # 客户端id
     is_sale = mongoengine.IntField()        # 是否正在售卖
-    promoter_id = mongoengine.StringField()  # 推广者id
-    self_employed = mongoengine.IntField()   # 是否自营
+    promoter_id = mongoengine.ObjectIdField()  # 推广者id  marketing.Admin.id
+    self_employed = mongoengine.BooleanField()   # 是否自营
+
+    #
+    publish_num = mongoengine.IntField()  # 总发布量
+    exposure_num = mongoengine.IntField()   # 曝光量
+
+    create_at = mongoengine.IntField()      # 创建时间
 
 
 class SpotComment(BaseItem, mongoengine.Document):
