@@ -26,8 +26,8 @@ class Account(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
 
-    type = mongoengine.StringField()
-    platform = mongoengine.IntField()  # 平台id 详见：
+    type = mongoengine.IntField()  # 平台类型 详见：WeMediaType.id
+    platform = mongoengine.IntField()  # 平台id 详见：WeMedia.id
     account_name = mongoengine.StringField()  # 账号名称
     admin_id = ObjectId()  # 管理员id
     account_id = mongoengine.IntField()  # 平台账号的id
@@ -68,7 +68,8 @@ class Article(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
 
-    platform = mongoengine.StringField()  # 平台类型
+    type = mongoengine.IntField()  # 平台类型 详见：WeMediaType.id
+    platform = mongoengine.IntField()  # 平台id 详见：WeMedia.id
     account_id = mongoengine.ObjectIdField()  # 账号id
     account_name = mongoengine.StringField()  # 账号名称
     admin_id = mongoengine.ObjectIdField()  # 管理者id
@@ -96,8 +97,8 @@ class DailyReport(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
 
-    type = mongoengine.StringField()  # 类型
-    platform = mongoengine.StringField()  # 平台类型
+    type = mongoengine.IntField()  # 平台类型 详见：WeMediaType.id
+    platform = mongoengine.IntField()  # 平台id 详见：WeMedia.id
     account_id = mongoengine.ObjectIdField()  # 账号id
     account_name = mongoengine.StringField()  # 账号名称
     admin_id = mongoengine.ObjectIdField()  # 管理者id
