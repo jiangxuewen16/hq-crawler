@@ -30,7 +30,7 @@ class Account(BaseItem, mongoengine.Document):
     platform = mongoengine.IntField()  # 平台id 详见：
     account_name = mongoengine.StringField()  # 账号名称
     admin_id = ObjectId()  # 管理员id
-    account_id = mongoengine.DictField()  # 平台账号的id  {'id':xxx}
+    account_id = mongoengine.IntField()  # 平台账号的id
 
     # 曝光
     exposure_num = mongoengine.IntField()  # 曝光量（推荐量 + 阅读量）
@@ -51,6 +51,7 @@ class Account(BaseItem, mongoengine.Document):
 
     account_home = mongoengine.StringField()  # 个人中心地址
     authorization_information = mongoengine.StringField()  # 授权信息（用于爬虫）
+    crawl_info = mongoengine.DictField()  # 爬虫需要的信息
 
     is_enable = mongoengine.BooleanField()  # 是否启用
 
