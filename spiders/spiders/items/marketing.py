@@ -30,7 +30,7 @@ class Account(BaseItem, mongoengine.Document):
     platform = mongoengine.IntField()  # 平台id 详见：WeMedia.id
     account_name = mongoengine.StringField()  # 账号名称
     admin_id = ObjectId()  # 管理员id
-    account_id = mongoengine.IntField()  # 平台账号的id
+    account_id = mongoengine.StringField()  # 平台账号的id
 
     # 曝光
     exposure_num = mongoengine.IntField()  # 曝光量（推荐量 + 阅读量）
