@@ -4,7 +4,7 @@ import scrapy
 from scrapy import Request
 from scrapy.http import HtmlResponse
 
-from spiders.common import OTA
+from spiders.common import OTA, helper
 from spiders.common.marketing import WeMedia, WeMediaType
 
 
@@ -30,7 +30,5 @@ if __name__ == '__main__':
     a = '石燕湖、石牛寨、九龙江、石牛寨'
 
     count_set = ['石燕湖', '石牛寨', '九龙江']
-    for item in count_set:
-        res = a.count(item)
-        print(res)
+    print(helper.String.str_count_list(a, count_set))
 
