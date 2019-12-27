@@ -70,7 +70,7 @@ class Article(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
 
-    type = mongoengine.IntField()  # 平台类型 详见：WeMediaType.id
+    platform_type = mongoengine.IntField()  # 平台类型 详见：WeMediaType.id
     platform = mongoengine.IntField()  # 平台id 详见：WeMedia.id
     account_id = mongoengine.ObjectIdField()  # 账号id
     account_name = mongoengine.StringField()  # 账号名称
