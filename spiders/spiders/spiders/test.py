@@ -14,11 +14,11 @@ class MeituanSpider(scrapy.Spider):
     start_urls = ['https://api.huiqulx.com/release/user/user/test']
 
     def start_requests(self):
-
         formdata = {
             "head": {"token": "", "time": 1563965531895, "version": "1.0", "platform": "43", "excode": "", "qrcode": "",
                      "recode": ""}, "data": {}}
-        yield Request(self.start_urls[0], method="POST", body=json.dumps(formdata), headers={'Content-Type': 'application/json'},
+        yield Request(self.start_urls[0], method="POST", body=json.dumps(formdata),
+                      headers={'Content-Type': 'application/json'},
                       callback=self.parse)
 
     def parse(self, response: HtmlResponse):
@@ -27,4 +27,10 @@ class MeituanSpider(scrapy.Spider):
 
 
 if __name__ == '__main__':
-    print(WeMedia.get_id_list_by_type(WeMediaType.WE_MEDIA))  # ota 景区id列表
+    a = '石燕湖、石牛寨、九龙江、石牛寨'
+
+    count_set = ['石燕湖', '石牛寨', '九龙江']
+    for item in count_set:
+        res = a.count(item)
+        print(res)
+

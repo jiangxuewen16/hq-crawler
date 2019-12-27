@@ -203,3 +203,5 @@ class MafengwoCommentSpider(scrapy.Spider):
         spot_data.spot_score = float(score) if score else 0
 
         yield spot_data
+
+
