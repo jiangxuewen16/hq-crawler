@@ -4,6 +4,9 @@ import scrapy
 from scrapy import Request
 from scrapy.http import HtmlResponse
 
+from spiders.common import OTA
+from spiders.common.marketing import WeMedia, WeMediaType
+
 
 class MeituanSpider(scrapy.Spider):
     name = 'huiqulx'
@@ -11,6 +14,7 @@ class MeituanSpider(scrapy.Spider):
     start_urls = ['https://api.huiqulx.com/release/user/user/test']
 
     def start_requests(self):
+
         formdata = {
             "head": {"token": "", "time": 1563965531895, "version": "1.0", "platform": "43", "excode": "", "qrcode": "",
                      "recode": ""}, "data": {}}
@@ -20,3 +24,7 @@ class MeituanSpider(scrapy.Spider):
     def parse(self, response: HtmlResponse):
         # items = response.css('div.service_c ul li').extract_first()
         print(response.body.decode('utf-8'))
+
+
+if __name__ == '__main__':
+    print(WeMedia.get_id_list_by_type(WeMediaType.WE_MEDIA))  # ota 景区id列表

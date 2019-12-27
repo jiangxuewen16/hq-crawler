@@ -13,6 +13,7 @@ class Admin(BaseItem, mongoengine.Document):
 
     name = mongoengine.StringField(max_length=50)  # 管理者名字
 
+    is_enable = mongoengine.BooleanField()  # 是否启用
     create_at = mongoengine.DateTimeField(null=True)
     update_at = mongoengine.DateTimeField(null=True)
 
@@ -75,6 +76,8 @@ class Article(BaseItem, mongoengine.Document):
     account_name = mongoengine.StringField()  # 账号名称
     admin_id = mongoengine.ObjectIdField()  # 管理者id
     admin_name = mongoengine.StringField()  # 管理者名字
+
+    article_id = mongoengine.StringField()      # 文章ID
 
     exposure_num = mongoengine.IntField()  # 曝光量（推荐量 + 阅读量）
     recommend_num = mongoengine.IntField()  # 推荐量
@@ -218,3 +221,6 @@ class MarketingActivityDailyReport(BaseItem, mongoengine.Document):
     exposure_num = mongoengine.IntField()  # 曝光量（推荐量 + 阅读量）
     income = mongoengine.DecimalField()  # 收益金额
     publish_num = mongoengine.IntField()  # 发布量
+
+    create_at = mongoengine.DateTimeField(null=True)
+    update_at = mongoengine.DateTimeField(null=True)
