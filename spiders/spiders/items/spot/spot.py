@@ -49,6 +49,7 @@ class CSpot(BaseItem, mongoengine.Document):
     city = mongoengine.StringField()        # 市
     area = mongoengine.StringField()        # 区
     name = mongoengine.StringField()        # 景区名
+    abbreviation = mongoengine.StringField()        # 景区简称
     level = mongoengine.IntField()          # 等级
     t_id = mongoengine.IntField()           # 租户id
     c_id = mongoengine.IntField()           # 客户端id
