@@ -205,3 +205,38 @@ class MafengwoCommentSpider(scrapy.Spider):
         yield spot_data
 
 
+class MafengwoCitySpot(scrapy.Spider):
+    name = 'mafengwo_city_spot'
+    allowed_domains = ['www.mafengwo.cn']
+    base_url = r'http://www.mafengwo.cn/sales/{ota_spot_id}.html'
+    start_urls = ['http://www.mafengwo.cn/sales/2272257.html']
+
+    base_referer = r'http://www.mafengwo.cn/sales/{ota_spot_id}.html'
+
+    spot_ota_list = [2272257, ]
+
+    cookies = {}
+
+    def start_requests(self):
+        # 再次请求到详情页，并且声明回调函数callback，dont_filter=True 不进行域名过滤，meta给回调函数传递数据
+        referer = 'https://www.mafengwo.cn/poi/339.html'
+        yield Request(url=self.start_urls[0], headers=MafengwoSpider.build_headers(referer), cookies=self.cookies,
+                      callback=self.parse,
+                      dont_filter=True)
+
+    def parse(self, response: HtmlResponse):
+        for ota_spot_id in self.spot_ota_list:
+            url = self.base_url.format(ota_spot_id=ota_spot_id)
+            yield Request(url=url, dont_filter=True, callback=self.parse_spot)
+
+    def parse_spot(self, response: HtmlResponse):
+        # print(response.body.decode('utf-8'))
+
+        # spot.SpotCity().objects(ota_id=)
+
+
+        ticket_dom = response.css('.ticket-info > tbody')
+        for item in ticket_dom:
+
+            print('==' * 20, item.css('.ticket-item > td:nth-child(1)::text').extract_first())
+        # spot.SpotCity().
