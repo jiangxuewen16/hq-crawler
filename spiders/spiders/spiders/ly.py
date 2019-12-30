@@ -185,11 +185,10 @@ class LySpotCity(scrapy.Spider):
         response_str = response.body.decode('utf-8')
         json_data = json.loads(response_str)
 
-        spot_city = spot.SpotCity.objects(ota_id=OTA.OtaCode.LY.value.id,
-                                          ota_spot_id=ota_spot_id).first()
+        op_price = price.OPrice.objects(ota_id=OTA.OtaCode.LY.value.id, ota_spot_id=ota_spot_id).first()
 
         # 不存在数据则新增数据,增量爬取
-        if not spot_city:
+        if not op_price:
             if 'SceneryPrices' in json_data:
                 for k1, v1 in enumerate(json_data['SceneryPrices']):
                     ota_product = []

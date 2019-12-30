@@ -75,6 +75,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.MEITUAN, 115915971),
         sp_map(OtaCode.LVMAMA, 10829578),
         sp_map(OtaCode.CTRIP, 1979030),
+        sp_map(OtaCode.LY, 229768),
         sp_map(OtaCode.QUNAR, 225118749),
         sp_map(OtaCode.FLIGGY, '32659156'),
     ]
@@ -85,6 +86,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.MEITUAN, 1451152),
         sp_map(OtaCode.LVMAMA, 103177),
         sp_map(OtaCode.CTRIP, 65169),
+        sp_map(OtaCode.LY, 5808),
         sp_map(OtaCode.QUNAR, 3821817759),
         sp_map(OtaCode.FLIGGY, '103590'),
     ]
@@ -95,6 +97,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.MEITUAN, 41614694),
         sp_map(OtaCode.CTRIP, 1493248),
         sp_map(OtaCode.QUNAR, 420237024),
+        sp_map(OtaCode.LY, 231854),
         sp_map(OtaCode.FLIGGY, '61484'),
     ]
     # 九龙江
@@ -103,6 +106,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.MEITUAN, 41164719),
         sp_map(OtaCode.LVMAMA, 160416),
         sp_map(OtaCode.CTRIP, 140900),
+        sp_map(OtaCode.LY, 29283),
         sp_map(OtaCode.QUNAR, 4123349957),
         sp_map(OtaCode.FLIGGY, '191470'),
     ]
@@ -129,6 +133,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.MEITUAN, 51575391),
         sp_map(OtaCode.LVMAMA, 10650528),
         sp_map(OtaCode.CTRIP, 1415157),
+        sp_map(OtaCode.LY, 182563),
         sp_map(OtaCode.QUNAR, 2333288470),
         sp_map(OtaCode.FLIGGY, '17165564'),
     ]
@@ -138,6 +143,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.MAFENGWO, 70048608),
         sp_map(OtaCode.MEITUAN, 158907227),
         sp_map(OtaCode.LVMAMA, 12210014),
+        sp_map(OtaCode.LY, 672767),
         sp_map(OtaCode.CTRIP, 3989530),
         sp_map(OtaCode.QUNAR, 3333064220),
         sp_map(OtaCode.FLIGGY, '33559796'),
@@ -150,7 +156,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.LVMAMA, 162027),
         sp_map(OtaCode.CTRIP, 3264963),
     ]
-
+    # 恺之峰
     KAI_ZHI_FENG = [
         sp_map(OtaCode.CTRIP, 1410449),
         sp_map(OtaCode.QUNAR, 63919496),
