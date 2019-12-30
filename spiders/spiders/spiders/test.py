@@ -27,6 +27,8 @@ class MeituanSpider(scrapy.Spider):
 
 
 if __name__ == '__main__':
-    print(OTA.OtaCode.MAFENGWO.value)
-    print(marketing.WeMediaType.WE_MEDIA.value)
+    s = '大家在网上自行搜索相关题目，会有很多的文章啦。那，如果你跟我一样。作为一个小白，没有专业知识，但热衷想体验一番。可以看看以下内容，这是我刚踩完坑后的(粗略)经验，分享给大家';
+    li = ['大家', '文章', '蒋雪文']
+    x = helper.String.str_count_list(s, li, True)
+    print(x)
 

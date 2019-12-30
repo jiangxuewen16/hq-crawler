@@ -227,13 +227,20 @@ class MafengwoCitySpot(scrapy.Spider):
     def parse(self, response: HtmlResponse):
         for ota_spot_id in self.spot_ota_list:
             url = self.base_url.format(ota_spot_id=ota_spot_id)
-            yield Request(url=url, dont_filter=True, callback=self.parse_spot)
+            yield Request(url=url, dont_filter=True, callback=self.parse_spot, meta={'ota_spot_id': ota_spot_id})
 
     def parse_spot(self, response: HtmlResponse):
         # print(response.body.decode('utf-8'))
+        ota_spot_id = response.meta['ota_spot_id']
+        spot_city = spot.SpotCity().objects(ota_id=OTA.OtaCode.MAFENGWO.value.id, ota_spot_id=ota_spot_id).first()
+        if not spot_city:
+            spot_city = spot.SpotCity()
+            spot_city.ota_id = OTA.OtaCode.MAFENGWO.value.id
+            spot_city.ota_spot_id = ota_spot_id
+            spot_city.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
-        # spot.SpotCity().objects(ota_id=)
-
+        spot_city.s_name = response.css('.sales-title > h1)::text').extract_first()
+        
 
         ticket_dom = response.css('.ticket-info > tbody')
         for item in ticket_dom:
