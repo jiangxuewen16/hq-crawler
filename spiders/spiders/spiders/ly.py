@@ -191,9 +191,16 @@ class LySpotCity(scrapy.Spider):
         if not op_price:
             if 'SceneryPrices' in json_data:
                 for k1, v1 in enumerate(json_data['SceneryPrices']):
-                    ota_product = []
                     type_key = v1['DestinationName']
                     spot_name = v1['DestinationName']
+
+                    o_price = price.OPrice()
+                    o_price.ota_id = OTA.OtaCode.LY.value.id
+                    o_price.ota_spot_id = response.meta['ota_spot_id']
+                    o_price.ota_product = []
+                    o_price.ota_spot_name = spot_name
+                    o_price.create_at = time.strftime("%Y-%m-%d", time.localtime())
+                    ota_product = {}
                     for k2, v2 in enumerate(v1['ChannelPriceModelEntityList']):
                         type_name = v2['ConsumersTypeName']
                         for k3, v3 in enumerate(v2['ChannelPriceEntityList']):
@@ -205,26 +212,21 @@ class LySpotCity(scrapy.Spider):
                                 'cut_price': 0
                                             }
 
-                            ota_entity_list = {'type_key': type_key,'normal_price': v3['AmountAdvice'], 'type_id': v3['TicketTypeId'],
-                                               'type_name': type_name, 'sale_num': v3['OrderNumber'], 'tickets': tickets_list}
-                            ota_product.append(ota_entity_list)
+                            ota_product = {'type_key': type_name, 'normal_price': v3['AmountAdvice'], 'type_id': v3['TicketTypeId'],
+                                           'type_name': type_key + type_name, 'sale_num': v3['OrderNumber'], 'tickets': []}
+                            ota_product['tickets'].append(tickets_list)
 
                             price_calendar = price.OPriceCalendar()
                             price_calendar.ota_id = OTA.OtaCode.LY.value.id
                             price_calendar.ota_spot_id = response.meta['ota_spot_id']
                             price_calendar.type_key = type_name
+                            price_calendar.pre_price = v3['DAmountAdvice']
                             price_calendar.type_name = v3['TicketName']
                             price_calendar.ota_spot_name = spot_name
                             price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime())
                             price_calendar.save(force_insert=False, validate=False, clean=True)
                             print('正在添加 ', v1['DestinationName'], ' 价格日历', "*" * 20)
-
-                    o_price = price.OPrice()
-                    o_price.ota_id = OTA.OtaCode.LY.value.id
-                    o_price.ota_spot_id = response.meta['ota_spot_id']
-                    o_price.ota_product = ota_product
-                    o_price.ota_spot_name = spot_name
-                    o_price.create_at = time.strftime("%Y-%m-%d", time.localtime())
+                    o_price.ota_product.append(ota_product)
                     print('正在添加 ', v1['DestinationName'], ' 的票型详情.OTA_id', OTA.OtaCode.LY.value.id, "*" * 20)
                     yield o_price
 

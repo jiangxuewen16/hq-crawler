@@ -417,9 +417,9 @@ class MeituanPrice(scrapy.Spider):
     start_urls = ['https://i.meituan.com/awp/h5/lvyou/poi/detail/index.html?&poiId=1515791']
 
     def parse(self, response: HtmlResponse):
-        # price.OPrice.objects(ota_id=OTA.OtaCode.MEITUAN.value.id).delete()
-        # price.OPriceCalendar.objects(ota_id=OTA.OtaCode.MEITUAN.value.id, create_at=time.strftime("%Y-%m-%d", time.localtime())).delete()
-        # print('start_request')
+        price.OPrice.objects(ota_id=OTA.OtaCode.MEITUAN.value.id).delete()
+        price.OPriceCalendar.objects(ota_id=OTA.OtaCode.MEITUAN.value.id, create_at=time.strftime("%Y-%m-%d", time.localtime())).delete()
+        print('start_request')
         for ota_spot_id in MeituanSpider.ota_spot_ids:
             # 更新景区的详情
             url = self.Info_urls.format(ota_spot_id=ota_spot_id)
@@ -446,18 +446,28 @@ class MeituanPrice(scrapy.Spider):
         if 'deals' in json_data and 'data' in json_data['deals']:  ## 数据不为空
             data = json_data['deals']['data']
             for k1, v1 in enumerate(data):
-                ota_product = []
                 lowPrice = ''
                 type_name = ''
+                o_price = price.OPrice()
+                o_price.ota_id = OTA.OtaCode.MEITUAN.value.id
+                o_price.ota_spot_id = ota_spot_id
+                o_price.ota_spot_name = ota_spot_name
+                o_price.ota_product = []
+                o_price.create_at = time.strftime("%Y-%m-%d", time.localtime())
+                ota_product = {}
+                type_key = ''
+                sale_num = 0
+                normal_price = 0
+
                 if v1['productName'] == '门票':  ## 门票数据
                     for k2, v2 in enumerate(v1['productModels']):
                         if 'lowPrice' in v2 and 'ticketName' in v2:
                             lowPrice = v2['lowPrice']
                             type_name = v2['ticketName']
-                        type_key = v1['productName']
+                            type_key = v2['ticketName']
                         if 'ticketDeals' in v2:
                             for k3, v3 in enumerate(v2['ticketDeals']):
-                                normal_price = v3['value']
+                                # normal_price = v3['value']
                                 tickets_list = {
                                     'price_id': v3['id'],
                                     'title': v3['title5'],
@@ -465,6 +475,9 @@ class MeituanPrice(scrapy.Spider):
                                     'cash_back': 0,
                                     'cut_price': 0
                                 }
+                                ota_product = {'type_key': type_key, 'normal_price': normal_price, 'sale_num': sale_num,
+                                               'type_id': 0, 'type_name': type_name, 'tickets': []}
+                                ota_product['tickets'].append(tickets_list)
                                 if '已售' in v3['newSoldsString']:
                                     if '万' in v3['newSoldsString']:
                                         sale_num = re.findall(r"\d+\.?\d*", v3['newSoldsString'])
@@ -472,19 +485,19 @@ class MeituanPrice(scrapy.Spider):
                                     else:
                                         sale_num = re.findall(r"\d+\.?\d*", v3['newSoldsString'])
                                         sale_num = float(sale_num[0])
-                                else:
-                                    sale_num = 0
 
-                                ota_entity_list = {'type_key': type_key, 'normal_price': normal_price,
-                                                   'type_name': type_name, 'sale_num': sale_num,
-                                                   'tickets': tickets_list}
-                                ota_product.append(ota_entity_list)
-                    o_price = price.OPrice()
-                    o_price.ota_id = OTA.OtaCode.MEITUAN.value.id
-                    o_price.lowPrice = lowPrice
-                    o_price.ota_spot_id = ota_spot_id
-                    o_price.ota_spot_name = ota_spot_name
-                    o_price.ota_product = ota_product
-                    o_price.create_at = time.strftime("%Y-%m-%d", time.localtime())
-                    print('正在添加 ', o_price['ota_spot_name'], ' 的票型价格详情.OTA_id', OTA.OtaCode.LY.value.id, "*" * 20)
-                    yield o_price
+                                price_calendar = price.OPriceCalendar()
+                                price_calendar.ota_id = OTA.OtaCode.MEITUAN.value.id
+                                price_calendar.ota_spot_id = response.meta['ota_spot_id']
+                                price_calendar.type_key = type_key
+                                price_calendar.type_name = type_name
+                                price_calendar.pre_price = v3['price']
+                                price_calendar.ota_spot_name = ota_spot_name
+                                price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime())
+                                yield price_calendar
+                                print('正在添加 ', ota_spot_name, ' 价格日历', "*" * 20)
+
+                            o_price.lowPrice = lowPrice
+                            o_price.ota_product.append(ota_product)
+                            print('正在添加 ', ota_spot_name, ' 的票型价格详情.OTA_id', OTA.OtaCode.MEITUAN.value.id, "*" * 20)
+                            yield o_price
