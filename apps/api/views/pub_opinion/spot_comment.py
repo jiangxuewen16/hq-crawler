@@ -215,6 +215,7 @@ class PublicOpinion(BaseView):
         else:
             condition['ota_id'] = [int(condition['ota_id'])]
 
+
         # 所有评论数量
         condition['up_score'] = 6
         condition['down_score'] = 0
@@ -490,7 +491,7 @@ class PublicOpinion(BaseView):
     #     out = output.getvalue()
     #     return self.file_response(out)
 
-    # 直接导出流示例
+        # 直接导出流示例
 
     @Route.route(path='/day/list')
     def day_list(self):

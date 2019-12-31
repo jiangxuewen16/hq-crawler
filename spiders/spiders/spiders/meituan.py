@@ -476,7 +476,7 @@ class MeituanPrice(scrapy.Spider):
                                     'cut_price': 0
                                 }
                                 ota_product = {'type_key': type_key, 'normal_price': normal_price, 'sale_num': sale_num,
-                                               'type_id': 0, 'type_name': type_name, 'tickets': []}
+                                               'type_id': v3['id'], 'type_name': type_name, 'tickets': []}
                                 ota_product['tickets'].append(tickets_list)
                                 if '已售' in v3['newSoldsString']:
                                     if '万' in v3['newSoldsString']:

@@ -205,15 +205,16 @@ class LySpotCity(scrapy.Spider):
                         type_name = v2['ConsumersTypeName']
                         for k3, v3 in enumerate(v2['ChannelPriceEntityList']):
                             tickets_list = {
-                                'price_id': v3['PriceId'],
+                                'price_id': v3['TicketTypeId'],
                                 'title': v3['TicketName'],
                                 'price': v3['DAmountAdvice'],
+                                'sale_num': v3['OrderNumber'],
                                 'cash_back': 0,
                                 'cut_price': 0
                                             }
 
                             ota_product = {'type_key': type_name, 'normal_price': v3['AmountAdvice'], 'type_id': v3['TicketTypeId'],
-                                           'type_name': type_key + type_name, 'sale_num': v3['OrderNumber'], 'tickets': []}
+                                           'type_name': type_key + type_name,  'tickets': []}
                             ota_product['tickets'].append(tickets_list)
 
                             price_calendar = price.OPriceCalendar()
