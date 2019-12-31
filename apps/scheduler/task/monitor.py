@@ -8,11 +8,11 @@ from core.lib.task import scheduler
 """
 
 
-@register_job(scheduler, "interval", seconds=10 * 60)
-def exception_send_email():
-    exception_service.send_email()
-
-
-@register_job(scheduler, "interval", seconds=10 * 60)
-def monitor_send_email():
-    rabbitmq_service.send_email()
+# @register_job(scheduler, "interval", seconds=10 * 60)
+# def exception_send_email():
+#     exception_service.send_email()
+#
+#
+# @register_job(scheduler, "interval", seconds=10 * 60)
+# def monitor_send_email():
+#     rabbitmq_service.send_email()
