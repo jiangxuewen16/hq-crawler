@@ -113,13 +113,14 @@ COOKIES_ENABLES = False
 # 代理ip列表
 PROXIES = ['118.126.105.239:8008', '106.15.39.21:8008', '193.112.181.35:8008']
 
-APP_ENV = 'develop'
+APP_ENV = os.getenv('APP_ENV')
 if APP_ENV == 'production':
     from .env.production import *
 elif APP_ENV == 'develop':
     from .env.develop import *
 else:
-    raise Exception('环境不存在')
+    from .env.develop import *
+    # raise Exception('环境不存在')
 
 SCRAPYD_DEPLOY = 'http://172.18.113.141:6800/'
 
