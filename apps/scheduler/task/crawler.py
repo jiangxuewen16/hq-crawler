@@ -11,19 +11,19 @@ from apps.api.model.exception import ExcLog
 """
 
 
-@register_job(scheduler, "cron", hour='02', minute='10', id='spot_info')
-def spot_info():
-    jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_spot')
-    print('=' * 30, '爬虫定时任务:::', '景区信息:::', jobid)
-    jobid = get_scrapyd_cli().schedule('spiders', 'lvmama_spot')
-    print('=' * 30, '爬虫定时任务:::', '景区信息:::', jobid)
-    jobid = get_scrapyd_cli().schedule('spiders', 'mafengwo_spot')
-    print('=' * 30, '爬虫定时任务:::', '景区信息:::', jobid)
-    jobid = get_scrapyd_cli().schedule('spiders', 'meituan_spot')
-    print('=' * 30, '爬虫定时任务:::', '景区信息:::', jobid)
+# @register_job(scheduler, "cron", hour='02', minute='10', id='spot_info')
+# def spot_info():
+#     jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_spot')
+#     print('=' * 30, '爬虫定时任务:::', '景区信息:::', jobid)
+#     jobid = get_scrapyd_cli().schedule('spiders', 'lvmama_spot')
+#     print('=' * 30, '爬虫定时任务:::', '景区信息:::', jobid)
+#     jobid = get_scrapyd_cli().schedule('spiders', 'mafengwo_spot')
+#     print('=' * 30, '爬虫定时任务:::', '景区信息:::', jobid)
+#     jobid = get_scrapyd_cli().schedule('spiders', 'meituan_spot')
+#     print('=' * 30, '爬虫定时任务:::', '景区信息:::', jobid)
 
 
-@register_job(scheduler, "interval", seconds=5 * 60 * 60)
+@register_job(scheduler, "cron", hour='02', minute='10', id='spot_comment')
 def spot_comment():
     jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_comment')
     print('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
