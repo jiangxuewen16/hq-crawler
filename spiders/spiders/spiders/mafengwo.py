@@ -8,6 +8,7 @@ from scrapy import Request, Selector
 from scrapy.http import HtmlResponse
 
 from spiders.common import OTA
+from spiders.items.price import price
 from spiders.items.spot import spot
 from spiders.items.spot.spot import Spot
 
@@ -232,18 +233,24 @@ class MafengwoCitySpot(scrapy.Spider):
     def parse_spot(self, response: HtmlResponse):
         # print(response.body.decode('utf-8'))
         ota_spot_id = response.meta['ota_spot_id']
-        spot_city = spot.SpotCity().objects(ota_id=OTA.OtaCode.MAFENGWO.value.id, ota_spot_id=ota_spot_id).first()
+        spot_city = spot.SpotCity.objects(ota_id=OTA.OtaCode.MAFENGWO.value.id, ota_spot_id=ota_spot_id).first()
         if not spot_city:
             spot_city = spot.SpotCity()
             spot_city.ota_id = OTA.OtaCode.MAFENGWO.value.id
             spot_city.ota_spot_id = ota_spot_id
             spot_city.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
-        spot_city.s_name = response.css('.sales-title > h1)::text').extract_first()
-        
+        spot_city.s_name = response.css('.sales-title > h1::text').extract_first()
+        spot_city.city_name = response.css('div.container > div.wrapper > div.crumb > div:nth-child(2) > a::text').extract_first()
+        # spot_city.
+
 
         ticket_dom = response.css('.ticket-info > tbody')
         for item in ticket_dom:
-
-            print('==' * 20, item.css('.ticket-item > td:nth-child(1)::text').extract_first())
-        # spot.SpotCity().
+            ticket_type = item.css('.ticket-item > td:nth-child(1)::text').extract_first()
+            tr_list =  item.css('.ticket-item')
+            for tr in tr_list:
+                price_id = tr.css('.tobuy-btn > span::attr(data-id)').extract_first()
+                price.OPrice.objects().first()
+                tr.css('.ticket-name::text').extract_first()
+                print('==' * 20, item.css('.ticket-item > td:nth-child(1)::text').extract_first())

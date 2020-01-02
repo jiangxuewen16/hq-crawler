@@ -47,6 +47,6 @@ def spot_comment():
 #     jobid = get_scrapyd_cli().schedule('spiders', 'hqlx_order')
 #     print('=' * 30, 'test:::', 'test:::', jobid)
 
-# @register_job(scheduler, "interval", seconds=5)
-# def order_check():
-#     print('=' * 30, 'test:::', 'test:::', "测试定时任务")
+@register_job(scheduler, "interval", seconds=5)
+def order_check():
+    print('=' * 30, 'test:::', 'test:::', "测试定时任务")
