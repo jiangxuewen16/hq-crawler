@@ -20,7 +20,6 @@ class LvmamaSpider(scrapy.Spider):
     allowed_domains = ['http://www.lvmama.com']
     start_urls = ['http://www.lvmama.com/']
     ota_spot_ids = OTA.OtaSpotIdMap.get_ota_spot_list(OTA.OtaCode.LVMAMA)  # ota 景区id列表
-
     def parse(self, response):
         pass
 
@@ -366,8 +365,10 @@ class LvmamaSpotPriceSpider(scrapy.Spider):
 
     def parse_price(self, response: HtmlResponse):
         # 价格日历
+        global ota_product
         o_price = price.OPrice.objects(ota_id=OTA.OtaCode.LVMAMA.value.id,
                                        ota_spot_id=response.meta['ota_spot_id']).first()
+
         # 不存在数据则新增数据
         if not o_price:
             o_price = OPrice()
@@ -382,29 +383,48 @@ class LvmamaSpotPriceSpider(scrapy.Spider):
         product_type = response.xpath('//*[@class="ptbox short"]')
         for product in product_type:
             product_name = product.css('.ptname > h5::text').extract_first()
-            ota_product = {
-                'type_id': 0,
-                'type_key': product_name,
-                'type_name': spot_name + product_name,
-                'tickets': []
-            }
+            # ota_product = {
+            #     'type_id': 0,
+            #     'type_key': product_name,
+            #     'type_name': spot_name + product_name,
+            #     'tickets': []
+            # }
 
             ticket_rs = product.css('.pdlist-inner > dl')
             for ticket in ticket_rs:
                 ticket_name = ticket.css('.pdname > a::text').extract_first()
-
                 ticket_name = re.sub('\s', '', ticket_name)
                 price_rs = ticket.css('.pdlvprice > dfn > i::text').extract_first()
-                ticket_info = {
-                    'price_id': ticket.css('.pdname > a::attr(data)').extract_first(),
-                    'title': ticket_name,
-                    'price': price_rs,
-                    'cash_back': 0,
-                    'cut_price': 0,
-                    'sale_num': 0,
-                    'seller_nick': ''
+                ota_product = {
+                    'type_id': ticket.css('.pdname > a::attr(data)').extract_first(),
+                    'type_key': ticket_name,
+                    'type_name': spot_name + product_name,
+                    'tickets': [
+                        {
+                            'price_id': ticket.css('.pdname > a::attr(data)').extract_first(),
+                            'title': ticket_name,
+                            'price': price_rs,
+                            'cash_back': 0,
+                            'cut_price': 0,
+                            'sale_num': 0,
+                            'seller_nick': ''
+                        }
+                    ]
                 }
-                ota_product['tickets'].append(ticket_info)
+                # ticket_name = ticket.css('.pdname > a::text').extract_first()
+                #
+                # ticket_name = re.sub('\s', '', ticket_name)
+                # price_rs = ticket.css('.pdlvprice > dfn > i::text').extract_first()
+                # ticket_info = {
+                #     'price_id': ticket.css('.pdname > a::attr(data)').extract_first(),
+                #     'title': ticket_name,
+                #     'price': price_rs,
+                #     'cash_back': 0,
+                #     'cut_price': 0,
+                #     'sale_num': 0,
+                #     'seller_nick': ''
+                # }
+                # ota_product['tickets'].append(ticket_info)
 
                 # 票型表记录
                 o_price_calendar = price.OPriceCalendar()
