@@ -215,7 +215,6 @@ class PublicOpinion(BaseView):
         else:
             condition['ota_id'] = [int(condition['ota_id'])]
 
-
         # 所有评论数量
         condition['up_score'] = 6
         condition['down_score'] = 0
@@ -262,9 +261,11 @@ class PublicOpinion(BaseView):
                 v1['c_from'] = '同程'
 
             if 'u_avatar' not in v1 or v1['u_avatar'] == '':
-                v1['u_avatar'] = 'https://dimg04.c-ctrip.com/images/t1/headphoto/699/910/854/683dab66bb374136af9930ea204dfc7e_C_180_180.jpg'
+                v1[
+                    'u_avatar'] = 'https://dimg04.c-ctrip.com/images/t1/headphoto/699/910/854/683dab66bb374136af9930ea204dfc7e_C_180_180.jpg'
 
-        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'whole': whole, 'total': total, 'newest_total': 100,
+        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'whole': whole, 'total': total,
+                'newest_total': 100,
                 'praise_total': praise_total, 'bad_total': bad_total, 'list': result}
         return self.success(data)
 
@@ -317,12 +318,20 @@ class PublicOpinion(BaseView):
     def spot_complex(self):
         now = time.strftime("%Y-%m-%d", time.localtime())
         now_month = str(datetime.date(datetime.date.today().year, datetime.date.today().month, 1))
-        month_first = str(datetime.date(datetime.date.today().year, datetime.date.today().month - 1, 1))
+        if datetime.date.today().month == 1:
+            month_first = str(datetime.date(datetime.date.today().year - 1, 12, 1))
+        else:
+            month_first = str(datetime.date(datetime.date.today().year, datetime.date.today().month - 1, 1))
         month_last = str(
             datetime.date(datetime.date.today().year, datetime.date.today().month, 1) - datetime.timedelta(1))
         last_year_month_first = str(datetime.date(datetime.date.today().year - 1, datetime.date.today().month, 1))
-        last_year_month_last = str(
-            datetime.date(datetime.date.today().year - 1, datetime.date.today().month - 1, 1) - datetime.timedelta(1))
+        if datetime.date.today().month == 1:
+            last_year_month_last = str(
+                datetime.date(datetime.date.today().year - 2, 12, 1) - datetime.timedelta(1))
+        else:
+            last_year_month_last = str(
+                datetime.date(datetime.date.today().year - 1, datetime.date.today().month - 1, 1) - datetime.timedelta(
+                    1))
         condition = {
             'now': now,
             'now_month': now_month,
@@ -481,7 +490,7 @@ class PublicOpinion(BaseView):
     #     out = output.getvalue()
     #     return self.file_response(out)
 
-        # 直接导出流示例
+    # 直接导出流示例
 
     @Route.route(path='/day/list')
     def day_list(self):
