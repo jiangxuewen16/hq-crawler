@@ -49,14 +49,14 @@ mongoengine.connect('passport', username='passport', password='hqlxpassport2019'
 """
 定时调度任务业务包
 """
-SCHEDULER_START = False  # 是否开启调度任务
+SCHEDULER_START = True  # 是否开启调度任务
 # 定时任务业务包，定时任务写到这里
 TASK_WORK_PACKAGE = 'apps.scheduler.task'
 
 """
 惠趣采集项目配置
 """
-SPIDER_START = False  # 是否开启采集项目
+SPIDER_START = True  # 是否开启采集项目
 SPIDER_PATH = f'{settings.BASE_DIR}/spiders/'  # 爬虫项目目录
 
 """
