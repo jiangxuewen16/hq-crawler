@@ -1,7 +1,6 @@
 import json
 import time
 
-import redis
 import scrapy
 from scrapy import Request
 
