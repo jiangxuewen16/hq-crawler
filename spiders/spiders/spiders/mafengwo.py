@@ -233,24 +233,40 @@ class MafengwoCitySpot(scrapy.Spider):
     def parse_spot(self, response: HtmlResponse):
         # print(response.body.decode('utf-8'))
         ota_spot_id = response.meta['ota_spot_id']
-        spot_city = spot.SpotCity.objects(ota_id=OTA.OtaCode.MAFENGWO.value.id, ota_spot_id=ota_spot_id).first()
-        if not spot_city:
-            spot_city = spot.SpotCity()
-            spot_city.ota_id = OTA.OtaCode.MAFENGWO.value.id
-            spot_city.ota_spot_id = ota_spot_id
-            spot_city.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        # spot_city = spot.SpotCity.objects(ota_id=OTA.OtaCode.MAFENGWO.value.id, ota_spot_id=ota_spot_id).first()
+        # if not spot_city:
+        #     spot_city = spot.SpotCity()
+        #     spot_city.ota_id = OTA.OtaCode.MAFENGWO.value.id
+        #     spot_city.ota_spot_id = ota_spot_id
+        #     spot_city.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        #
+        # spot_city.s_name = response.css('.sales-title > h1::text').extract_first()
+        # spot_city.city_name = response.css(
+        #     'div.container > div.wrapper > div.crumb > div:nth-child(2) > a::text').extract_first()
 
-        spot_city.s_name = response.css('.sales-title > h1::text').extract_first()
-        spot_city.city_name = response.css('div.container > div.wrapper > div.crumb > div:nth-child(2) > a::text').extract_first()
-        # spot_city.
+        o_price = price.OPrice.objects(ota_spot_id=ota_spot_id, ota_id=OTA.OtaCode.MAFENGWO.value.id).first()
+        if not o_price:
+            o_price = price.OPrice()
+            o_price.ota_id = OTA.OtaCode.MAFENGWO.value.id
+            o_price.ota_spot_name = response.css('div.sales-title > h1::text').extract_first()
+            o_price.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            o_price.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
-
+        ota_product = []
         ticket_dom = response.css('.ticket-info > tbody')
         for item in ticket_dom:
-            ticket_type = item.css('.ticket-item > td:nth-child(1)::text').extract_first()
-            tr_list =  item.css('.ticket-item')
+
+            product_item = {}
+            type_key = item.css('td.ticket-type.adult-ticket.folded::text').extract_first()
+            tr_list = item.css('.ticket-item')
             for tr in tr_list:
-                price_id = tr.css('.tobuy-btn > span::attr(data-id)').extract_first()
-                price.OPrice.objects().first()
-                tr.css('.ticket-name::text').extract_first()
-                print('==' * 20, item.css('.ticket-item > td:nth-child(1)::text').extract_first())
+                product_item['type_id'] = tr.css('.tobuy-btn > span::attr(data-id)').extract_first()
+                product_item['type_key'] = type_key
+                product_item['type_name'] = item.css('td.ticket-name::text').extract_first()
+                product_item['normal_price'] = item.css('td.ticket-price::text').extract_first().strip('¥起')
+                product_item['tickets'] = {'price_id': product_item['type_id'], 'title': product_item['type_name'],
+                                           'seller_nick': product_item['type_name'],
+                                           'price': product_item['normal_price']}
+                ota_product.append(product_item)
+        o_price.ota_product = ota_product
+        yield o_price
