@@ -37,7 +37,7 @@ class OtaSpotIdMap(Enum):
                   sp_map(OtaCode.LY, 9513),
                   sp_map(OtaCode.CTRIP, 62931),
                   sp_map(OtaCode.QUNAR, 706176810),
-                  sp_map(OtaCode.FLIGGY, '11481'),
+                  sp_map(OtaCode.FLIGGY, 11481),
                   ]
 
     # 石牛寨
@@ -48,7 +48,7 @@ class OtaSpotIdMap(Enum):
                     sp_map(OtaCode.LY, 25196),
                     sp_map(OtaCode.CTRIP, 127339),
                     sp_map(OtaCode.QUNAR, 1915618311),
-                    sp_map(OtaCode.FLIGGY, '33966')
+                    sp_map(OtaCode.FLIGGY, 33966)
                     ]
     # 益阳嘉年华
     YI_YANG_JIA_NIAN_HUA = [
@@ -66,7 +66,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.MEITUAN, 188085997),
         sp_map(OtaCode.CTRIP, 5060343),
         sp_map(OtaCode.QUNAR, 2554926827),
-        sp_map(OtaCode.FLIGGY, '140975087'),
+        sp_map(OtaCode.FLIGGY, 140975087),
     ]
     # 东浒寨
     DONG_HU_ZHAI = [
@@ -77,7 +77,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.CTRIP, 1979030),
         sp_map(OtaCode.LY, 229768),
         sp_map(OtaCode.QUNAR, 225118749),
-        sp_map(OtaCode.FLIGGY, '32659156'),
+        sp_map(OtaCode.FLIGGY, 32659156),
     ]
     # 马仁奇峰
     MA_REN_QI_FENG = [
@@ -88,7 +88,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.CTRIP, 65169),
         sp_map(OtaCode.LY, 5808),
         sp_map(OtaCode.QUNAR, 3821817759),
-        sp_map(OtaCode.FLIGGY, '103590'),
+        sp_map(OtaCode.FLIGGY, 103590),
     ]
     # 大茅山
     DA_MAO_SHAN = [
@@ -98,7 +98,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.CTRIP, 1493248),
         sp_map(OtaCode.QUNAR, 420237024),
         sp_map(OtaCode.LY, 231854),
-        sp_map(OtaCode.FLIGGY, '61484'),
+        sp_map(OtaCode.FLIGGY, 61484),
     ]
     # 九龙江
     JIU_LONG_JIANG = [
@@ -108,7 +108,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.CTRIP, 140900),
         sp_map(OtaCode.LY, 29283),
         sp_map(OtaCode.QUNAR, 4123349957),
-        sp_map(OtaCode.FLIGGY, '191470'),
+        sp_map(OtaCode.FLIGGY, 191470),
     ]
 
     TIAN_KONG_ZHI_CHENG = [
@@ -116,7 +116,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.MEITUAN, 182573099),
         sp_map(OtaCode.LVMAMA, 11945662),
         sp_map(OtaCode.CTRIP, 5058354),
-        sp_map(OtaCode.FLIGGY, '140626417'),
+        sp_map(OtaCode.FLIGGY, 140626417),
     ]
 
     LIAN_YUN_SHAN = [
@@ -135,7 +135,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.CTRIP, 1415157),
         sp_map(OtaCode.LY, 182563),
         sp_map(OtaCode.QUNAR, 2333288470),
-        sp_map(OtaCode.FLIGGY, '17165564'),
+        sp_map(OtaCode.FLIGGY, 17165564),
     ]
     # 三翁花园
     SAN_FENG_HUA_YUAN = [
@@ -146,7 +146,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.LY, 672767),
         sp_map(OtaCode.CTRIP, 3989530),
         sp_map(OtaCode.QUNAR, 3333064220),
-        sp_map(OtaCode.FLIGGY, '33559796'),
+        sp_map(OtaCode.FLIGGY, 33559796),
     ]
 
     WU_JIN_SHAN = [
