@@ -469,14 +469,14 @@ class MeituanPrice(scrapy.Spider):
                             for k3, v3 in enumerate(v2['ticketDeals']):
                                 # normal_price = v3['value']
                                 tickets_list = {
-                                    'price_id': v3['id'],
+                                    'price_id': str(v3['id']),
                                     'title': v3['title5'],
                                     'price': v3['price'],
                                     'cash_back': 0,
                                     'cut_price': 0
                                 }
                                 ota_product = {'type_key': type_key, 'normal_price': normal_price, 'sale_num': sale_num,
-                                               'type_id': v3['id'], 'type_name': type_name, 'tickets': []}
+                                               'type_id': v3['id'], 'type_name': type_name,'link_url': self.base_url, 'tickets': []}
                                 ota_product['tickets'].append(tickets_list)
                                 if '已售' in v3['newSoldsString']:
                                     if '万' in v3['newSoldsString']:

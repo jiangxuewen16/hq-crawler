@@ -88,6 +88,88 @@ class SpotComment:
         # return get_three_type(spot_city_s)
 
     @classmethod
+    def ota_list_comment(cls, condition, skip, limit, sort):
+        pipeline = [
+            {
+                '$lookup': {
+                    'from': "spot",
+                    'localField': "ota_spot_id",
+                    'foreignField': "ota_spot_id",
+                    'as': "spot"
+                }
+            },
+            {
+                '$unwind': {
+                    'path': "$spot",
+                    'preserveNullAndEmptyArrays': True
+                }
+            },
+            {
+                '$project': {
+                    '_id': "$_id",
+                    'ota_id': "$ota_id",
+                    'ota_spot_id': "$ota_spot_id",
+                    'u_id': "$u_id",
+                    'u_avatar': "$u_avatar",
+                    'u_level': "$u_level",
+                    'u_name': "$u_name",
+                    'c_tag': "$c_tag",
+                    'c_id': "$c_id",
+                    'c_score': "$c_score",
+                    'c_content': "$c_content",
+                    'c_img': "$c_img",
+                    'c_from': "$c_from",
+                    'create_at': "$create_at",
+                    'update_at': "$update_at",
+                    'spot_name': "$spot.spot_name"
+                }
+            },
+            {
+                '$sort': {sort: -1}
+            },
+            {
+                '$match': {
+                    '$and': [
+                        {'$or': [
+                            {'u_name': {'$regex': '.*' + condition['check_name'] + '.*'}},
+                            {'_id': {'$regex': '.*' + condition['check_name'] + '.*'}},
+                        ]},
+                        {
+                            'create_at': {
+                                '$gte': condition['begin_date'],
+                                '$lt': condition['end_date']
+                            }
+                        },
+                        {
+                            'c_score': {
+                                '$gt': condition['down_score'],
+                                '$lte': condition['up_score']
+                            }
+                        },
+                        {
+                            'goods_name': condition['goods_name']
+                        },
+                        {
+                            'ota_id': {'$in': condition['ota_id']}
+                        }
+                    ]
+                }
+            },
+            {
+                '$skip': skip
+            },
+            {
+                '$limit': limit
+            }
+        ]
+        spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            p['_id'] = str(p['_id'])
+            L.append(dict(p))
+        return L
+
+    @classmethod
     def list_comment(cls, condition, skip, limit, sort):
         pipeline = [
             {
@@ -146,9 +228,6 @@ class SpotComment:
                                 '$lte': condition['up_score']
                             }
                         },
-                        # {
-                        #     'ota_id': condition['ota_id']
-                        # }
                         {
                             'ota_id': {'$in': condition['ota_id']}
                         }

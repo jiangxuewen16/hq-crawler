@@ -171,8 +171,8 @@ class LySpotCity(scrapy.Spider):
     start_urls = ['https://m.ly.com/scenery/scenerydetail_9513_0_0.html']
 
     def parse(self, response: HtmlResponse):
-        price.OPrice.objects(ota_id=OTA.OtaCode.LY.value.id).delete()
-        price.OPriceCalendar.objects(ota_id=OTA.OtaCode.LY.value.id, create_at=time.strftime("%Y-%m-%d", time.localtime())).delete()
+        # price.OPrice.objects(ota_id=OTA.OtaCode.LY.value.id).delete()
+        # price.OPriceCalendar.objects(ota_id=OTA.OtaCode.LY.value.id, create_at=time.strftime("%Y-%m-%d", time.localtime())).delete()
         print('start_request')
         for ota_spot_id in LySpider.ota_spot_ids:
             # 更新景区的详情
@@ -205,7 +205,7 @@ class LySpotCity(scrapy.Spider):
                         type_name = v2['ConsumersTypeName']
                         for k3, v3 in enumerate(v2['ChannelPriceEntityList']):
                             tickets_list = {
-                                'price_id': v3['TicketTypeId'],
+                                'price_id': str(v3['TicketTypeId']),
                                 'title': v3['TicketName'],
                                 'price': v3['DAmountAdvice'],
                                 'sale_num': v3['OrderNumber'],
@@ -214,7 +214,7 @@ class LySpotCity(scrapy.Spider):
                                             }
 
                             ota_product = {'type_key': type_name, 'normal_price': v3['AmountAdvice'], 'type_id': v3['TicketTypeId'],
-                                           'type_name': type_key + type_name,  'tickets': []}
+                                           'type_name': type_key + type_name, 'link_url': self.base_url,  'tickets': []}
                             ota_product['tickets'].append(tickets_list)
 
                             price_calendar = price.OPriceCalendar()

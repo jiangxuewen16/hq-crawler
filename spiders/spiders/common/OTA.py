@@ -110,7 +110,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.QUNAR, 4123349957),
         sp_map(OtaCode.FLIGGY, 191470),
     ]
-
+# 天空之城
     TIAN_KONG_ZHI_CHENG = [
         sp_map(OtaCode.HUIQULX, 10009),
         sp_map(OtaCode.MEITUAN, 182573099),
@@ -118,7 +118,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.CTRIP, 5058354),
         sp_map(OtaCode.FLIGGY, 140626417),
     ]
-
+# 连云山
     LIAN_YUN_SHAN = [
         sp_map(OtaCode.HUIQULX, 10010),
         sp_map(OtaCode.MAFENGWO, 33673148),
@@ -148,7 +148,7 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.QUNAR, 3333064220),
         sp_map(OtaCode.FLIGGY, 33559796),
     ]
-
+#乌金山
     WU_JIN_SHAN = [
         sp_map(OtaCode.HUIQULX, 10013),
         sp_map(OtaCode.MAFENGWO, 964195),
@@ -160,6 +160,7 @@ class OtaSpotIdMap(Enum):
     KAI_ZHI_FENG = [
         sp_map(OtaCode.CTRIP, 1410449),
         sp_map(OtaCode.QUNAR, 63919496),
+        sp_map(OtaCode.LY, 190966),
     ]
 
     @classmethod
