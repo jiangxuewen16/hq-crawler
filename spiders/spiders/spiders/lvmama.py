@@ -355,6 +355,19 @@ class LvmamaSpotPriceSpider(scrapy.Spider):
     allowed_domains = ['www.lvmama.com']
     base_url = r'http://ticket.lvmama.com/scenic-{ota_spot_id}?dropdownlist=true'
     start_urls = ['http://ticket.lvmama.com/scenic-100025?dropdownlist=true']
+    spot_name = {
+        '100025': '石燕湖',
+        '103113': '石牛寨',
+        '11367356': '益阳嘉年华',
+        '10829578': '东浒寨',
+        '103177': '马仁奇峰',
+        '160416': '九龙江',
+        '11945662': '天空之城',
+        '102525': '连云山',
+        '10650528': '侠天下',
+        '12210014': '三翁花园',
+        '162027': '乌金山'
+    }
 
     def parse(self, response: HtmlResponse):
         for ota_spot_id in LvmamaSpider.ota_spot_ids:
@@ -377,7 +390,7 @@ class LvmamaSpotPriceSpider(scrapy.Spider):
 
         o_price.ota_id = OTA.OtaCode.LVMAMA.value.id
         o_price.ota_spot_id = response.meta['ota_spot_id']
-        o_price.ota_spot_name = spot_name
+        o_price.ota_spot_name = self.spot_name[str(response.meta['ota_spot_id'])]
         o_price.create_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
         o_price.ota_product = []
         product_type = response.xpath('//*[@class="ptbox short"]')
@@ -392,13 +405,38 @@ class LvmamaSpotPriceSpider(scrapy.Spider):
 
             ticket_rs = product.css('.pdlist-inner > dl')
             for ticket in ticket_rs:
+                pipeline = [
+                    {
+                        '$unwind': '$ota_product'
+                    },
+                    {
+                        '$match': {
+                            'ota_id': OTA.OtaCode.LVMAMA.value.id,
+                            'ota_spot_id': response.meta['ota_spot_id'],
+                            'ota_product.type_id': ticket.css('.pdname > a::attr(data)').extract_first()
+                        }
+                    }
+                ]
+                old_rs = price.OPrice.objects.aggregate(*pipeline)
+                old_rs = list(old_rs)
+
                 ticket_name = ticket.css('.pdname > a::text').extract_first()
                 ticket_name = re.sub('\s', '', ticket_name)
+                if old_rs:
+                    normal_price = old_rs[0]['ota_product']['normal_price']
+                    type_name = old_rs[0]['ota_product']['type_name']
+                else:
+                    normal_price = 0
+                    type_name = ticket_name
+
+                # print(old_rs.to_dict())
                 price_rs = ticket.css('.pdlvprice > dfn > i::text').extract_first()
+                url = self.base_url.format(ota_spot_id=response.meta['ota_spot_id'])
                 ota_product = {
                     'type_id': ticket.css('.pdname > a::attr(data)').extract_first(),
-                    'type_key': ticket_name,
-                    'type_name': spot_name + product_name,
+                    'type_key': self.spot_name[str(response.meta['ota_spot_id'])] + product_name,
+                    'type_name': type_name,
+                    'normal_price': normal_price,
                     'tickets': [
                         {
                             'price_id': ticket.css('.pdname > a::attr(data)').extract_first(),
@@ -407,10 +445,14 @@ class LvmamaSpotPriceSpider(scrapy.Spider):
                             'cash_back': 0,
                             'cut_price': 0,
                             'sale_num': 0,
-                            'seller_nick': ''
+                            'seller_nick': '',
+                            'url': url
                         }
                     ]
                 }
+
+                o_price.ota_product.append(ota_product)
+
                 # ticket_name = ticket.css('.pdname > a::text').extract_first()
                 #
                 # ticket_name = re.sub('\s', '', ticket_name)
@@ -432,11 +474,12 @@ class LvmamaSpotPriceSpider(scrapy.Spider):
                 o_price_calendar.ota_spot_id = response.meta['ota_spot_id']
                 o_price_calendar.ota_spot_name = spot_name
                 o_price_calendar.type_key = product_name
-                o_price_calendar.type_name = product_name
+                o_price_calendar.type_name = ticket_name
                 o_price_calendar.pre_price = price_rs
                 o_price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
+                o_price_calendar.normal_price = normal_price
+                o_price_calendar.type_id = str(ticket.css('.pdname > a::attr(data)').extract_first())
                 yield o_price_calendar
 
-            o_price.ota_product.append(ota_product)
         yield o_price
 
