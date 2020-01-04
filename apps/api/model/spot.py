@@ -147,7 +147,7 @@ class SpotComment:
                             }
                         },
                         {
-                            'goods_name': condition['goods_name']
+                            'spot_name': condition['spot_name']
                         },
                         {
                             'ota_id': {'$in': condition['ota_id']}

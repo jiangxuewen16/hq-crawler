@@ -205,7 +205,7 @@ class PublicOpinion(BaseView):
             'end_date': Spot.get_param(param=param, in_name='end_date', default=str(datetime.datetime.now())),
             'up_score': Spot.get_param(param=param, in_name='up_score', default=6),
             'down_score': Spot.get_param(param=param, in_name='down_score', default=0),
-            'goods_name': Spot.get_param(param=param, in_name='goods_name', default=0),
+            'spot_name': Spot.get_param(param=param, in_name='goods_name', default=''),
             'ota_id': Spot.get_param(param=param, in_name='ota_id',
                                      default=[10001, 10002, 10003, 10004, 10005, 10006, 10007])
         }
@@ -249,9 +249,10 @@ class PublicOpinion(BaseView):
             condition['up_score'] = 1
             condition['down_score'] = 0
             total = bad_total
-        if condition['goods_name']:
+        if condition['spot_name']:
             result = SpotComment.ota_list_comment(condition=condition, skip=skip, limit=limit, sort=sort)
-        else:result = SpotComment.list_comment(condition=condition, skip=skip, limit=limit, sort=sort)
+        else:
+            result = SpotComment.list_comment(condition=condition, skip=skip, limit=limit, sort=sort)
         for v1 in result:
             if v1['ota_id'] == 10001:
                 v1['c_from'] = '马蜂窝'
