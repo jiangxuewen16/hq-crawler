@@ -478,7 +478,7 @@ class LvmamaSpotPriceSpider(scrapy.Spider):
                 o_price_calendar.pre_price = price_rs
                 o_price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
                 o_price_calendar.normal_price = normal_price
-                o_price_calendar.type_id = str(ticket.css('.pdname > a::attr(data)').extract_first())
+                o_price_calendar.type_id = ticket.css('.pdname > a::attr(data)').extract_first()
                 yield o_price_calendar
 
         yield o_price
