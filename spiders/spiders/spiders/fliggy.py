@@ -44,8 +44,6 @@ class FliggySpotSpider(scrapy.Spider):
     def parse(self, response: HtmlResponse):
         init_sign = '29cf97ff4076ea74f3319bc2f4e12f80'
         for ota_spot_id in FliggySpider.ota_spot_ids:
-            price.OPrice.objects(ota_id=OTA.OtaCode.FLIGGY.value.id, ota_spot_id=ota_spot_id).delete()
-
             request_data = json.loads('{"poiId":"11481","from":"","h5Version":"0.5.17"}')
             request_data['poiId'] = str(ota_spot_id)
             temp_request = request_data
@@ -68,13 +66,16 @@ class FliggySpotSpider(scrapy.Spider):
     def parse_item(self, response: HtmlResponse):
         response_str = response.body.decode('utf-8')
         charging_item_group_list = json.loads(response_str)['data']['data'][1]['list'][0]['chargingItemGroupList']
-        o_price = price.OPrice()
-        o_price.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        o_price.ota_id = OTA.OtaCode.FLIGGY.value.id
-        o_price.ota_spot_id = response.meta['ota_spot_id']
-        o_price.ota_spot_name = self.get_spot_name(response.meta['ota_spot_id'])
+        o_price = price.OPrice.objects(ota_id=OTA.OtaCode.FLIGGY.value.id, ota_spot_id=response.meta['ota_spot_id'])\
+            .first()
+        if not o_price:
+            o_price = price.OPrice()
+            o_price.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            o_price.ota_id = OTA.OtaCode.FLIGGY.value.id
+            o_price.ota_spot_id = response.meta['ota_spot_id']
+            o_price.ota_spot_name = self.get_spot_name(response.meta['ota_spot_id'])
+            o_price.ota_product = []
         o_price.update_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
-        o_price.ota_product = []
         for charging_item_group in charging_item_group_list:
             for charge_item in charging_item_group['chargeItems']:
                 detail_url = r'https://h5api.m.taobao.com/h5/mtop.trip.travelspdetail.scenic.product.itemsearch/1.0' \
@@ -121,17 +122,27 @@ class FliggySpotSpider(scrapy.Spider):
         total_price = i = 0
         init_url = r'https://h5.m.taobao.com/trip/rx-poi/detail/index.html?_wx_tpl=https%3A%2F%2Fh5.m.taobao.com' \
                    r'%2Ftrip%2Frx-poi%2Fdetail%2Findex.weex.js&_fli_newpage=1&poiId={ota_spot_id}&_projVer=0.5.17'
+        normal_price = 0
+        type_name = data['productName']
+        type_id = self.get_spot_name(response.meta['ota_spot_id']) + data['ticketKindName'] + '_' + str(data['productId'])
+        for product in o_price.ota_product:
+            print(product)
+            print(type_id)
+            if product['type_id'] == type_id:
+                normal_price = product['normal_price']
+                type_name = product['type_name']
+                break
         ota_product = {
-            'type_id': products_detail[0]['categoryId'] if len(products_detail) else 0,
-            'type_key': data['ticketKindName'],
-            'type_name': data['productName'],
-            'normal_price': 0,
+            'type_id': type_id,
+            'type_key': self.get_spot_name(response.meta['ota_spot_id']) + data['ticketKindName'],
+            'type_name': type_name,
+            'normal_price': normal_price,
             'tickets': []
         }
         for ticket in products_detail:
             ticket_info = {
-                'price_id': ticket['itemId'],
-                'title': ticket['title'],
+                'price_id': str(ticket['itemId']),
+                'title': ticket['title'].replace(' ', ''),
                 'price': ticket['price'],
                 'cash_back': 0,
                 'cut_price': 0,
@@ -149,8 +160,10 @@ class FliggySpotSpider(scrapy.Spider):
         o_price_calendar.ota_spot_id = response.meta['ota_spot_id']
         o_price_calendar.ota_spot_name = self.get_spot_name(response.meta['ota_spot_id'])
         o_price_calendar.type_key = data['ticketKindName']
-        o_price_calendar.type_name = data['productName']
+        o_price_calendar.type_name = type_name
         o_price_calendar.pre_price = total_price / i
+        o_price_calendar.normal_price = normal_price
+        o_price_calendar.type_id = type_id
         o_price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
         yield o_price_calendar
 
@@ -184,16 +197,16 @@ class FliggySpotSpider(scrapy.Spider):
     @staticmethod
     def get_spot_name(ota_spot_id):
         spot_name = {
-            '11481': '石燕湖',
-            '33966': '石牛寨',
-            '140975087': '花田溪谷',
-            '32659156': '东浒寨',
-            '103590': '马仁奇峰',
-            '61484': '大茅山',
-            '191470': '九龙江',
-            '140626417': '天空之城',
-            '17165564': '侠天下',
-            '33559796': '三翁花园'
+            11481: '石燕湖',
+            33966: '石牛寨',
+            140975087: '花田溪谷',
+            32659156: '东浒寨',
+            103590: '马仁奇峰',
+            61484: '大茅山',
+            191470: '九龙江',
+            140626417: '天空之城',
+            17165564: '侠天下',
+            33559796: '三翁花园'
         }
         return spot_name.get(ota_spot_id)
 
