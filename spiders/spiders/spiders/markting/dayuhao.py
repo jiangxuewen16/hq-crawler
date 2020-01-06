@@ -164,12 +164,12 @@ class DayuAccountSpider(scrapy.Spider):
 class DayuArticleSpider(scrapy.Spider):
     # marketing.Account.objects(account_name='小惠带你去旅行').delete()
     name = 'dayu_article'
-    allowed_domains = ['mp.dayu.com']
+    allowed_domains = ['mp.dayu.com', 'ff.dayu.com']
     account_list = DayuAccountSpider.account_list
 
     def start_requests(self):
-        print(WeMediaType.WE_MEDIA.value[0].id)  # 平台类型
-        print(WeMedia.DA_YU.value[0].id)  # 平台id
+        print(WeMediaType.WE_MEDIA.value.id)  # 平台类型
+        print(WeMedia.DA_YU.value.id)  # 平台id
         for v in self.account_list:
             print(v['account_name'])
             print('-' * 20)
@@ -195,30 +195,39 @@ class DayuArticleSpider(scrapy.Spider):
                           , callback=self.article_list)
 
     def article_list(self, response):
-        result = json.loads(response.body)
+        result = json.loads(response.body)  # 获取article_list文章列表
         for _, v in enumerate(result['dataList']['data']):
             print(v['origin_id'], v['title'])
             article_id = v['origin_id']
             title = v['title']
-            yield Request(url=response.meta['cookies'][0]['article_detail'] + '&aid=' + str(v['origin_id'])  # login_url
+            yield Request(url='https://ff.dayu.com/contents/origin/' + v[
+                'origin_id'] + '?biz_id=1002&_fetch_author=1&_incr_fields=click1,click2,click3,click_total,play,like'
                           , method="GET"
                           , headers={'Content-Type': 'application/json'}
                           , cookies=response.meta['cookies']
                           , meta={'cookies': response.meta['cookies'], 'account_name': response.meta['account_name'],
                                   'article_id': article_id, 'title': title}
-                          , callback=self.article_detail)
+                          , callback=self.article_content)
+
+    def article_content(self, response):
+        result = json.loads(response.body)  # 获取到文章详情
+
+        print(result['data']['created_at'])
+        yield Request(url=response.meta['cookies'][0]['article_detail'] + '&aid=' + response.meta['article_id']
+                      , method="GET"
+                      , headers={'Content-Type': 'application/json'}
+                      , cookies=response.meta['cookies']
+                      , meta={'cookies': response.meta['cookies'], 'account_name': response.meta['account_name'],
+                              'article_id': response.meta['article_id'], 'title': response.meta['title'],
+                              'content': result['data']['body']['text'], 'create_at': result['data']['created_at']}
+                      , callback=self.article_detail)
 
     def article_detail(self, response):
-        print(response.meta['account_name'])
-        print(response.meta['article_id'])
+        print(response.meta['create_at'])
         print(response.meta['title'])
         result = json.loads(response.body)
         print(result)
-        recommend_num = 0
-        read_num = 0
-        forward_num = 0
-        like_num = 0
-        comment_num = 0
+        recommend_num = read_num = forward_num = like_num = comment_num = 0
         if 'data' in result:
             for _, v in enumerate(result['data']):
                 if v['text'] == "推荐数":
@@ -239,35 +248,11 @@ class DayuArticleSpider(scrapy.Spider):
                     forward_num = v['value']
         exposure_num = int(recommend_num) + int(read_num)  # 曝光量
 
-        # article = marketing.Article.objects(article_id=response.meta['meta_data']['article_id'])
-        # if article:
-        #     print(article)
-        # else:
-        #     article = marketing.Article()
-        #     article.type = WeMediaType.WE_MEDIA.value[0].id  # 平台类型 详见：WeMediaType.id
-        #     article.platform = WeMedia.DA_YU.value[0].id  # 平台id 详见：WeMedia.id
-        #
-        #     article.account_name = response.meta['meta_data']['account_name']  # 平台id 详见：WeMedia.id
-        #
-        #     article.exposure_num = exposure_num  # 曝光量（推荐量 + 阅读量）
-        #     article.recommend_num = recommend_num  # 推荐量
-        #     article.read_num = read_num  # 阅读量
-        #     article.forward_num = forward_num  # 转发
-        #     article.like_num = like_num  # 点赞
-        #     article.comment_num = comment_num  # 评论量
-        #
-        #     article.title = response.meta['meta_data']['title']  # 标题
-        #     article.article_id = response.meta['meta_data']['article_id']  # 标题id
-        #     article.content = '内容'  # 内容
-        #
-        #     article.create_at = time.strftime("%Y-%m-%d", time.localtime())
-        #     article.update_at = time.strftime("%Y-%m-%d", time.localtime())
-        #     article.save(force_insert=False, validate=False, clean=True)
-        print(WeMedia.DA_YU.value[0].id)
+        print(WeMedia.DA_YU.value.id)
         # print(WeMediaType.WE_MEDIA.value.id)
         marketing.Article.objects(article_id=response.meta['article_id']).update_one(
-            set__platform_type=WeMediaType.WE_MEDIA.value[0].id,  # 平台类型 详见：WeMediaType.id
-            set__platform=WeMedia.DA_YU.value[0].id,  # 平台id 详见：WeMedia.id
+            set__platform_type=WeMediaType.WE_MEDIA.value.id,  # 平台类型 详见：WeMediaType.id
+            set__platform=WeMedia.DA_YU.value.id,  # 平台id 详见：WeMedia.id
             set__account_name=response.meta['account_name'],  # 账号名称
             set__exposure_num=exposure_num,  # 曝光量（推荐量 + 阅读量）
             set__recommend_num=recommend_num,  # 推荐量
@@ -275,8 +260,72 @@ class DayuArticleSpider(scrapy.Spider):
             set__forward_num=forward_num,  # 转发
             set__like_num=like_num,  # 点赞
             set__comment_num=comment_num,  # 评论量
+            set__content=response.meta['content'],  # 内容
             set__title=response.meta['title'],  # 标题
             set__article_id=response.meta['article_id'],  # 标题id
-            set__create_at=time.strftime("%Y-%m-%d", time.localtime()),
+            set__create_at=response.meta['create_at'],
             set__update_at=time.strftime("%Y-%m-%d", time.localtime()),
             upsert=True)
+
+
+class DayuContentSpider(scrapy.Spider):
+    # marketing.Account.objects(account_name='小惠带你去旅行').delete()
+    name = 'dayu_content'
+    allowed_domains = ['mp.dayu.com', 'ff.dayu.com']
+    account_list = DayuAccountSpider.account_list
+
+    def start_requests(self):
+        print(WeMediaType.WE_MEDIA.value.id)  # 平台类型
+        print(WeMedia.DA_YU.value.id)  # 平台id
+        for v in self.account_list:
+            print(v['account_name'])
+            print('-' * 20)
+            # meta_data = {'account_name': v['account_name']}
+            account_name = v['account_name']
+            yield Request(url=v['article_url']  # login_url
+                          , method="GET"
+                          , headers={'Content-Type': 'application/json'}
+                          , cookies=[v]
+                          , meta={'cookies': [v], 'account_name': account_name}
+                          , callback=self.after_login)
+
+    def after_login(self, response):
+        result = json.loads(response.body)
+        print('共：', result['dataList']['totalPage'], '页')  # 总页数
+        for page in range(51, result['dataList']['totalPage'] + 1):
+            print('第', page, '页', '-' * 20)
+            yield Request(url=response.meta['cookies'][0]['article_url'] + '&page=' + str(page)  # login_url
+                          , method="GET"
+                          , headers={'Content-Type': 'application/json'}
+                          , cookies=response.meta['cookies']
+                          , meta={'cookies': response.meta['cookies'], 'account_name': response.meta['account_name']}
+                          , callback=self.article_list)
+
+    def article_list(self, response):
+        result = json.loads(response.body)
+        for _, v in enumerate(result['dataList']['data']):
+            print(v['origin_id'], v['title'])
+            article_id = v['origin_id']
+            yield Request(
+                url='https://mp.dayu.com/api/stat/article/all/daylist_v2?beginDate=2010-12-21&endDate=' + time.strftime(
+                    "%Y-%m-%d") + '&_=1577518280607&_rid=' +
+                    v['origin_id']
+                , method="GET"
+                , headers={'Content-Type': 'application/json;charset=UTF-8'}
+                , cookies=response.meta['cookies']
+                , meta={'cookies': response.meta['cookies'], 'account_name': response.meta['account_name'],
+                        'article_id': v['origin_id']}
+                , callback=self.article_content)
+
+    def article_content(self, response):
+        result = json.loads(response.body)
+        print(result)
+        if 'data' in result:
+            for _, v in enumerate(result['data']['list']):
+                print(v)
+                marketing.MarketingDailyReport.objects(account_id=response.meta['article_id']).update_one(
+                    set__platform_type=WeMediaType.WE_MEDIA.value.id,  # 平台类型 详见：WeMediaType.id
+                    set__platform=WeMedia.DA_YU.value.id,  # 平台id 详见：WeMedia.id
+                    # set__account_id=response.meta['article_id'],  # 标题id
+                    set__update_at=time.strftime("%Y-%m-%d", time.localtime()),
+                    upsert=True)

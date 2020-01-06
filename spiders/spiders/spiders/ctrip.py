@@ -424,10 +424,12 @@ class PriceSpider(scrapy.Spider):
                         for k3, v3 in enumerate(result['data']['shelfgroupinfo']['saleunits']):
                             if v2['saleunitid'] == v3['id']:
                                 tickets = []
-                                tickets_list = {'price_id': v1['resid']
+                                tickets_list = {'price_id': str(v1['resid'])
                                     , 'title': v3['name']  # 票名
                                     , 'seller_nick': v1['brandname']  # 分销商
                                     , 'price': v3['price']
+                                    , 'url': 'https://m.ctrip.com/webapp/ticket/dest/t' + str(response.meta[
+                                                                                                  'ota_spot_id']) + '.html'
                                     , 'cash_back': 0
                                     , 'cut_price': 0
                                     , 'sale_num': v1['annualsales']  # 销量
@@ -435,7 +437,9 @@ class PriceSpider(scrapy.Spider):
                                 tickets.append(tickets_list)
                                 ota_product = []
 
-                                ota_product_list = {'type_id': v3['id'], 'type_key': v3['propleproperty'],  # 票类型
+                                ota_product_list = {'type_id': str(v3['id']),
+                                                    'type_key': response.meta['ota_spot_name'] + v3['propleproperty'],
+                                                    # 票类型
                                                     'type_name': v3['name'],  # 票名
                                                     'normal_price': v3['price'],  # 价格
                                                     'tickets': tickets}
@@ -454,6 +458,7 @@ class PriceSpider(scrapy.Spider):
                                 price_calendar.ota_spot_name = response.meta['ota_spot_name']
                                 price_calendar.pre_price = v3['price']
                                 price_calendar.type_key = v3['propleproperty']
+                                price_calendar.type_id = str(v3['id'])
                                 price_calendar.type_name = v3['name']
                                 price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime())
                                 price_calendar.save(force_insert=False, validate=False, clean=True)
