@@ -189,12 +189,13 @@ class PublicOpinion(BaseView):
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
         return self.success(data)
 
-    #ota景区名称列表
+    # ota景区名称列表
     @Route.route(path='/spot/ota/list')
     def ota_list(self):
         spot_list = spot.CSpot.objects(self_employed=True).fields(name=1).to_json()
 
         return self.success(json.loads(spot_list))
+
     # 实时点评
     @Route.route(path='/spot/reviews')
     def real_reviews(self):
@@ -336,7 +337,7 @@ class PublicOpinion(BaseView):
         last_year_month_first = str(datetime.date(datetime.date.today().year - 1, datetime.date.today().month, 1))
         if datetime.date.today().month == 1:
             last_year_month_last = str(
-                datetime.date(datetime.date.today().year - 2, 12, 1) - datetime.timedelta(1))
+                datetime.date(datetime.date.today().year - 1, 1, datetime.date.today().day))
         else:
             last_year_month_last = str(
                 datetime.date(datetime.date.today().year - 1, datetime.date.today().month - 1, 1) - datetime.timedelta(
@@ -352,72 +353,25 @@ class PublicOpinion(BaseView):
             'comment_tags_true': [1],
             'comment_tags_false': [2]
         }
-        # # 景区综合评分
-        # spot_complex = Spot.spot_complex(condition=condition)
-        # # 景区评论数
-        # comment_num = Spot.comment_num(condition=condition)
+        # 景区综合评分
+        spot_complex = Spot.spot_complex(condition=condition)
+        # 景区评论数
+        comment_num = Spot.comment_num(condition=condition)
         # # 当月评分走势
-        # now_month = Spot.now_month(condition=condition)
+        now_month = Spot.now_month(condition=condition)
         # # 评分等级占比数据
-        # star_percent = Spot.star_percent(condition=condition)
+        star_percent = Spot.star_percent(condition=condition)
         # # 舆情标签
-        # comment_tags = Spot.comment_tags(condition=condition)
-        #
-        # result = {"spot_complex": spot_complex, "comment_num": comment_num, "now_month": now_month,
-        #           "star_percent": star_percent, "comment_tags": comment_tags}
-        result = list()
-        t1 = threading.Thread(target=Spot.comment_num, name='thread1', args=(condition,))
-        t2 = threading.Thread(target=Spot.now_month, name='thread2', args=(condition,))
-        t3 = threading.Thread(target=Spot.star_percent, name='thread3', args=(condition,))
-        t4 = threading.Thread(target=Spot.comment_tags, name='thread4',
-                              args=(condition['comment_tags'], 'comment_tags'))
-        t41 = threading.Thread(target=Spot.comment_tags, name='thread4',
-                               args=(condition['comment_tags_true'], 'comment_tags_true'))
-        t42 = threading.Thread(target=Spot.comment_tags, name='thread4',
-                               args=(condition['comment_tags_false'], 'comment_tags_false'))
-        t5 = threading.Thread(target=Spot.spot_complex, name='thread4', args=(condition,))
-        t1.start()
-        t2.start()
-        t3.start()
-        t4.start()
-        t41.start()
-        t42.start()
-        t5.start()
-        t1.join()
-        t2.join()
-        t3.join()
-        t4.join()
-        t41.join()
-        t42.join()
-        t5.join()
-        data = {}
-        while not spot_queue.empty():
-            result.append(spot_queue.get())
-        for item in result:
-            data[item[1]] = item[0]
-        return self.success(data)
+        comment_tags = Spot.comment_tags(condition=condition['comment_tags'], )
+        comment_tags_true = Spot.comment_tags(condition=condition['comment_tags_true'], )
+        comment_tags_false = Spot.comment_tags(condition=condition['comment_tags_false'], )
 
-    # 景区评论数
-    @Route.route(path='/comment/num')
-    def comment_num(self):
-        condition = {}
-        # result = Spot.comment_num(condition=condition)
-        import threading
-        result = list()
-        t1 = threading.Thread(target=Spot.comment_num, name='thread1', args=(condition,))
-        t2 = threading.Thread(target=Spot.now_month, name='thread2', args=(condition,))
-        t1.start()
-        t2.start()
-        t1.join()
-        t1.join()
-        while not spot_queue.empty():
-            result.append(spot_queue.get())
-        for item in result:
-            print("+" * 20, item, "-" * 20)
+        result = {"spot_complex": spot_complex, "comment_num": comment_num, "now_month": now_month,
+                  "star_percent": star_percent, "comment_tags": comment_tags, "comment_tags_true": comment_tags_true,
+                  "comment_tags_false": comment_tags_false}
         return self.success(result)
 
-        # 当月评分走势
-
+    # 当月评分走势
     @Route.route(path='/now/month')
     def now_month(self):
         condition = {}
@@ -499,7 +453,7 @@ class PublicOpinion(BaseView):
     #     out = output.getvalue()
     #     return self.file_response(out)
 
-        # 直接导出流示例
+    # 直接导出流示例
 
     @Route.route(path='/day/list')
     def day_list(self):
