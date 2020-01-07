@@ -80,15 +80,15 @@ class MeituanCommentSpider(scrapy.Spider):
     def parse(self, response: HtmlResponse):
 
         # 爬取景区列表数据
-        # for ota_spot_id in MeituanSpider.ota_spot_ids:
-        #     # 更新景区的评论数量
-        #     url = self.base_url.format(spot_id=ota_spot_id, offset=0, page_size=1)
-        #     yield Request(url=url, callback=self.parse_count, dont_filter=True,
-        #                   meta={'offset': 0, 'ota_spot_id': ota_spot_id})
+        for ota_spot_id in MeituanSpider.ota_spot_ids:
+            # 更新景区的评论数量
+            url = self.base_url.format(spot_id=ota_spot_id, offset=0, page_size=1)
+            yield Request(url=url, callback=self.parse_count, dont_filter=True,
+                          meta={'offset': 0, 'ota_spot_id': ota_spot_id})
 
-        url = self.base_url.format(spot_id=188085997, offset=0, page_size=1)
-        yield Request(url=url, callback=self.parse_count, dont_filter=True,
-                           meta={'offset': 0, 'ota_spot_id': 188085997})
+        # url = self.base_url.format(spot_id=188085997, offset=0, page_size=1)
+        # yield Request(url=url, callback=self.parse_count, dont_filter=True,
+        #                    meta={'offset': 0, 'ota_spot_id': 188085997})
 
     def parse_page(self, response: HtmlResponse):
         response_str = response.body.decode('utf-8')
