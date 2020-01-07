@@ -106,28 +106,10 @@ class PublicOpinion(BaseView):
         limit = Spot.get_param(param=param, in_name='limit', default=5)
         skip = (page - 1) * limit
 
-        # result = Spot.all_comment(condition=condition, skip=skip, limit=limit)
-        # result_count = Spot.all_comment(condition=condition, skip=0, limit=10000)
-        # total = len(result_count)
-        # last_page = math.ceil(total / limit)
-        # data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
-        # return self.success(data)
-        topic = "list"
-        result = list()
-        t1 = threading.Thread(target=Spot.all_comment, name='thread1', args=(condition, skip, limit, topic))
-        t2 = threading.Thread(target=Spot.all_comment, name='thread1', args=(condition, 0, 200, "total"))
-        t1.start()
-        t2.start()
-        t1.join()
-        t2.join()
-        data = {}
-        while not spot_queue_list.empty():
-            result.append(spot_queue_list.get())
-        for item in result:
-            data[item[1]] = item[0]
-        data['current_page'] = page
-        data['last_page'] = math.ceil(data["total"] / limit)
-        data['per_page'] = limit
+        result = Spot.all_comment(condition=condition, skip=skip, limit=100)
+        total = Spot.spot_count(condition)
+        last_page = math.ceil(total / limit)
+        data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
         return self.success(data)
 
     # 运营中心数据 景区评论统计

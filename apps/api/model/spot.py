@@ -669,7 +669,7 @@ class Spot:
         return L
 
     @classmethod
-    def all_comment(cls, condition, skip, limit, topic):
+    def all_comment(cls, condition, skip, limit):
         pipeline = [
             {
                 "$lookup": {
@@ -707,12 +707,12 @@ class Spot:
                                 "$in": condition['ota_spot_id']
                             }
                         },
-                        {
-                            "c_score": {
-                                "$ne": None
-                            }
-
-                        }
+                        # {
+                        #     "c_score": {
+                        #         "$ne": None
+                        #     }
+                        #
+                        # }
                         # {
                         #     "create_at": {
                         #         "$gte": condition['begin_date'] + " 00:00:00"
@@ -1533,12 +1533,39 @@ class Spot:
 
             L.append(dict(p))
             i = i + 1
-        if topic == "list":
-            spot_queue_list.put((L, topic))
-        elif topic == 'total':
-            spot_queue_list.put((len(L), topic))
-        else:
-            return L
+        return L
+
+    @classmethod
+    def spot_count(cls, condition):
+        pipeline = [
+            {
+                "$match": {
+                    "$and": [
+                        {
+                            "spot_name": {
+                                "$exists": True
+                            }
+                        },
+                        {
+                            "ota_spot_id": {
+                                "$in": condition['ota_spot_id']
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "$group": {
+                    "_id": None,
+                    "count": {
+                        "$sum": 1
+                    }
+                }
+            }
+        ]
+        spot_count = spot.Spot.objects.aggregate(*pipeline)
+        L = list(spot_count)
+        return L[0]['count']
 
     @classmethod
     def spot_score_count(cls, condition):
