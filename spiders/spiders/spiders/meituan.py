@@ -71,7 +71,8 @@ class MeituanCommentSpider(scrapy.Spider):
     allowed_domains = ['www.meituan.com']
 
     total_num = 0  # 总评论
-    page_size = 100  # 默认爬取每页100条
+    page_size = 50  # 默认爬取每页50条
+    # https://www.meituan.com/ptapi/poi/getcomment?id=1515791&offset=0&pageSize=10&mode=0&starRange=&userId=&sortType=0
     base_url = r'https://www.meituan.com/ptapi/poi/getcomment?id={spot_id}&offset={offset}&pageSize={page_size}&mode=0&starRange=&userId=&sortType=0'
     start_urls = [
         'https://www.meituan.com/ptapi/poi/getcomment?id=1515791&offset=0&pageSize=1&mode=0&starRange=&userId=&sortType=0']
@@ -79,11 +80,15 @@ class MeituanCommentSpider(scrapy.Spider):
     def parse(self, response: HtmlResponse):
 
         # 爬取景区列表数据
-        for ota_spot_id in MeituanSpider.ota_spot_ids:
-            # 更新景区的评论数量
-            url = self.base_url.format(spot_id=ota_spot_id, offset=0, page_size=1)
-            yield Request(url=url, callback=self.parse_count, dont_filter=True,
-                          meta={'offset': 0, 'ota_spot_id': ota_spot_id})
+        # for ota_spot_id in MeituanSpider.ota_spot_ids:
+        #     # 更新景区的评论数量
+        #     url = self.base_url.format(spot_id=ota_spot_id, offset=0, page_size=1)
+        #     yield Request(url=url, callback=self.parse_count, dont_filter=True,
+        #                   meta={'offset': 0, 'ota_spot_id': ota_spot_id})
+
+        url = self.base_url.format(spot_id=188085997, offset=0, page_size=1)
+        yield Request(url=url, callback=self.parse_count, dont_filter=True,
+                           meta={'offset': 0, 'ota_spot_id': 188085997})
 
     def parse_page(self, response: HtmlResponse):
         response_str = response.body.decode('utf-8')
@@ -121,7 +126,7 @@ class MeituanCommentSpider(scrapy.Spider):
             yield spot_comment
 
         start_offset = response.meta['offset'] + page_size
-        print('============', start_offset, max_offset, page_size)
+        print('测试============', start_offset, max_offset, page_size)
         if start_offset < max_offset:
             url = self.base_url.format(spot_id=ota_spot_id, offset=start_offset,
                                        page_size=page_size)
@@ -151,7 +156,7 @@ class MeituanCommentSpider(scrapy.Spider):
 
         # 爬取景区的所有评论
         start_offset = 0
-        print('=========增量爬取参数=========', ota_spot_id, new_total, comment_num, max_offset)
+        print('=========增量爬取参数=========', '===景区id:', ota_spot_id, '===爬取时数量:', new_total, '===数据库数量:', comment_num, '===最大能偏移的数量:', max_offset)
         url = self.base_url.format(spot_id=ota_spot_id, offset=start_offset, page_size=page_size)
 
         yield Request(url=url, callback=self.parse_page, dont_filter=True,
