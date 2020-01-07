@@ -106,7 +106,7 @@ class PublicOpinion(BaseView):
         limit = Spot.get_param(param=param, in_name='limit', default=5)
         skip = (page - 1) * limit
 
-        result = Spot.all_comment(condition=condition, skip=skip, limit=100)
+        result = Spot.all_comment(condition=condition, skip=skip, limit=limit)
         total = Spot.spot_count(condition)
         last_page = math.ceil(total / limit)
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'total': total, 'list': result}
