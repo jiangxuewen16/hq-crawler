@@ -253,9 +253,10 @@ class PublicOpinion(BaseView):
                 v1['c_from'] = '同程'
 
             if 'u_avatar' not in v1 or v1['u_avatar'] == '':
-                v1[
-                    'u_avatar'] = 'https://dimg04.c-ctrip.com/images/t1/headphoto/699/910/854/683dab66bb374136af9930ea204dfc7e_C_180_180.jpg'
-
+                v1['u_avatar'] = 'https://dimg04.c-ctrip.com/images/t1/headphoto/699/910/854/683dab66bb374136af9930ea204dfc7e_C_180_180.jpg'
+            if 'c_content' is None:
+                v1['c_content'] = '默认好评'
+                v1['c_score'] = 5
         data = {'current_page': page, 'last_page': last_page, 'per_page': limit, 'whole': whole, 'total': total,
                 'newest_total': 100,
                 'praise_total': praise_total, 'bad_total': bad_total, 'list': result}

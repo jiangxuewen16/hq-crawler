@@ -133,7 +133,7 @@ class LyCommentSpider(scrapy.Spider):
             spot_comment.goods_id = item['DPItemId']
             spot_comment.u_name = item['dpUserName']
             spot_comment.u_avatar = item['memberHeaderImgUrl']
-            # spot_comment.u_avg_price = item['avgPrice']
+            spot_comment.c_id = item['dpId']
             spot_comment.u_level = item['DPUserLevel']
 
             # spot_comment.c_tag = item['dpTagList']
@@ -168,7 +168,8 @@ class LySpotCity(scrapy.Spider):
     name = 'ly_price'
     allowed_domains = ['www.ly.com']
     base_url = r'https://www.ly.com/scenery/AjaxHelper/SceneryPriceFrame.aspx?action=GETNEWPRICEFRAMEFORLAST&ids={ota_spot_id}&isSimple=1&isShowAppThree=0&widthtype=1&isGrap=1&nobookid=&isyry=1&YpState=1&lon=null&lat=null&isforegin=null&iid=0.9687010629933097'
-    start_urls = ['https://m.ly.com/scenery/scenerydetail_9513_0_0.html']
+    start_urls = ['https://m.ly.com/scenery/scenerydetail_{ota_spot_id}_0_0.html']
+    url = r'https://m.ly.com/scenery/scenerydetail_{ota_spot_id}_0_0.html'
 
     def parse(self, response: HtmlResponse):
         # price.OPrice.objects(ota_id=OTA.OtaCode.LY.value.id).delete()
@@ -191,7 +192,6 @@ class LySpotCity(scrapy.Spider):
         if not op_price:
             if 'SceneryPrices' in json_data:
                 for k1, v1 in enumerate(json_data['SceneryPrices']):
-                    type_key = v1['DestinationName']
                     spot_name = v1['DestinationName']
 
                     o_price = price.OPrice()
@@ -209,18 +209,21 @@ class LySpotCity(scrapy.Spider):
                                 'title': v3['TicketName'],
                                 'price': v3['DAmountAdvice'],
                                 'sale_num': v3['OrderNumber'],
+                                'url': self.url.format(ota_spot_id=response.meta['ota_spot_id']),
                                 'cash_back': 0,
+                                'seller_nick': '',
                                 'cut_price': 0
                                             }
 
-                            ota_product = {'type_key': type_name, 'normal_price': v3['AmountAdvice'], 'type_id': v3['TicketTypeId'],
-                                           'type_name': type_key + type_name, 'link_url': self.base_url,  'tickets': []}
+                            ota_product = {'type_key': spot_name + type_name, 'normal_price': v3['AmountAdvice'], 'type_id': str(v3['TicketTypeId']),
+                                           'type_name': type_name,  'tickets': []}
                             ota_product['tickets'].append(tickets_list)
 
                             price_calendar = price.OPriceCalendar()
                             price_calendar.ota_id = OTA.OtaCode.LY.value.id
                             price_calendar.ota_spot_id = response.meta['ota_spot_id']
-                            price_calendar.type_key = type_name
+                            price_calendar.type_key = spot_name+type_name
+                            price_calendar.type_id = str(v3['TicketTypeId'])
                             price_calendar.pre_price = v3['DAmountAdvice']
                             price_calendar.type_name = v3['TicketName']
                             price_calendar.ota_spot_name = spot_name

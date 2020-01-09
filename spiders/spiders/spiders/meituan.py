@@ -419,7 +419,8 @@ class MeituanPrice(scrapy.Spider):
     allowed_domains = ['i.meituan.com']
     base_url = r'https://itrip.meituan.com/volga/api/v3/trip/poi/business/info/{ota_spot_id}?ct_poi=190361606798914361847646491438431785905_e7283630514797780583_c5_dtrippoipolyb&poiId=1515791&source=mt&client=wap&uuid=3F1B3AB7262A309B279A62C912513D18CEF869AD324DF8263D921F91967B162B&cityId=70&feclient=lvyou_wap&platform=5&partner=11&originUrl=https%3A%2F%2Fi.meituan.com%2Fawp%2Fh5%2Flvyou%2Fpoi%2Fdetail%2Findex.html%3Fct_poi%3D190361606798914361847646491438431785905_e7283630514797780583_c5_dtrippoipolyb%26poiId%3D1515791&_token=eJytUltr5CAU%252Fi9C%252BhSixlscCGWgdMlCH1ravgwlZNSdkSYaEtN2KP3vPemF3X3YtwXxO5dPz%252Fk8vqKpsWhDCSG0zNGTm9AG0YIUEuUozZARSnGtFdGiBIL5MwanBM%252FRfrq%252FQJudEiSnjPGHNXIDgR1TIpdSPeS%252FrZLDWhkNENAxpXHeYOyLwfm0dKEwccDd84iPAvdPp7jgMXpsXep8j32w7qU4pqE%252FN6mFRE01YZJKIpWuNOVgV1xJLvnqVJxRVQlNROtUWTHJiKBcaaUqIirWGtHaNPkRLhpjf9qfgdHYmgqQpynI%252F0d3xsQlJNzHgw%252Fn%252B848LlNfr9yMbbPyEtZfB8BfqwB8CAKMk3UT4H45wT6kNfehLWOXn8IydvFfpWWlnOMyGQcXDwk803sXEnjPHVSXMPbZx9CGblgpCzTzywdnIWVd1zcWgtAK1IUeEIxvuIXxAT5%252BYfeF6du%252Fgm8ETzj7QwDL%252FXy5vTs02%252B2Pw%252Fbmuq7R2zvWCreX'
     Info_urls = r'https://itrip.meituan.com/volga/api/v3/trip/poi/basic/info/{ota_spot_id}?=&poiId={ota_spot_id}'
-    start_urls = ['https://i.meituan.com/awp/h5/lvyou/poi/detail/index.html?&poiId=1515791']
+    start_urls = ['https://i.meituan.com/awp/h5/lvyou/poi/detail/index.html?&poiId={ota_spot_id}']
+    url = r'https://i.meituan.com/awp/h5/lvyou/poi/detail/index.html?&poiId={ota_spot_id}'
 
     def parse(self, response: HtmlResponse):
         price.OPrice.objects(ota_id=OTA.OtaCode.MEITUAN.value.id).delete()
@@ -464,12 +465,12 @@ class MeituanPrice(scrapy.Spider):
                 sale_num = 0
                 normal_price = 0
 
-                if v1['productName'] == '门票':  ## 门票数据
+                if v1['productName'] == '门票':  # 门票数据
                     for k2, v2 in enumerate(v1['productModels']):
                         if 'lowPrice' in v2 and 'ticketName' in v2:
                             lowPrice = v2['lowPrice']
                             type_name = v2['ticketName']
-                            type_key = v2['ticketName']
+                            type_key = ota_spot_name+v2['ticketName'][1:3]+'票'
                         if 'ticketDeals' in v2:
                             for k3, v3 in enumerate(v2['ticketDeals']):
                                 # normal_price = v3['value']
@@ -477,11 +478,14 @@ class MeituanPrice(scrapy.Spider):
                                     'price_id': str(v3['id']),
                                     'title': v3['title5'],
                                     'price': v3['price'],
+                                    'sale_num': sale_num,
+                                    'url': self.url.format(ota_spot_id=response.meta['ota_spot_id']),
                                     'cash_back': 0,
+                                    'seller_nick': '',
                                     'cut_price': 0
                                 }
-                                ota_product = {'type_key': type_key, 'normal_price': normal_price, 'sale_num': sale_num,
-                                               'type_id': v3['id'], 'type_name': type_name,'link_url': self.base_url, 'tickets': []}
+                                ota_product = {'type_key': type_key, 'normal_price': normal_price,
+                                               'type_id': str(v3['id']), 'type_name': type_name,  'tickets': []}
                                 ota_product['tickets'].append(tickets_list)
                                 if '已售' in v3['newSoldsString']:
                                     if '万' in v3['newSoldsString']:
@@ -495,6 +499,7 @@ class MeituanPrice(scrapy.Spider):
                                 price_calendar.ota_id = OTA.OtaCode.MEITUAN.value.id
                                 price_calendar.ota_spot_id = response.meta['ota_spot_id']
                                 price_calendar.type_key = type_key
+                                price_calendar.type_id = str(v3['id'])
                                 price_calendar.type_name = type_name
                                 price_calendar.pre_price = v3['price']
                                 price_calendar.ota_spot_name = ota_spot_name
