@@ -29,10 +29,10 @@ class PublicOpinion(BaseView):
 
         if 'access_token' in result:
             Authorization = result['token_type'] + " " + result['access_token']
-            url = "http://11.75.1.29:8056/"
+            # url = "http://11.75.1.29:8056/"
 
             params = self.request_param
-            url = url + params['api_url']
+            url = params['api_url']
             headers = {'Authorization': Authorization}
             if 'request_type' in params:
                 if params['request_type'] == 'POST':
