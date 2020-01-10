@@ -36,11 +36,11 @@ class PublicOpinion(BaseView):
                     r = requests.get(url, headers=headers, params=params)
             else:
                 r = requests.get(url, headers=headers, params=params)
-            if not r:
-                return self.success("接口错误！请检查参数或联系惠趣云相关技术人员！！")
+        if r.text:
             result = r.json()
-            # r = requests.post(url, headers=headers, data=params)
-        return self.success(result)
+            return self.success(result)
+        else:
+            return self.success("接口错误！请检查参数或联系惠趣云相关技术人员！！")
 
     @Route.route(path='/test')
     def test(self):
