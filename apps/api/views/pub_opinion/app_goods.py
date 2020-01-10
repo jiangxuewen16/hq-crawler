@@ -7,7 +7,7 @@ from core.lib.route import Route
 from core.lib.view import BaseView
 
 
-@Route.route(path='api/ApplicationCenter/apporder')
+@Route.route(path='api/application')
 class PublicOpinion(BaseView):
 
     @Route.route(path='/index')
