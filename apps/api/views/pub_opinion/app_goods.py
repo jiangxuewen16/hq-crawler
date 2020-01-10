@@ -32,12 +32,12 @@ class PublicOpinion(BaseView):
             if 'request_type' in params:
                 if params['request_type'] == 'POST':
                     r = requests.post(url, headers=headers, data=params)
-                    if not r:
-                        return self.success("接口错误！请检查参数或联系惠趣云相关技术人员！！")
                 else:
                     r = requests.get(url, headers=headers, params=params)
             else:
                 r = requests.get(url, headers=headers, params=params)
+            if not r:
+                return self.success("接口错误！请检查参数或联系惠趣云相关技术人员！！")
             result = r.json()
             # r = requests.post(url, headers=headers, data=params)
         return self.success(result)
