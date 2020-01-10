@@ -9,15 +9,15 @@ ALLOWED_HOSTS = ['*']
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'hq_crawler',
-        'USER': 'root',
-        'HOST': '11.75.1.124',
-        'PASSWORD': '123456',
-        'PORT': 3306,
-        'OPTIONS': {'charset': 'utf8mb4'},
-    }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'hq_crawler',
+    #     'USER': 'root',
+    #     'HOST': '11.75.1.124',
+    #     'PASSWORD': '123456',
+    #     'PORT': 3306,
+    #     'OPTIONS': {'charset': 'utf8mb4'},
+    # }
 }
 
 CACHES = {
