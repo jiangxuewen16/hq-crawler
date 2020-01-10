@@ -42,4 +42,13 @@ class PublicOpinion(BaseView):
 
     @Route.route(path='/test')
     def test(self):
-        return self.success(1111)
+        login_url = "http://11.75.1.29:8018/api/account/login"
+        login_headers = {
+            "Content-Type": "application/json"
+        }
+        login_payload = {'userName': "admin", "password": "1q2w3E*"}
+
+        r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
+        print(r.json())
+        result = r.json()
+        return self.success(result)
