@@ -39,3 +39,7 @@ class PublicOpinion(BaseView):
             result = r.json()
             # r = requests.post(url, headers=headers, data=params)
         return self.success(result)
+
+    @Route.route(path='/test')
+    def test(self):
+        return self.success(1111)
