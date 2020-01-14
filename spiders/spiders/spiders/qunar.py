@@ -186,7 +186,7 @@ class CommentAndTagSpider(scrapy.Spider):
                     'https://touch.piao.qunar.com/touch/queryCommentsAndTravelTips.json?type=mp&pageSize=10&fromType=SIGHT&pageNum=' + str(
                         pag_num) + '&sightId=' + str(response.meta['ota_spot_id'])
                     , method='GET'
-                    , meta={'page': pag_num}
+                    , meta={'page': pag_num, 'ota_spot_id': response.meta['ota_spot_id']}
                     , callback=self.each_page)
 
     def each_page(self, response):
@@ -200,7 +200,8 @@ class CommentAndTagSpider(scrapy.Spider):
                 else:
                     headImg = ''
                 yield spot.SpotComment.objects(c_id=value['commentId']).update_one(
-                    set__ota_spot_id=706176810,
+                    set__ota_id=OTA.OtaCode.QUNAR.value.id,
+                    set__ota_spot_id=response.meta['ota_spot_id'],
                     set__goods_name=value['sightName'],
                     set__u_avatar=headImg,
                     set__u_name=value['author'],
