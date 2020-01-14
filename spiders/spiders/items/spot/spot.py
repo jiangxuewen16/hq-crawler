@@ -81,7 +81,7 @@ class SpotComment(BaseItem, mongoengine.Document):
     u_avg_price = mongoengine.DecimalField()  # 用户的平均消费
 
     c_tag = mongoengine.DictField()  # tag列表
-    c_id = mongoengine.IntField()  # 评论id
+    c_id = mongoengine.StringField()  # 评论id
     c_score = mongoengine.FloatField()  # 评分
     c_useful_num = mongoengine.IntField()  # 赞数量
     c_reply_num = mongoengine.IntField()  # 回复数量

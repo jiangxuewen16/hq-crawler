@@ -207,14 +207,14 @@ class MafengwoCommentSpider(scrapy.Spider):
 
 
 class MafengwoCitySpot(scrapy.Spider):
-    name = 'mafengwo_city_spot'
+    name = 'Mafengwo_price'
     allowed_domains = ['www.mafengwo.cn']
     base_url = r'http://www.mafengwo.cn/sales/{ota_spot_id}.html'
     start_urls = ['http://www.mafengwo.cn/sales/2272257.html']
 
     base_referer = r'http://www.mafengwo.cn/sales/{ota_spot_id}.html'
 
-    spot_ota_list = [2272257, ]
+    spot_ota_list = [2272257, 7431278, 2287661, 2387328, 2672069, 6379176]
 
     cookies = {}
 
@@ -245,15 +245,25 @@ class MafengwoCitySpot(scrapy.Spider):
         #     'div.container > div.wrapper > div.crumb > div:nth-child(2) > a::text').extract_first()
 
         o_price = price.OPrice.objects(ota_spot_id=ota_spot_id, ota_id=OTA.OtaCode.MAFENGWO.value.id).first()
+        # print(response.css('div.sales-title > h1::text').extract_first(),'%%%'*20)
+
+        # 不存在数据则新增数据
         if not o_price:
             o_price = price.OPrice()
-            o_price.ota_id = OTA.OtaCode.MAFENGWO.value.id
-            o_price.ota_spot_name = response.css('div.sales-title > h1::text').extract_first()
-            o_price.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            o_price.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        o_price.ota_id = OTA.OtaCode.MAFENGWO.value.id
+        o_price.ota_spot_id = ota_spot_id
+        o_price.ota_spot_name = response.css('div.sales-title > h1::text').extract_first()
+        o_price.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        o_price.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
         ota_product = []
         ticket_dom = response.css('.ticket-info > tbody')
+
+        if response.css('li.item-sold::text').extract_first().strip() is None:
+            sale_num = 0
+        else:
+            sale_num = response.css('li.item-sold::text').extract_first().strip()[2:]
+
         for item in ticket_dom:
 
             product_item = {}
@@ -266,7 +276,22 @@ class MafengwoCitySpot(scrapy.Spider):
                 product_item['normal_price'] = item.css('td.ticket-price::text').extract_first().strip('¥起')
                 product_item['tickets'] = {'price_id': product_item['type_id'], 'title': product_item['type_name'],
                                            'seller_nick': product_item['type_name'],
-                                           'price': product_item['normal_price']}
+                                           'price': product_item['normal_price'], 'cash_back': 0, 'cut_price': 0,
+                                           'sale_num': sale_num,
+                                           'url': self.base_url.format(ota_spot_id=response.meta['ota_spot_id'])}
                 ota_product.append(product_item)
+                price_calendar = price.OPriceCalendar()
+                price_calendar.ota_id = OTA.OtaCode.MEITUAN.value.id
+                price_calendar.ota_spot_id = response.meta['ota_spot_id']
+                price_calendar.type_key = type_key
+                price_calendar.type_id = tr.css('.tobuy-btn > span::attr(data-id)').extract_first()
+                price_calendar.type_name = item.css('td.ticket-name::text').extract_first()
+                price_calendar.pre_price = product_item['normal_price']
+                price_calendar.ota_spot_name = response.css('div.sales-title > h1::text').extract_first()
+                price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime())
+                yield price_calendar
+                print('正在添加 ', response.css('div.sales-title > h1::text').extract_first(), ' 价格日历', "*" * 20)
         o_price.ota_product = ota_product
+        print('正在添加 ', response.css('div.sales-title > h1::text').extract_first(),
+              ' 的票型详情.OTA_id', OTA.OtaCode.MAFENGWO.value.id, "*" * 20)
         yield o_price
