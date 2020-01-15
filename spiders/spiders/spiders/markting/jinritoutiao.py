@@ -194,9 +194,11 @@ class JinritoutiaoArticleSpider(scrapy.Spider):
     content_url = r'https://www.toutiao.com/i{article_id}/'
     account = marketing.Account()
     spot_list = []
+    we_media_id = WeMedia.TOU_TIAO.value.id
+    we_media_type = WeMediaType.WE_MEDIA.value.id
 
     def parse(self, response: HtmlResponse):
-        [self.account, self.cookie_list] = JinritoutiaoSpider.get_account()
+        [self.account, self.cookie_list] = helper.get_media_account(self)
         yield Request(url=self.start_urls[0], callback=self.parse_article, dont_filter=True, cookies=self.cookie_list,
                       meta={'page': 1})
 
@@ -206,14 +208,14 @@ class JinritoutiaoArticleSpider(scrapy.Spider):
         article_list = article_data['content']
         page = article_data['page'] + 1
         for article_detail in article_list:
-            self.handle_article(article_detail)
+            yield self.handle_article(article_detail)
         if page <= math.ceil(article_data['total'] / self.page_size):
             yield Request(url=self.page_url.format(page=page), callback=self.parse_article,
                           dont_filter=True, cookies=self.cookie_list, meta={'page': page})
 
     def handle_article(self, article_detail):
-        article = Article.objects(platform_type=self.account.type, platform=self.account.platform,
-                                  article_id=article_detail['id']).first()
+        actual_article = article = Article.objects(platform_type=self.account.type, platform=self.account.platform
+                                                   , article_id=article_detail['id']).first()
         article = Article() if article is None else article
         article.exposure_num = article_detail['impression_count'] + article_detail['go_detail_count']
         article.recommend_num = article_detail['impression_count']
@@ -221,7 +223,7 @@ class JinritoutiaoArticleSpider(scrapy.Spider):
         article.forward_num = article_detail['share_count']
         article.like_num = 0
         article.comment_num = article_detail['comment_count']
-        if article is None:
+        if actual_article is None:
             article.platform_type = self.account.type
             article.platform = self.account.platform
             article.article_id = article_detail['id']
@@ -229,17 +231,17 @@ class JinritoutiaoArticleSpider(scrapy.Spider):
             article.account_id = self.account.id
             article.create_at = datetime.datetime.now().strftime('%Y-%m-%d')
             article.admin_id = self.account.admin_id
-            article.admin_name = self.account.admin_name
+            # article.admin_name = self.account.admin_name
             headers = {
                 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) '
                               'Chrome/79.0.3945.88 Safari/537.36',
                 'referer': self.content_url.format(article_id=article.article_id)
             }
-            yield Request(url=self.content_url.format(article_id=article.article_id), callback=self.parse_content,
-                          dont_filter=True, cookies=self.cookie_list, headers=headers, meta={'article': article})
+            return Request(url=self.content_url.format(article_id=article.article_id), callback=self.parse_content
+                           , dont_filter=True, cookies=self.cookie_list, headers=headers, meta={'article': article})
         else:
             article.update_at = datetime.datetime.now().strftime('%Y-%m-%d')
-            yield article
+            return article
 
     def parse_content(self, response: HtmlResponse):
         article = response.meta['article']
@@ -248,13 +250,14 @@ class JinritoutiaoArticleSpider(scrapy.Spider):
         if content is None:
             content = re.search(r'gallery: JSON.parse\(\"(.*)\"\)', response_str)
             content = content.group(1).encode('latin-1').decode('unicode-escape')
+        article.content = content
         article.keyword_list = article.spot_id_list = []
         for spot_keywords in self.get_spot_list():
             if spot_keywords['abbreviation'] in str(content):
                 article.keyword_list.append(spot_keywords['abbreviation'])
                 article.spot_id_list.append(spot_keywords['spot_id'])
         article.update_at = datetime.datetime.now().strftime('%Y-%m-%d')
-        yield article
+        return article
 
     def get_spot_list(self):
         if not len(self.spot_list):
