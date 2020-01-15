@@ -56,6 +56,7 @@ class CSpot(BaseItem, mongoengine.Document):
     is_sale = mongoengine.IntField()  # 是否正在售卖
     promoter_id = mongoengine.ObjectIdField()  # 推广者id  marketing.Admin.id
     self_employed = mongoengine.BooleanField()  # 是否自营
+    ota_spot_list = mongoengine.ListField()  # ota_name ota_id ota_spot_id
 
     #
     publish_num = mongoengine.IntField()  # 总发布量

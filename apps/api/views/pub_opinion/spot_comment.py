@@ -174,9 +174,54 @@ class PublicOpinion(BaseView):
     # ota景区名称列表
     @Route.route(path='/spot/ota/list')
     def ota_list(self):
-        spot_list = spot.CSpot.objects(self_employed=True).fields(name=1).to_json()
-
-        return self.success(json.loads(spot_list))
+        spot_list = spot.CSpot.objects(self_employed=True).fields(name=1)
+        print(spot_list)
+        if spot_list:
+            return self.success(json.loads(spot_list))
+        else:
+            spot_list = [
+                {
+                    "name": "玻璃桥景区石牛寨"
+                },
+                {
+                    "name": "益阳现代农业嘉年华"
+                },
+                {
+                    "name": "石燕湖旅游区"
+                },
+                {
+                    "name": "重庆花田溪谷景区"
+                },
+                {
+                    "name": "东浒寨风景区"
+                },
+                {
+                    "name": "恺之峰旅游区"
+                },
+                {
+                    "name": "榆次乌金山狂欢谷"
+                },
+                {
+                    "name": "香水百荷景区"
+                },
+                {
+                    "name": "三翁花园"
+                },
+                {
+                    "name": "江西双井黄庭坚故里"
+                },
+                {
+                    "name": "侠天下旅游区"
+                },
+                {
+                    "name": "6501景区"
+                },
+                {
+                    "name": "马仁奇峰"
+                }
+            ]
+        print(spot_list)
+        return self.success(spot_list)
 
     # 实时点评
     @Route.route(path='/spot/reviews')
@@ -253,7 +298,8 @@ class PublicOpinion(BaseView):
                 v1['c_from'] = '同程'
 
             if 'u_avatar' not in v1 or v1['u_avatar'] == '':
-                v1['u_avatar'] = 'https://dimg04.c-ctrip.com/images/t1/headphoto/699/910/854/683dab66bb374136af9930ea204dfc7e_C_180_180.jpg'
+                v1[
+                    'u_avatar'] = 'https://dimg04.c-ctrip.com/images/t1/headphoto/699/910/854/683dab66bb374136af9930ea204dfc7e_C_180_180.jpg'
             if v1['c_content'] is None:
                 v1['c_content'] = '默认好评'
                 v1['c_score'] = 5
