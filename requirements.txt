@@ -7,7 +7,6 @@ python-scrapyd-api==2.1.2
 django-apscheduler==0.3.0
 scrapyd-client==1.1.0
 mongoengine==0.18.2
-fake-useragent==0.1.11
 pika==1.1.0
 django-cors-headers==3.1.0
 # mysqlclient===1.4.4
@@ -19,3 +18,7 @@ django-celery-beat==1.5.0
 django-redis==4.10.0
 py-micro==0.0.3
 anyjson==0.3.3
+
+# 爬虫第三方user-agent库
+fake-useragent==0.1.11
+python-daemon==2.2.4
