@@ -25,7 +25,7 @@ class App():
         formatter = logging.Formatter(u'%(asctime)s [%(levelname)s] %(message)s')
         fh.setFormatter(formatter)
         logs.addHandler(fh)
-        print(os.getcwd())
+        print(os.path.abspath(os.path.dirname(__file__)))
         sys.argv = ['/home/python/hq-crawler/manage.py', 'runserver', '0.0.0.0:8000']
         import manage
         manage.main()
