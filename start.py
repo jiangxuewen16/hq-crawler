@@ -27,6 +27,7 @@ class App():
 
         sys.argv = ['runserver', '0.0.0.0:8000']
         import manage
+        manage.main()
 
 
 app = App()
