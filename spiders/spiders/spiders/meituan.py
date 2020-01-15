@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import base64
 import json
+import re
 import time
 import zlib
 from urllib import parse
@@ -11,6 +12,7 @@ from scrapy import Request
 from scrapy.http import HtmlResponse
 
 from spiders.common import OTA
+from spiders.items.price import price
 from spiders.items.spot import spot
 from spiders.items.spot.spot import Spot
 
@@ -24,44 +26,44 @@ class MeituanSpider(scrapy.Spider):
     def parse(self, response):
         pass
 
-
-class MeituanSpotSpider(scrapy.Spider):
-    name = 'meituan_spot'
-    allowed_domains = ['www.meituan.com']
-    base_url = r'https://www.meituan.com/zhoubianyou/{ota_spot_id}'
-    start_urls = ['https://www.meituan.com/zhoubianyou/1515791']
-
-    def parse(self, response: HtmlResponse):
-        for ota_spot_id in MeituanSpider.ota_spot_ids:
-            # 更新景区的评论数量
-            url = self.base_url.format(ota_spot_id=ota_spot_id)
-            yield Request(url=url, callback=self.parse_item, dont_filter=True,
-                          meta={'ota_spot_id': ota_spot_id})
-
-    def parse_item(self, response: HtmlResponse):
-        spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.MEITUAN.value.id,
-                                      ota_spot_id=response.meta['ota_spot_id']).first()
-
-        # 不存在数据则新增数据
-        if not spot_data:
-            spot_data = Spot()
-            spot_data.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
-        spot_data.ota_spot_id = response.meta['ota_spot_id']
-        spot_data.ota_id = OTA.OtaCode.MEITUAN.value.id
-        spot_data.spot_name = response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/h1/text()').extract_first()
-        # print('++'*20,response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/text()[1]'))
-        spot_data.spot_score = float(
-            response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/text()[1]').extract_first())
-        spot_data.avg_price = float(
-            response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/span/text()[2]').extract_first())
-        spot_data.addr = response.xpath(
-            '//*[@id="react"]/div/div/div[2]/div[1]/div[2]/div[1]/a/span/text()').extract_first()
-        spot_data.tel = response.xpath(
-            '//*[@id="react"]/div/div/div[2]/div[1]/div[2]/div[2]/span[2]/text()').extract_first()
-        spot_data.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
-        yield spot_data
+# todo 景区用城市景区的
+# class MeituanSpotSpider(scrapy.Spider):
+#     name = 'meituan_spot'
+#     allowed_domains = ['www.meituan.com']
+#     base_url = r'https://www.meituan.com/zhoubianyou/{ota_spot_id}'
+#     start_urls = ['https://www.meituan.com/zhoubianyou/1515791']
+#
+#     def parse(self, response: HtmlResponse):
+#         for ota_spot_id in MeituanSpider.ota_spot_ids:
+#             # 更新景区的评论数量
+#             url = self.base_url.format(ota_spot_id=ota_spot_id)
+#             yield Request(url=url, callback=self.parse_item, dont_filter=True,
+#                           meta={'ota_spot_id': ota_spot_id})
+#
+#     def parse_item(self, response: HtmlResponse):
+#         spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.MEITUAN.value.id,
+#                                       ota_spot_id=response.meta['ota_spot_id']).first()
+#
+#         # 不存在数据则新增数据
+#         if not spot_data:
+#             spot_data = Spot()
+#             spot_data.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+#
+#         spot_data.ota_spot_id = response.meta['ota_spot_id']
+#         spot_data.ota_id = OTA.OtaCode.MEITUAN.value.id
+#         spot_data.spot_name = response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/h1/text()').extract_first()
+#         # print('++'*20,response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/text()[1]'))
+#         spot_data.spot_score = float(
+#             response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/text()[1]').extract_first())
+#         spot_data.avg_price = float(
+#             response.xpath('//*[@id="react"]/div/div/div[2]/div[1]/div[1]/span/span/text()[2]').extract_first())
+#         spot_data.addr = response.xpath(
+#             '//*[@id="react"]/div/div/div[2]/div[1]/div[2]/div[1]/a/span/text()').extract_first()
+#         spot_data.tel = response.xpath(
+#             '//*[@id="react"]/div/div/div[2]/div[1]/div[2]/div[2]/span[2]/text()').extract_first()
+#         spot_data.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+#
+#         yield spot_data
 
 
 class MeituanCommentSpider(scrapy.Spider):
@@ -69,7 +71,8 @@ class MeituanCommentSpider(scrapy.Spider):
     allowed_domains = ['www.meituan.com']
 
     total_num = 0  # 总评论
-    page_size = 100  # 默认爬取每页100条
+    page_size = 50  # 默认爬取每页50条
+    # https://www.meituan.com/ptapi/poi/getcomment?id=1515791&offset=0&pageSize=10&mode=0&starRange=&userId=&sortType=0
     base_url = r'https://www.meituan.com/ptapi/poi/getcomment?id={spot_id}&offset={offset}&pageSize={page_size}&mode=0&starRange=&userId=&sortType=0'
     start_urls = [
         'https://www.meituan.com/ptapi/poi/getcomment?id=1515791&offset=0&pageSize=1&mode=0&starRange=&userId=&sortType=0']
@@ -82,6 +85,10 @@ class MeituanCommentSpider(scrapy.Spider):
             url = self.base_url.format(spot_id=ota_spot_id, offset=0, page_size=1)
             yield Request(url=url, callback=self.parse_count, dont_filter=True,
                           meta={'offset': 0, 'ota_spot_id': ota_spot_id})
+
+        # url = self.base_url.format(spot_id=188085997, offset=0, page_size=1)
+        # yield Request(url=url, callback=self.parse_count, dont_filter=True,
+        #                    meta={'offset': 0, 'ota_spot_id': 188085997})
 
     def parse_page(self, response: HtmlResponse):
         response_str = response.body.decode('utf-8')
@@ -119,7 +126,7 @@ class MeituanCommentSpider(scrapy.Spider):
             yield spot_comment
 
         start_offset = response.meta['offset'] + page_size
-        print('============', start_offset, max_offset, page_size)
+        print('测试============', start_offset, max_offset, page_size)
         if start_offset < max_offset:
             url = self.base_url.format(spot_id=ota_spot_id, offset=start_offset,
                                        page_size=page_size)
@@ -149,7 +156,7 @@ class MeituanCommentSpider(scrapy.Spider):
 
         # 爬取景区的所有评论
         start_offset = 0
-        print('=========增量爬取参数=========', ota_spot_id, new_total, comment_num, max_offset)
+        print('=========增量爬取参数=========', '===景区id:', ota_spot_id, '===爬取时数量:', new_total, '===数据库数量:', comment_num, '===最大能偏移的数量:', max_offset)
         url = self.base_url.format(spot_id=ota_spot_id, offset=start_offset, page_size=page_size)
 
         yield Request(url=url, callback=self.parse_page, dont_filter=True,
@@ -405,3 +412,102 @@ class MeituanCitySpot(scrapy.Spider):
         # 二进制解压
         token_string = zlib.decompress(token_decode)
         return token_string
+
+
+class MeituanPrice(scrapy.Spider):
+    name = 'meituan_price'
+    allowed_domains = ['i.meituan.com']
+    base_url = r'https://itrip.meituan.com/volga/api/v3/trip/poi/business/info/{ota_spot_id}?ct_poi=190361606798914361847646491438431785905_e7283630514797780583_c5_dtrippoipolyb&poiId=1515791&source=mt&client=wap&uuid=3F1B3AB7262A309B279A62C912513D18CEF869AD324DF8263D921F91967B162B&cityId=70&feclient=lvyou_wap&platform=5&partner=11&originUrl=https%3A%2F%2Fi.meituan.com%2Fawp%2Fh5%2Flvyou%2Fpoi%2Fdetail%2Findex.html%3Fct_poi%3D190361606798914361847646491438431785905_e7283630514797780583_c5_dtrippoipolyb%26poiId%3D1515791&_token=eJytUltr5CAU%252Fi9C%252BhSixlscCGWgdMlCH1ravgwlZNSdkSYaEtN2KP3vPemF3X3YtwXxO5dPz%252Fk8vqKpsWhDCSG0zNGTm9AG0YIUEuUozZARSnGtFdGiBIL5MwanBM%252FRfrq%252FQJudEiSnjPGHNXIDgR1TIpdSPeS%252FrZLDWhkNENAxpXHeYOyLwfm0dKEwccDd84iPAvdPp7jgMXpsXep8j32w7qU4pqE%252FN6mFRE01YZJKIpWuNOVgV1xJLvnqVJxRVQlNROtUWTHJiKBcaaUqIirWGtHaNPkRLhpjf9qfgdHYmgqQpynI%252F0d3xsQlJNzHgw%252Fn%252B848LlNfr9yMbbPyEtZfB8BfqwB8CAKMk3UT4H45wT6kNfehLWOXn8IydvFfpWWlnOMyGQcXDwk803sXEnjPHVSXMPbZx9CGblgpCzTzywdnIWVd1zcWgtAK1IUeEIxvuIXxAT5%252BYfeF6du%252Fgm8ETzj7QwDL%252FXy5vTs02%252B2Pw%252Fbmuq7R2zvWCreX'
+    Info_urls = r'https://itrip.meituan.com/volga/api/v3/trip/poi/basic/info/{ota_spot_id}?=&poiId={ota_spot_id}'
+    start_urls = ['https://i.meituan.com/awp/h5/lvyou/poi/detail/index.html?&poiId={ota_spot_id}']
+    url = r'https://i.meituan.com/awp/h5/lvyou/poi/detail/index.html?&poiId={ota_spot_id}'
+
+    def parse(self, response: HtmlResponse):
+        price.OPrice.objects(ota_id=OTA.OtaCode.MEITUAN.value.id).delete()
+        price.OPriceCalendar.objects(ota_id=OTA.OtaCode.MEITUAN.value.id, create_at=time.strftime("%Y-%m-%d", time.localtime())).delete()
+        print('start_request')
+        for ota_spot_id in MeituanSpider.ota_spot_ids:
+            # 更新景区的详情
+            url = self.Info_urls.format(ota_spot_id=ota_spot_id)
+            yield Request(url=url, callback=self.parse_item, dont_filter=True, meta={'ota_spot_id': ota_spot_id})
+
+    def parse_item(self, response: HtmlResponse):
+        ota_spot_id = response.meta['ota_spot_id']
+        response_str = response.body.decode('utf-8')
+        json_data = json.loads(response_str)
+
+        ota_spot_name = ''
+        if 'poiInfo' in json_data['poiBasicInfo']:
+            ota_spot_name = json_data['poiBasicInfo']['poiInfo']['name']
+
+        url = self.base_url.format(ota_spot_id=ota_spot_id)
+        yield Request(url=url, callback=self.meituan_price, dont_filter=True,
+                      meta={'ota_spot_id': ota_spot_id, 'ota_spot_name': ota_spot_name})
+
+    def meituan_price(self, response: HtmlResponse):
+        ota_spot_id = response.meta['ota_spot_id']
+        ota_spot_name = response.meta['ota_spot_name']
+        response_str = response.body.decode('utf-8')
+        json_data = json.loads(response_str)
+        if 'deals' in json_data and 'data' in json_data['deals']:  ## 数据不为空
+            data = json_data['deals']['data']
+            for k1, v1 in enumerate(data):
+                lowPrice = ''
+                type_name = ''
+                o_price = price.OPrice()
+                o_price.ota_id = OTA.OtaCode.MEITUAN.value.id
+                o_price.ota_spot_id = ota_spot_id
+                o_price.ota_spot_name = ota_spot_name
+                o_price.ota_product = []
+                o_price.create_at = time.strftime("%Y-%m-%d", time.localtime())
+                ota_product = {}
+                type_key = ''
+                sale_num = 0
+                normal_price = 0
+
+                if v1['productName'] == '门票':  # 门票数据
+                    for k2, v2 in enumerate(v1['productModels']):
+                        if 'lowPrice' in v2 and 'ticketName' in v2:
+                            lowPrice = v2['lowPrice']
+                            type_name = v2['ticketName']
+                            type_key = ota_spot_name+v2['ticketName'][1:3]+'票'
+                        if 'ticketDeals' in v2:
+                            for k3, v3 in enumerate(v2['ticketDeals']):
+                                # normal_price = v3['value']
+                                tickets_list = {
+                                    'price_id': str(v3['id']),
+                                    'title': v3['title5'],
+                                    'price': v3['price'],
+                                    'sale_num': sale_num,
+                                    'url': self.url.format(ota_spot_id=response.meta['ota_spot_id']),
+                                    'cash_back': 0,
+                                    'seller_nick': '',
+                                    'cut_price': 0
+                                }
+                                ota_product = {'type_key': type_key, 'normal_price': normal_price,
+                                               'type_id': str(v3['id']), 'type_name': type_name,  'tickets': []}
+                                ota_product['tickets'].append(tickets_list)
+                                if '已售' in v3['newSoldsString']:
+                                    if '万' in v3['newSoldsString']:
+                                        sale_num = re.findall(r"\d+\.?\d*", v3['newSoldsString'])
+                                        sale_num = float(sale_num[0]) * 10000
+                                    else:
+                                        sale_num = re.findall(r"\d+\.?\d*", v3['newSoldsString'])
+                                        sale_num = float(sale_num[0])
+
+                                price_calendar = price.OPriceCalendar()
+                                price_calendar.ota_id = OTA.OtaCode.MEITUAN.value.id
+                                price_calendar.ota_spot_id = response.meta['ota_spot_id']
+                                price_calendar.type_key = type_key
+                                price_calendar.type_id = str(v3['id'])
+                                price_calendar.type_name = type_name
+                                price_calendar.pre_price = v3['price']
+                                price_calendar.ota_spot_name = ota_spot_name
+                                price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime())
+                                yield price_calendar
+                                print('正在添加 ', ota_spot_name, ' 价格日历', "*" * 20)
+
+                            o_price.lowPrice = lowPrice
+                            o_price.ota_product.append(ota_product)
+                            print('正在添加 ', ota_spot_name, ' 的票型价格详情.OTA_id', OTA.OtaCode.MEITUAN.value.id, "*" * 20)
+                            yield o_price

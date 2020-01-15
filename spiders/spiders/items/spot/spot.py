@@ -11,6 +11,7 @@ from scrapy.item import BaseItem
 """
 
 
+# todo 景区用城市景区的,停止维护
 class Spot(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
@@ -33,10 +34,34 @@ class Spot(BaseItem, mongoengine.Document):
     spot_favorable = mongoengine.StringField(max_length=100)  # 好评率
     spot_rank = mongoengine.IntField()  # 必玩榜排名
     spot_introduction = mongoengine.StringField()  # 必玩理由
-    tag_list = mongoengine.ListField()  # 评论tag
+    tag_list = mongoengine.ListField()  # 评论tag  [{'tag_name': '取票方便、好玩', 'tag_num': 22, 'tag_score': 5,'tag_type': 78}]
 
     create_at = mongoengine.DateTimeField(null=True)
     update_at = mongoengine.DateTimeField(null=True)
+
+
+class CSpot(BaseItem, mongoengine.Document):
+    pk = 1  # 必须定义
+    id = ObjectId()  # 必须定义
+
+    spot_id = mongoengine.StringField()  # 景区ID
+    province = mongoengine.StringField()  # 省
+    city = mongoengine.StringField()  # 市
+    area = mongoengine.StringField()  # 区
+    name = mongoengine.StringField()  # 景区名
+    abbreviation = mongoengine.StringField()  # 景区简称
+    level = mongoengine.IntField()  # 等级
+    t_id = mongoengine.IntField()  # 租户id
+    c_id = mongoengine.IntField()  # 客户端id
+    is_sale = mongoengine.IntField()  # 是否正在售卖
+    promoter_id = mongoengine.ObjectIdField()  # 推广者id  marketing.Admin.id
+    self_employed = mongoengine.BooleanField()  # 是否自营
+
+    #
+    publish_num = mongoengine.IntField()  # 总发布量
+    exposure_num = mongoengine.IntField()  # 曝光量
+
+    create_at = mongoengine.IntField()  # 创建时间
 
 
 class SpotComment(BaseItem, mongoengine.Document):

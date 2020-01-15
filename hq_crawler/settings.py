@@ -150,5 +150,5 @@ if APP_ENV == 'production':
 elif APP_ENV == 'develop':
     from .env.develop import *
 else:
-    raise Exception('环境不存在')
+    from .env.develop import *
 

@@ -42,7 +42,7 @@ class Scrapy(BaseView):
         print('=' * 30, '爬虫任务:::', '景区美团评论:::', ':::', jobid)
         # jobid = get_scrapyd_cli().schedule('spiders', 'fliggy_comment')
         # print('=' * 30, '爬虫任务:::', '景区评论:::', ':::', jobid)
-        jobid = get_scrapyd_cli().schedule('spiders', 'qunar_comment')
+        jobid = get_scrapyd_cli().schedule('spiders', 'comment_and_tag')
         print('=' * 30, '爬虫任务:::', '景区去哪评论:::', ':::', jobid)
         jobid = get_scrapyd_cli().schedule('spiders', 'ly_comment')
         print('=' * 30, '爬虫任务:::', '景区同程评论:::', ':::', jobid)

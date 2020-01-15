@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import hashlib
 import json
 import time
 
@@ -9,6 +10,8 @@ from scrapy.http import HtmlResponse
 
 from spiders.items.spot import spot
 from spiders.common import OTA
+from urllib.parse import quote
+from spiders.items.price import price
 
 """
 飞猪: todo:暂时不要爬
@@ -27,12 +30,185 @@ class FliggySpider(scrapy.Spider):
 
 class FliggySpotSpider(scrapy.Spider):
     name = 'fliggy_spot'
-    allowed_domains = ['www.fliggy.com']
-    base_url = r'https://traveldetail.fliggy.com/item.htm?id={ota_spot_id}&spm=181.7395991.1998089960.2.122d2405nqRYtu&expiredate='
-    start_urls = ['https://traveldetail.fliggy.com/item.htm?id=556487712203']
+    app_key = '12574478'
+    sign_cookie = ''
+    sign_header = {}
+    allowed_domains = ['h5.m.taobao.com/']
+    base_url = r'https://h5api.m.taobao.com/h5/mtop.alitrip.tripmdd.querypoiinfo/3.9?type=originaljson&api=mtop' \
+               r'.alitrip.tripmdd.querypoiinfo&v=3.9&data={data}&ttid=12mtb0000155&appKey=12574478&t={' \
+               r'time}&sign={sign}'
+    start_urls = ['https://h5api.m.taobao.com/h5/mtop.alitrip.tripmdd.querypoiinfo/3.9?type=originaljson&api=mtop'
+                  '.alitrip.tripmdd.querypoiinfo&v=3.9&data={data}&ttid=12mtb0000155&appKey=12574478&t={'
+                  'time}&sign={sign}']
 
     def parse(self, response: HtmlResponse):
-        pass
+        init_sign = '29cf97ff4076ea74f3319bc2f4e12f80'
+        for ota_spot_id in FliggySpider.ota_spot_ids:
+            request_data = json.loads('{"poiId":"11481","from":"","h5Version":"0.5.17"}')
+            request_data['poiId'] = str(ota_spot_id)
+            temp_request = request_data
+            request_data = quote(json.dumps(request_data).replace(' ', ''), 'utf-8')
+            url = self.base_url.format(data=request_data, time=str(int(round(time.time() * 1000))), sign=init_sign)
+            yield Request(url=url, callback=self.parse_master, dont_filter=True,
+                          meta={'ota_spot_id': ota_spot_id, 'data': temp_request, 'url_request_data': request_data})
+
+    def parse_master(self, response: HtmlResponse):
+        response_str = response.body.decode('utf-8')
+        json_data = json.loads(response_str)
+        if json_data['ret'] == ['FAIL_SYS_ILLEGAL_ACCESS::非法请求']:
+            cookie_list = self.get_cook_list(response)
+            timestamp = str(int(round(time.time() * 1000)))
+            sign = self.encode_token(timestamp, response.meta['data'], cookie_list)
+            url = self.base_url.format(data=response.meta['url_request_data'], time=timestamp, sign=sign)
+            yield Request(url=url, callback=self.parse_item, dont_filter=True, headers=self.sign_header,
+                          meta={'ota_spot_id': response.meta['ota_spot_id'], 'data': response.meta['data']})
+
+    def parse_item(self, response: HtmlResponse):
+        response_str = response.body.decode('utf-8')
+        charging_item_group_list = json.loads(response_str)['data']['data'][1]['list'][0]['chargingItemGroupList']
+        o_price = price.OPrice.objects(ota_id=OTA.OtaCode.FLIGGY.value.id, ota_spot_id=response.meta['ota_spot_id'])\
+            .first()
+        if not o_price:
+            o_price = price.OPrice()
+            o_price.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            o_price.ota_id = OTA.OtaCode.FLIGGY.value.id
+            o_price.ota_spot_id = response.meta['ota_spot_id']
+            o_price.ota_spot_name = self.get_spot_name(response.meta['ota_spot_id'])
+            o_price.ota_product = []
+        o_price.update_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
+        for charging_item_group in charging_item_group_list:
+            for charge_item in charging_item_group['chargeItems']:
+                detail_url = r'https://h5api.m.taobao.com/h5/mtop.trip.travelspdetail.scenic.product.itemsearch/1.0' \
+                             r'?type=originaljson&api=mtop.trip.travelspdetail.scenic.product.itemsearch&v=1.0&data={' \
+                             r'data}&AntiCreep=true&AntiFlood=true&ttid=201300@travel_h5_3.1.0&appKey=12574478&t={' \
+                             r'timestamp}&sign={sign}'
+                data = {
+                    "searchType": "TICKET",
+                    "startRow": 0,
+                    "pageSize": 2,
+                    "source": "scenic",
+                    "poiId": response.meta['ota_spot_id'],
+                    "ticketKindName": charge_item['ticketTypeName'],
+                    "productName": charge_item['value'],
+                    "productId": charge_item['productVid'],
+                    "h5Version": "0.5.17"
+                }
+                timestamp = str(int(round(time.time() * 1000)))
+                sign = self.encode_token(timestamp, data)
+                url_request_data = quote(json.dumps(data, ensure_ascii=False).replace(' ', ''), 'utf-8')
+                url = detail_url.format(data=url_request_data, timestamp=timestamp, sign=sign)
+                yield Request(url=url, callback=self.parse_detail, dont_filter=True, headers=self.sign_header,
+                              meta={'ota_spot_id': response.meta['ota_spot_id'],
+                                    'data': data, 'detail_url': detail_url, 'o_price': o_price})
+
+    def parse_detail(self, response: HtmlResponse):
+        response_str = response.body.decode('utf-8')
+        products_detail = json.loads(response_str)
+        o_price = response.meta['o_price']
+        data = response.meta['data']
+        data['pageSize'] = products_detail['data']['totalCount']
+        timestamp = str(int(round(time.time() * 1000)))
+        sign = self.encode_token(timestamp, data)
+        url_request_data = quote(json.dumps(data, ensure_ascii=False).replace(' ', ''), 'utf-8')
+        request_url = response.meta['detail_url'].format(data=url_request_data, timestamp=timestamp, sign=sign)
+        yield Request(url=request_url, callback=self.parse_data, dont_filter=True, headers=self.sign_header,
+                      meta={'ota_spot_id': response.meta['ota_spot_id'], 'data': data, 'o_price': o_price})
+
+    def parse_data(self, response: HtmlResponse):
+        response_str = response.body.decode('utf-8')
+        products_detail = json.loads(response_str)['data']['itemInfos']
+        data = response.meta['data']
+        o_price = response.meta['o_price']
+        total_price = i = 0
+        init_url = r'https://h5.m.taobao.com/trip/rx-poi/detail/index.html?_wx_tpl=https%3A%2F%2Fh5.m.taobao.com' \
+                   r'%2Ftrip%2Frx-poi%2Fdetail%2Findex.weex.js&_fli_newpage=1&poiId={ota_spot_id}&_projVer=0.5.17'
+        normal_price = 0
+        type_name = data['productName']
+        type_id = self.get_spot_name(response.meta['ota_spot_id']) + data['ticketKindName'] + '_' + str(data['productId'])
+        for product in o_price.ota_product:
+            print(product)
+            print(type_id)
+            if product['type_id'] == type_id:
+                normal_price = product['normal_price']
+                type_name = product['type_name']
+                break
+        ota_product = {
+            'type_id': type_id,
+            'type_key': self.get_spot_name(response.meta['ota_spot_id']) + data['ticketKindName'],
+            'type_name': type_name,
+            'normal_price': normal_price,
+            'tickets': []
+        }
+        for ticket in products_detail:
+            ticket_info = {
+                'price_id': str(ticket['itemId']),
+                'title': ticket['title'].replace(' ', ''),
+                'price': ticket['price'],
+                'cash_back': 0,
+                'cut_price': 0,
+                'sale_num': int(ticket['soldRecent'][2:-1]) if 'soldRecent' in ticket else 0,
+                'seller_nick': ticket['sellerNick'],
+                'url': init_url.format(ota_spot_id=response.meta['ota_spot_id'])
+            }
+            i = i + 1
+            total_price = total_price + float(ticket['price'])
+            ota_product['tickets'].append(ticket_info)
+        o_price.ota_product.append(ota_product)
+        yield o_price
+        o_price_calendar = price.OPriceCalendar()
+        o_price_calendar.ota_id = OTA.OtaCode.FLIGGY.value.id
+        o_price_calendar.ota_spot_id = response.meta['ota_spot_id']
+        o_price_calendar.ota_spot_name = self.get_spot_name(response.meta['ota_spot_id'])
+        o_price_calendar.type_key = data['ticketKindName']
+        o_price_calendar.type_name = type_name
+        o_price_calendar.pre_price = total_price / i
+        o_price_calendar.normal_price = normal_price
+        o_price_calendar.type_id = type_id
+        o_price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
+        yield o_price_calendar
+
+    def get_cook_list(self, response: HtmlResponse):
+        cookie_list = response.headers.getlist('Set-Cookie')
+        request_cookie = ''
+        for cookie in cookie_list:
+            if '_m_h5_tk' in str(cookie) or '_m_h5_tk_enc' in str(cookie):
+                request_cookie += bytes.decode(cookie) + '; '
+                continue
+        self.sign_header = {
+            'Content-Type': 'application/json',
+            'cookie': request_cookie,
+        }
+        return cookie_list
+
+    def encode_token(self, timestamp, data, cookie_list=None):
+        if cookie_list is not None:
+            temp_cookie = ''
+            for cookie in cookie_list:
+                if '_m_h5_tk' in str(cookie):
+                    temp_cookie = cookie
+                    break
+            index_len = len('_m_h5_tk') + 1
+            token_len = len('cf63a39b0140c01b5499b4d2f9f09950') + index_len
+            self.sign_cookie = bytes.decode(temp_cookie[index_len:token_len])
+        md_str = self.sign_cookie + '&' + timestamp + '&' + self.app_key + '&' + str(json.dumps(data, ensure_ascii=False
+                                                                                                )).replace(' ', '')
+        return hashlib.md5(md_str.encode()).hexdigest()
+
+    @staticmethod
+    def get_spot_name(ota_spot_id):
+        spot_name = {
+            11481: '石燕湖',
+            33966: '石牛寨',
+            140975087: '花田溪谷',
+            32659156: '东浒寨',
+            103590: '马仁奇峰',
+            61484: '大茅山',
+            191470: '九龙江',
+            140626417: '天空之城',
+            17165564: '侠天下',
+            33559796: '三翁花园'
+        }
+        return spot_name.get(ota_spot_id)
 
 
 class FliggyCommentSpider(scrapy.Spider):

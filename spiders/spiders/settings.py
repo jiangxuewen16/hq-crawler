@@ -56,8 +56,22 @@ DOWNLOAD_DELAY = 1
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     'spiders.middlewares.RandomUserAgentMiddlware': 333,  # 随机User-Agent
-    'spiders.middlewares.ProxyMiddleware': 334,  # 随机ip代理
+    # 'spiders.middlewares.ProxyMiddleware': 334,  # 随机ip代理
     # 'spiders.middlewares.SpidersDownloaderMiddleware': 542,
+    'scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': 100,
+    'scrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware': 300,
+    'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware': 350,
+    'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware': 400,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
+    'scrapy.downloadermiddlewares.ajaxcrawl.AjaxCrawlMiddleware': 560,
+    'scrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware': 580,
+    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 590,
+    'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': 600,
+    'scrapy.downloadermiddlewares.cookies.CookiesMiddleware': 700,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 750,
+    'scrapy.downloadermiddlewares.stats.DownloaderStats': 850,
+    'scrapy.downloadermiddlewares.httpcache.HttpCacheMiddleware': 900,
 }
 
 # Enable or disable extensions
@@ -99,13 +113,18 @@ COOKIES_ENABLES = False
 # 代理ip列表
 PROXIES = ['118.126.105.239:8008', '106.15.39.21:8008', '193.112.181.35:8008']
 
-APP_ENV = os.getenv('APP_ENV')
-if APP_ENV == 'production':
-    from .env.production import *
-elif APP_ENV == 'develop':
-    from .env.develop import *
-else:
-    raise Exception('环境不存在')
+# APP_ENV = os.getenv('APP_ENV')
+# if APP_ENV == 'production':
+#     print('+' * 40, '正式环境', '+' * 40)
+#     from .env.production import *
+# elif APP_ENV == 'develop':
+#     print('+' * 40, '测试环境', '+' * 40)
+#     from .env.develop import *
+# else:
+#     from .env.develop import *
+#     # raise Exception('环境不存在')
+
+from .env.production import *
 
 SCRAPYD_DEPLOY = 'http://172.18.113.141:6800/'
 

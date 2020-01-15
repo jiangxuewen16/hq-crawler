@@ -4,6 +4,7 @@ import json
 import re
 import queue
 
+from apps.api.common.helper.helper import getDayList
 from spiders.common import OTA
 from spiders.items.spot import spot
 
@@ -87,6 +88,88 @@ class SpotComment:
         # return get_three_type(spot_city_s)
 
     @classmethod
+    def ota_list_comment(cls, condition, skip, limit, sort):
+        pipeline = [
+            {
+                '$lookup': {
+                    'from': "spot",
+                    'localField': "ota_spot_id",
+                    'foreignField': "ota_spot_id",
+                    'as': "spot"
+                }
+            },
+            {
+                '$unwind': {
+                    'path': "$spot",
+                    'preserveNullAndEmptyArrays': True
+                }
+            },
+            {
+                '$project': {
+                    '_id': "$_id",
+                    'ota_id': "$ota_id",
+                    'ota_spot_id': "$ota_spot_id",
+                    'u_id': "$u_id",
+                    'u_avatar': "$u_avatar",
+                    'u_level': "$u_level",
+                    'u_name': "$u_name",
+                    'c_tag': "$c_tag",
+                    'c_id': "$c_id",
+                    'c_score': "$c_score",
+                    'c_content': "$c_content",
+                    'c_img': "$c_img",
+                    'c_from': "$c_from",
+                    'create_at': "$create_at",
+                    'update_at': "$update_at",
+                    'spot_name': "$spot.spot_name"
+                }
+            },
+            {
+                '$sort': {sort: -1}
+            },
+            {
+                '$match': {
+                    '$and': [
+                        {'$or': [
+                            {'u_name': {'$regex': '.*' + condition['check_name'] + '.*'}},
+                            {'_id': {'$regex': '.*' + condition['check_name'] + '.*'}},
+                        ]},
+                        {
+                            'create_at': {
+                                '$gte': condition['begin_date'],
+                                '$lt': condition['end_date']
+                            }
+                        },
+                        {
+                            'c_score': {
+                                '$gt': condition['down_score'],
+                                '$lte': condition['up_score']
+                            }
+                        },
+                        {
+                            'spot_name': condition['spot_name']
+                        },
+                        {
+                            'ota_id': {'$in': condition['ota_id']}
+                        }
+                    ]
+                }
+            },
+            {
+                '$skip': skip
+            },
+            {
+                '$limit': limit
+            }
+        ]
+        spot_city_s = spot.SpotComment.objects.aggregate(*pipeline)
+        L = []
+        for p in spot_city_s:
+            p['_id'] = str(p['_id'])
+            L.append(dict(p))
+        return L
+
+    @classmethod
     def list_comment(cls, condition, skip, limit, sort):
         pipeline = [
             {
@@ -145,9 +228,6 @@ class SpotComment:
                                 '$lte': condition['up_score']
                             }
                         },
-                        # {
-                        #     'ota_id': condition['ota_id']
-                        # }
                         {
                             'ota_id': {'$in': condition['ota_id']}
                         }
@@ -589,7 +669,7 @@ class Spot:
         return L
 
     @classmethod
-    def all_comment(cls, condition, skip, limit, topic):
+    def all_comment(cls, condition, skip, limit):
         pipeline = [
             {
                 "$lookup": {
@@ -627,12 +707,12 @@ class Spot:
                                 "$in": condition['ota_spot_id']
                             }
                         },
-                        {
-                            "c_score": {
-                                "$ne": None
-                            }
-
-                        }
+                        # {
+                        #     "c_score": {
+                        #         "$ne": None
+                        #     }
+                        #
+                        # }
                         # {
                         #     "create_at": {
                         #         "$gte": condition['begin_date'] + " 00:00:00"
@@ -1453,11 +1533,39 @@ class Spot:
 
             L.append(dict(p))
             i = i + 1
-        if topic == "list":
-            return spot_queue_list.put((L, topic))
-        else:
-            return spot_queue_list.put((len(L), topic))
-        # return L
+        return L
+
+    @classmethod
+    def spot_count(cls, condition):
+        pipeline = [
+            {
+                "$match": {
+                    "$and": [
+                        {
+                            "spot_name": {
+                                "$exists": True
+                            }
+                        },
+                        {
+                            "ota_spot_id": {
+                                "$in": condition['ota_spot_id']
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "$group": {
+                    "_id": None,
+                    "count": {
+                        "$sum": 1
+                    }
+                }
+            }
+        ]
+        spot_count = spot.Spot.objects.aggregate(*pipeline)
+        L = list(spot_count)
+        return L[0]['count']
 
     @classmethod
     def spot_score_count(cls, condition):
@@ -1542,27 +1650,7 @@ class Spot:
 
     @classmethod
     def spot_complex(cls, condition):
-        pipeline = [{
-            "$lookup": {
-                "from": "spot_comment",
-                "localField": "ota_spot_id",
-                "foreignField": "ota_spot_id",
-                "as": "spot_comment"
-            }
-        },
-            {
-                "$match": {
-                    "spot_name": {
-                        "$ne": None
-                    }
-                }
-            },
-            {
-                "$unwind": {
-                    "path": "$spot_comment",
-                    "preserveNullAndEmptyArrays": True
-                }
-            },
+        pipeline = [
             {
                 "$group": {
                     "_id": None,
@@ -1570,9 +1658,9 @@ class Spot:
                         "$sum": {
                             "$cond": [{
                                 "$and": [{
-                                    "$lte": ["$spot_comment.create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['now'] + ' 23:59:59']
                                 }, {
-                                    "$gte": ["$spot_comment.create_at", "2017-10-23"]
+                                    "$gte": ["$create_at", condition['now_month'] + ' 00:00:00']
                                 }]
                             }, 1, 0]
                         }
@@ -1581,20 +1669,20 @@ class Spot:
                         "$sum": {
                             "$cond": [{
                                 "$and": [{
-                                    "$lte": ["$spot_comment.create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['now'] + ' 23:59:59']
                                 }, {
-                                    "$gte": ["$spot_comment.create_at", "2017-10-23"]
+                                    "$gte": ["$create_at", condition['now_month'] + ' 00:00:00']
                                 }]
-                            }, "$spot_comment.c_score", 0]
+                            }, "$c_score", 0]
                         }
                     },
                     "last_month_total": {
                         "$sum": {
                             "$cond": [{
                                 "$and": [{
-                                    "$lte": ["$spot_comment.create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['last_month_first'] + ' 23:59:59']
                                 }, {
-                                    "$gte": ["$spot_comment.create_at", "2018-10-23"]
+                                    "$gte": ["$create_at", condition['last_month_last'] + ' 00:00:00']
                                 }]
                             }, 1, 0]
                         }
@@ -1603,20 +1691,20 @@ class Spot:
                         "$sum": {
                             "$cond": [{
                                 "$and": [{
-                                    "$lte": ["$spot_comment.create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['last_month_first'] + ' 23:59:59']
                                 }, {
-                                    "$gte": ["$spot_comment.create_at", "2018-10-23"]
+                                    "$gte": ["$create_at", condition['last_month_last'] + ' 00:00:00']
                                 }]
-                            }, "$spot_comment.c_score", 0]
+                            }, "$c_score", 0]
                         }
                     },
                     "lastyear_month_total": {
                         "$sum": {
                             "$cond": [{
                                 "$and": [{
-                                    "$lte": ["$spot_comment.create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['last_year_month_first'] + ' 23:59:59']
                                 }, {
-                                    "$gte": ["$spot_comment.create_at", "2015-10-23"]
+                                    "$gte": ["$create_at", condition['last_year_month_last'] + ' 00:00:00']
                                 }]
                             }, 1, 0]
                         }
@@ -1625,11 +1713,11 @@ class Spot:
                         "$sum": {
                             "$cond": [{
                                 "$and": [{
-                                    "$lte": ["$spot_comment.create_at", "2020-10-23"]
+                                    "$lte": ["$create_at", condition['last_year_month_first'] + ' 23:59:59']
                                 }, {
-                                    "$gte": ["$spot_comment.create_at", "2015-10-23"]
+                                    "$gte": ["$create_at", condition['last_year_month_last'] + ' 00:00:00']
                                 }]
-                            }, "$spot_comment.c_score", 0]
+                            }, "$c_score", 0]
                         }
                     }
                 }
@@ -1638,22 +1726,40 @@ class Spot:
                 "$project": {
                     "_id": 0,
                     "now_month_per_score": {
-                        "$divide": ["$now_month_score", "$now_month_total"]
+                        '$cond': [{
+                            '$eq': ['$now_month_total', 0]
+                        }, 4.7, {
+                            '$multiply': [{
+                                "$divide": ["$now_month_score", "$now_month_total"]
+                            }, 1]
+                        }]
                     },
                     "last_month_per_score": {
-                        "$divide": ["$last_month_score", "$last_month_total"]
+                        '$cond': [{
+                            '$eq': ['$last_month_total', 0]
+                        }, 4.7, {
+                            '$multiply': [{
+                                "$divide": ["$last_month_score", "$last_month_total"]
+                            }, 1]
+                        }]
                     },
                     "lastyear_month_per_score": {
-                        "$divide": ["$lastyear_month_score", "$lastyear_month_total"]
+                        '$cond': [{
+                            '$eq': ['$lastyear_month_total', 0]
+                        }, 4.7, {
+                            '$multiply': [{
+                                "$divide": ["$lastyear_month_score", "$lastyear_month_total"]
+                            }, 1]
+                        }]
                     }
                 }
-            }]
-        spot_complex = spot.Spot.objects.aggregate(*pipeline)
-        L = []
-        for p in spot_complex:
-            L.append(dict(p))
-        tongbi_num = round(L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score'], 1)
-        huanbi_num = round(L[0]['now_month_per_score'] - L[0]['last_month_per_score'], 1)
+            }
+        ]
+        spot_complex = spot.SpotComment.objects.aggregate(*pipeline)
+
+        L = list(spot_complex)
+        tongbi_num = round(L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score'], 2)
+        huanbi_num = round(L[0]['now_month_per_score'] - L[0]['last_month_per_score'], 2)
         if L[0]['lastyear_month_per_score']:
             tongbi_per = round(
                 (L[0]['now_month_per_score'] - L[0]['lastyear_month_per_score']) * 100 / L[0][
@@ -1673,26 +1779,11 @@ class Spot:
                "tongbi_per": tongbi_per,
                "huanbi_per": huanbi_per
                }
-        return spot_queue.put((dic, 'spot_complex'))
-        # return dic
+        return dic
 
     @classmethod
     def comment_num(cls, condition):
-        pipeline = [{
-            "$lookup": {
-                "from": "spot_comment",
-                "localField": "ota_spot_id",
-                "foreignField": "ota_spot_id",
-                "as": "spot_comment"
-            }
-        },
-            {
-                "$match": {
-                    "spot_name": {
-                        "$ne": None
-                    }
-                }
-            },
+        pipeline = [
             {
                 "$unwind": {
                     "path": "$spot_comment",
@@ -1706,7 +1797,7 @@ class Spot:
                         "$sum": {
                             "$cond": {
                                 "if": {
-                                    "$gt": ["$spot_comment.c_score", 3]
+                                    "$gt": ["$c_score", 3]
                                 },
                                 "then": 1,
                                 "else": 0
@@ -1717,7 +1808,7 @@ class Spot:
                         "$sum": {
                             "$cond": {
                                 "if": {
-                                    "$lte": ["$spot_comment.c_score", 3]
+                                    "$lte": ["$c_score", 3]
                                 },
                                 "then": 1,
                                 "else": 0
@@ -1727,55 +1818,33 @@ class Spot:
                 }
             }
         ]
-        spot_complex = spot.Spot.objects.aggregate(*pipeline)
-        L = []
-        for p in spot_complex:
-            L.append(dict(p))
+        spot_complex = spot.SpotComment.objects.aggregate(*pipeline)
+        L = list(spot_complex)
         up_score_count = L[0]['up_score_count']
         down_score_count = L[0]['down_score_count']
         up_score_per = round(up_score_count * 100 / (up_score_count + down_score_count), 1)
         down_score_per = round(down_score_count * 100 / (up_score_count + down_score_count), 1)
         dic = {"up_score_count": up_score_count, "down_score_count": down_score_count, "up_score_per": up_score_per,
-               "down_score_per": down_score_per}
-        spot_queue.put((dic, 'comment_num'))
-        # return dic
+               "down_score_per": down_score_per, "total": up_score_count + down_score_count}
+        # spot_queue.put((dic, 'comment_num'))
+        return dic
 
     @classmethod
     def now_month(cls, condition):
-        pipeline = [{
-            "$lookup": {
-                "from": "spot_comment",
-                "localField": "ota_spot_id",
-                "foreignField": "ota_spot_id",
-                "as": "spot_comment"
-            }
-        },
-            {
-                "$match": {
-                    "spot_name": {
-                        "$ne": None
-                    }
-                }
-            },
-            {
-                "$unwind": {
-                    "path": "$spot_comment",
-                    "preserveNullAndEmptyArrays": True
-                }
-            },
+        pipeline = [
             {
                 "$project": {
-                    "create_at": "$spot_comment.create_at",
+                    "create_at": "$create_at",
                     "day_substring": {
-                        "$substr": ["$spot_comment.create_at", 8, 2]
+                        "$substr": ["$create_at", 8, 2]
                     },
-                    "c_score": "$spot_comment.c_score"
+                    "c_score": "$c_score"
                 }
             },
             {
                 "$match": {
                     "create_at": {
-                        "$gte": "2018-11-24"
+                        "$gte": condition['now_month']
                     }
                 }
             },
@@ -1793,41 +1862,29 @@ class Spot:
                 }
             }
         ]
-        now_month = spot.Spot.objects.aggregate(*pipeline)
-        L = []
+        now_month_bak = getDayList()
+        now_month = spot.SpotComment.objects.aggregate(*pipeline)
+
         for p in now_month:
+            for b in now_month_bak:
+                if b['_id'] == p['_id']:
+                    b['avg_score'] = p['avg_score']
+                else:
+                    pass
+
+        L = []
+        for p in now_month_bak:
             p['avg_score'] = round(p['avg_score'], 1)
             L.append(dict(p))
-        spot_queue.put((L, 'now_month'))
-        # return L
+        return L
 
     @classmethod
     def star_percent(cls, condition):
-        pipeline = [{
-            "$lookup": {
-                "from": "spot_comment",
-                "localField": "ota_spot_id",
-                "foreignField": "ota_spot_id",
-                "as": "spot_comment"
-            }
-        },
-            {
-                "$match": {
-                    "spot_name": {
-                        "$ne": None
-                    }
-                }
-            },
-            {
-                "$unwind": {
-                    "path": "$spot_comment",
-                    "preserveNullAndEmptyArrays": True
-                }
-            },
+        pipeline = [
             {
                 "$project": {
                     "c_score": {
-                        "$floor": "$spot_comment.c_score"
+                        "$floor": "$c_score"
                     }
                 }
             },
@@ -1851,7 +1908,7 @@ class Spot:
                     "_id": -1
                 }
             }]
-        star_percent = spot.Spot.objects.aggregate(*pipeline)
+        star_percent = spot.SpotComment.objects.aggregate(*pipeline)
         L = []
         total = 0
         for p in star_percent:
@@ -1861,11 +1918,11 @@ class Spot:
         for m in L:
             m['percent'] = round(m['count'] * 100 / total, 1)
             result.append(m)
-        spot_queue.put((L, 'star_percent'))
-        # return result  # 15221
+        # spot_queue.put((L, 'star_percent'))
+        return result  # 15221
 
     @classmethod
-    def comment_tags(cls, condition, topic):
+    def comment_tags(cls, condition):
         pipeline = [{
             "$unwind": {
                 "path": "$tag_list",
@@ -1896,8 +1953,8 @@ class Spot:
         L = []
         for p in comment_tags:
             L.append(dict(p))
-        return spot_queue.put((L, topic))
-        # return L
+        # return spot_queue.put((L, topic))
+        return L
 
     @classmethod
     def get_param(cls, param, in_name, default):

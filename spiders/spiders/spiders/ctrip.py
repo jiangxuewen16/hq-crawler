@@ -7,6 +7,7 @@ from scrapy import Request
 from scrapy.http import HtmlResponse
 
 from spiders.common import OTA
+from spiders.items.price import price
 from spiders.items.spot import spot
 
 
@@ -59,58 +60,58 @@ class CtripSpider(scrapy.Spider):
 景区数据
 """
 
-
-class CtripSpotSpider(scrapy.Spider):
-    name = 'ctrip_spot'
-    allowed_domains = ['www.ctrip.com']
-    base_url = r'https://piao.ctrip.com/ticket/dest/t{ota_spot_id}.html'
-    start_urls = ['https://piao.ctrip.com/ticket/dest/t62931.html']
-
-    def parse(self, response: HtmlResponse):
-        for ota_spot_id in CtripSpider.ota_spot_ids:
-            # 获取景区页面数据
-            url = self.base_url.format(ota_spot_id=ota_spot_id)
-            yield Request(url=url, callback=self.parse_item, dont_filter=True,
-                          meta={'ota_spot_id': ota_spot_id})
-
-    def parse_item(self, response: HtmlResponse):
-        spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.CTRIP.value.id,
-                                      ota_spot_id=response.meta['ota_spot_id']).first()
-
-        # 不存在数据则新增数据
-        if not spot_data:
-            spot_data = spot.Spot()
-            spot_data.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
-        # spot_data.spot_id = OTA.OtaSpotIdMap.get_ota_spot_id(OTA.OtaSpotIdMap.SHI_YAN_HU.name, OTA.OtaCode.HUIQULX)
-        spot_data.ota_spot_id = response.meta['ota_spot_id']
-
-        spot_data.ota_id = OTA.OtaCode.CTRIP.value.id
-        spot_data.spot_name = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/h2/text()').extract_first()
-
-        spot_imgs = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/ul/li')
-        spot_data.spot_img = []
-        for img in spot_imgs:
-            spot_data.spot_img.append(img.xpath('/a/img[@src]').extract_first())
-
-        spot_data.desc = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[5]/div[1]/div[3]/div[2]').get()
-        # spot_data.tel = ????
-        spot_data.traffic = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[5]/div[1]/div[4]/div[3]/p/text()').extract()
-        spot_data.ticket_num = 1
-        spot.addr = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/ul/li[1]/span/text()').extract_first()
-        spot_data.open_time = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/ul/li[2]/span/text()').extract_first()
-        spot_data.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        spot_data.comment_num = response.xpath(
-            '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/a/text()').extract_first().strip(
-            '查看条点评')
-        # print('='*20, spot_data.to_json())
-        yield spot_data
+# todo 景区用城市景区的
+# class CtripSpotSpider(scrapy.Spider):
+#     name = 'ctrip_spot'
+#     allowed_domains = ['www.ctrip.com']
+#     base_url = r'https://piao.ctrip.com/ticket/dest/t{ota_spot_id}.html'
+#     start_urls = ['https://piao.ctrip.com/ticket/dest/t62931.html']
+#
+#     def parse(self, response: HtmlResponse):
+#         for ota_spot_id in CtripSpider.ota_spot_ids:
+#             # 获取景区页面数据
+#             url = self.base_url.format(ota_spot_id=ota_spot_id)
+#             yield Request(url=url, callback=self.parse_item, dont_filter=True,
+#                           meta={'ota_spot_id': ota_spot_id})
+#
+#     def parse_item(self, response: HtmlResponse):
+#         spot_data = spot.Spot.objects(ota_id=OTA.OtaCode.CTRIP.value.id,
+#                                       ota_spot_id=response.meta['ota_spot_id']).first()
+#
+#         # 不存在数据则新增数据
+#         if not spot_data:
+#             spot_data = spot.Spot()
+#             spot_data.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+#
+#         # spot_data.spot_id = OTA.OtaSpotIdMap.get_ota_spot_id(OTA.OtaSpotIdMap.SHI_YAN_HU.name, OTA.OtaCode.HUIQULX)
+#         spot_data.ota_spot_id = response.meta['ota_spot_id']
+#
+#         spot_data.ota_id = OTA.OtaCode.CTRIP.value.id
+#         spot_data.spot_name = response.xpath(
+#             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/h2/text()').extract_first()
+#
+#         spot_imgs = response.xpath(
+#             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[1]/div[2]/div[1]/ul/li')
+#         spot_data.spot_img = []
+#         for img in spot_imgs:
+#             spot_data.spot_img.append(img.xpath('/a/img[@src]').extract_first())
+#
+#         spot_data.desc = response.xpath(
+#             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[5]/div[1]/div[3]/div[2]').get()
+#         # spot_data.tel = ????
+#         spot_data.traffic = response.xpath(
+#             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[5]/div[1]/div[4]/div[3]/p/text()').extract()
+#         spot_data.ticket_num = 1
+#         spot.addr = response.xpath(
+#             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/ul/li[1]/span/text()').extract_first()
+#         spot_data.open_time = response.xpath(
+#             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/ul/li[2]/span/text()').extract_first()
+#         spot_data.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+#         spot_data.comment_num = response.xpath(
+#             '//*[@id="root"]/div/div/div/div/div[3]/div[1]/div[1]/div[3]/div[2]/div[1]/a/text()').extract_first().strip(
+#             '查看条点评')
+#         # print('='*20, spot_data.to_json())
+#         yield spot_data
 
 
 """
@@ -287,8 +288,8 @@ class CtripCitySpot(scrapy.Spider):
         json_data = json.loads(json_str)
         spot_list = json_data['data']['viewspots']
         for item in spot_list:
-            print('+'*30, item['name'], item['cityname'], item['districtId'])
-            if item['districtId'] != area_id:       # 如果地区id不是需要查询的地区id直接退出
+            print('+' * 30, item['name'], item['cityname'], item['districtId'])
+            if item['districtId'] != area_id:  # 如果地区id不是需要查询的地区id直接退出
                 print('+' * 30, item)
                 continue
 
@@ -339,7 +340,7 @@ class CtripCitySpot(scrapy.Spider):
     def spot_detail(self, response: HtmlResponse):
         spot_city = response.meta['spot_city']
 
-        #print('=' * 30, spot_city.s_name)
+        # print('=' * 30, spot_city.s_name)
 
         json_str = response.body.decode('utf-8')
         json_data = json.loads(json_str)
@@ -373,3 +374,92 @@ class CtripCitySpot(scrapy.Spider):
         spot_city.s_ticket['spot_hotel'] = spot_hotel_product
 
         yield spot_city
+
+
+class PriceSpider(scrapy.Spider):
+    ota_map = [{'ota_spot_id': 62931, 'sightName': '石燕湖'}  # 石燕湖
+        , {'ota_spot_id': 127339, 'sightName': '石牛寨'}  # 石牛寨
+               # , {'ota_spot_id': 4741361, 'sightName': '益阳嘉年华'}  # 益阳嘉年华1
+        , {'ota_spot_id': 5060343, 'sightName': '花田溪谷'}  # 花田溪谷
+        , {'ota_spot_id': 1979030, 'sightName': '东浒寨'}  # 东浒寨
+        , {'ota_spot_id': 65169, 'sightName': '马仁奇峰'}  # 马仁奇峰
+        , {'ota_spot_id': 1493248, 'sightName': '大茅山'}  # 大茅山
+        , {'ota_spot_id': 140900, 'sightName': '九龙江'}  # 九龙江
+        , {'ota_spot_id': 5058354, 'sightName': '天空之城'}  # 天空之城
+               # , {'ota_spot_id': 1411376, 'sightName': '连云山'}  # 连云山
+        , {'ota_spot_id': 1415157, 'sightName': '侠天下'}  # 侠天下
+        , {'ota_spot_id': 3989530, 'sightName': '三翁花园'}  # 三翁花园
+        , {'ota_spot_id': 3264963, 'sightName': '乌金山'}  # 乌金山
+               ]
+    name = 'ctrip_price'
+    allowed_domains = ['m.ctrip.com']
+    login_url = 'https://sec-m.ctrip.com/restapi/soa2/12530/json/scenicSpotDetails?_fxpcqlniredt=09031019110028741215'
+
+    def start_requests(self):
+        price.OPrice.objects(ota_id=10002).delete()
+        price.OPriceCalendar.objects(ota_id=10002, create_at=time.strftime("%Y-%m-%d", time.localtime())).delete()
+        for value in self.ota_map:
+            form_data = {"spotid": value['ota_spot_id'], "pageid": 10320662470, "imgsize": "C_640_360",
+                         "resourceLimit": True,
+                         "contentType": "json",
+                         "head": {"cid": "09031019110028741215", "ctok": "", "cver": "1.0", "lang": "01", "sid": "8888",
+                                  "syscode": "09", "auth": "", "extension": [{"name": "protocal", "value": "https"}]},
+                         "ver": "8.3.3"}
+            yield Request(url=self.login_url
+                          , body=json.dumps(form_data)
+                          , method="POST"
+                          , headers={'Content-Type': 'application/json'}
+                          , meta={'ota_spot_id': value['ota_spot_id'], 'ota_spot_name': value['sightName']}
+                          , callback=self.after_login)
+
+    def after_login(self, response):
+        print(response.meta['ota_spot_name'])
+        result = json.loads(response.body)
+        rs = result['data']['shelfgroupinfo']['shelfresources'][0]['resourceid']
+        print(rs, "*" * 20)
+        if 'data' in result and 'resources' in result['data']:
+            for k1, v1 in enumerate(result['data']['resources']):  # group数据   sightId
+                for k2, v2 in enumerate(result['data']['shelfgroupinfo']['shelfresources']):
+                    if v1['resid'] == v2['resourceid']:
+                        for k3, v3 in enumerate(result['data']['shelfgroupinfo']['saleunits']):
+                            if v2['saleunitid'] == v3['id']:
+                                tickets = []
+                                tickets_list = {'price_id': str(v1['resid'])
+                                    , 'title': v3['name']  # 票名
+                                    , 'seller_nick': v1['brandname']  # 分销商
+                                    , 'price': v3['price']
+                                    , 'url': 'https://m.ctrip.com/webapp/ticket/dest/t' + str(response.meta[
+                                                                                                  'ota_spot_id']) + '.html'
+                                    , 'cash_back': 0
+                                    , 'cut_price': 0
+                                    , 'sale_num': v1['annualsales']  # 销量
+                                                }
+                                tickets.append(tickets_list)
+                                ota_product = []
+
+                                ota_product_list = {'type_id': str(v3['id']),
+                                                    'type_key': response.meta['ota_spot_name'] + v3['propleproperty'],
+                                                    # 票类型
+                                                    'type_name': v3['name'],  # 票名
+                                                    'normal_price': v3['price'],  # 价格
+                                                    'tickets': tickets}
+                                ota_product.append(ota_product_list)
+
+                                o_price = price.OPrice()
+                                o_price.ota_id = OTA.OtaCode.CTRIP.value.id
+                                o_price.ota_spot_id = response.meta['ota_spot_id']
+                                o_price.ota_spot_name = response.meta['ota_spot_name']
+                                o_price.ota_product = ota_product  # typeId typeName qunarPrice
+
+                                price_calendar = price.OPriceCalendar()
+
+                                price_calendar.ota_id = OTA.OtaCode.CTRIP.value.id
+                                price_calendar.ota_spot_id = response.meta['ota_spot_id']
+                                price_calendar.ota_spot_name = response.meta['ota_spot_name']
+                                price_calendar.pre_price = v3['price']
+                                price_calendar.type_key = v3['propleproperty']
+                                price_calendar.type_id = str(v3['id'])
+                                price_calendar.type_name = v3['name']
+                                price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime())
+                                price_calendar.save(force_insert=False, validate=False, clean=True)
+                                yield o_price

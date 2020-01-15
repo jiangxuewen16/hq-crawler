@@ -117,7 +117,7 @@ DATABASES = {
         # 'ENGINE': 'django.db.backends.mysql',
         # 'NAME': 'hq_crawler',
         # 'USER': 'root',
-        # 'HOST': '192.168.56.100',
+        # 'HOST': '192.168.18.254',
         # 'PASSWORD': 'root',
         # 'PORT': 3306,
         # 'OPTIONS': {'charset': 'utf8mb4'},
@@ -177,8 +177,8 @@ STATIC_URL = '/static/'
 下面是项目自定义配置
 """
 
-mongoengine.connect('hq_crawler', host='mongodb://11.75.1.20:27017', alias='default')  # 连接hq_crawler.mongodb
-mongoengine.connect('passport', host='mongodb://11.75.1.20:27017', alias='passport')  # 连接passport
+mongoengine.connect('hq_crawler', host='mongodb://11.75.1.124:27017', alias='default')  # 连接hq_crawler.mongodb
+mongoengine.connect('passport', host='mongodb://11.75.1.124:27017', alias='passport')  # 连接passport
 
 """
 定时调度任务业务包
