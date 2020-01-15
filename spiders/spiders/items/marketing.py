@@ -31,7 +31,7 @@ class Account(BaseItem, mongoengine.Document):
     platform = mongoengine.IntField()  # 平台id 详见：WeMedia.id
     account_name = mongoengine.StringField()  # 账号名称
     login_name = mongoengine.StringField()  # 登录账号名
-    admin_id = ObjectId()  # 管理员id
+    admin_id = mongoengine.ObjectIdField()  # 管理员id
     account_id = mongoengine.StringField()  # 平台账号的id
 
     # 曝光
