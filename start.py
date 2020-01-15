@@ -25,7 +25,6 @@ class App():
         fh.setFormatter(formatter)
         logs.addHandler(fh)
 
-        run1 = subprocess.Popen("python3 run1.py", shell=True)
         sys.argv = ['runserver', '0.0.0.0:8000']
         import manage
 
