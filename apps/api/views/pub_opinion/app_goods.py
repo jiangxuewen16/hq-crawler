@@ -12,7 +12,7 @@ class PublicOpinion(BaseView):
 
     @Route.route(path='/index')
     def index(self):
-        login_url = "http://11.75.1.29:8018/api/account/login"
+        login_url = "https://api-saas.huiquyun.com/api/account/login"
         login_headers = {
             "Content-Type": "application/json"
         }
