@@ -16,7 +16,7 @@ class PublicOpinion(BaseView):
         login_headers = {
             "Content-Type": "application/json"
         }
-        login_payload = {'userName': "admin", "password": "1q2w3E*"}
+        login_payload = {'userName': "ztyyzx", "password": "1q2w3E*"}
 
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         print(r.json())
