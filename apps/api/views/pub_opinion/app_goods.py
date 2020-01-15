@@ -19,7 +19,6 @@ class PublicOpinion(BaseView):
         login_payload = {'userName': "ztyyzx", "password": "1q2w3E*"}
 
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
-        print(r.json())
         result = r.json()
 
         if 'access_token' in result:
@@ -51,6 +50,5 @@ class PublicOpinion(BaseView):
         login_payload = {'userName': "admin", "password": "1q2w3E*"}
 
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
-        print(r.json())
         result = r.json()
         return self.success(result)
