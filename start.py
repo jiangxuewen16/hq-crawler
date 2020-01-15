@@ -6,6 +6,7 @@ import sys
 from daemon import runner
 
 cmd = os.getcwd()
+project_name = 'hq_crawl'
 
 
 class App:
@@ -27,10 +28,9 @@ class App:
         fh.setFormatter(formatter)
         logs.addHandler(fh)
         sys.argv = [cmd + '/manage.py', 'runserver', '0.0.0.0:8000']
-        logs.info("开始启动! \n")
+        logs.info(f"[{project_name}]启动! \n")
         import manage
         manage.main()
-        logs.info("启动完成! \n")
 
 
 app = App()
