@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.http import FileResponse
 
 from core.common.helper import get_scrapyd_cli
@@ -37,3 +38,9 @@ class Home(BaseView):
     @Route.route(path='home')
     def home1(self):
         return self.response(self.request_param)
+
+    @Route.route(path='test/redis')
+    def redis(self):
+        cache.set('name', 'jiangxuewen', 60)
+        a = cache.get('name')
+        return self.success({"name": a})
