@@ -2,7 +2,7 @@ import mongoengine
 from hq_crawler import celery, settings
 import djcelery
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
