@@ -8,7 +8,7 @@ from daemon import runner
 cmd = os.getcwd()
 
 
-class App():
+class App:
 
     def __init__(self):
         self.stdin_path = '/dev/null'
