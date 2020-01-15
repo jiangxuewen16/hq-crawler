@@ -27,7 +27,7 @@ class App():
         fh.setFormatter(formatter)
         logs.addHandler(fh)
         print(cmd)
-        sys.argv = ['/home/python/hq-crawler/manage.py', 'runserver', '0.0.0.0:8000']
+        sys.argv = [cmd + '/manage.py', 'runserver', '0.0.0.0:8000']
         import manage
         manage.main()
 
