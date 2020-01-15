@@ -213,16 +213,17 @@ class WangyihaoAriticleSpider(scrapy.Spider):
         account_name = response.meta['account_name']
         data = json.loads(response.body.decode('utf-8'))
         new_total = data['data']['total']
-        article_num = marketing.Article.objects(platform=WeMedia.WANG_YI.value.id, account_id=account_id).count()
-        new_num = new_total - article_num
-        if new_num <= 0:  # 没有新文章的情况下不需要做任何处理
-            return
+
+        # article_num = marketing.Article.objects(platform=WeMedia.WANG_YI.value.id, account_id=account_id).count()
+        # new_num = new_total - article_num
+        # if new_num <= 0:  # 没有新文章的情况下不需要做任何处理
+        #     return
 
         page_size = self.page_size
         # 总页数
-        total_page = math.ceil(new_num / page_size)
-        if new_num < self.page_size:  # 新增的文章数量小于默认爬取的最大数量，则用新增的数量作为爬取数量
-            page_size = new_num
+        total_page = math.ceil(new_total / page_size)
+        # if new_num < self.page_size:  # 新增的文章数量小于默认爬取的最大数量，则用新增的数量作为爬取数量
+        #     page_size = new_num
 
         millisecond = self.get_millisecond()
         page = 1
@@ -250,7 +251,7 @@ class WangyihaoAriticleSpider(scrapy.Spider):
         data = json.loads(response.body.decode('utf-8'))
 
         for item in data['data']['list']:
-            article = self.article_data(item)
+            article = self.article_data(item, account_id, account_name)
             if not article.content:
                 if item['contentType'] == 1:
                     url = self.base_article_detail_url.format(articleId=item['articleId'])
@@ -285,7 +286,7 @@ class WangyihaoAriticleSpider(scrapy.Spider):
                                 'account_id': account_id})
 
     @staticmethod
-    def article_data(item):
+    def article_data(item, account_id, account_name):
         article = marketing.Article.objects(platform=WeMedia.WANG_YI.value.id,
                                             article_id=item['articleId']).first()
         article_id = item['articleId']
@@ -301,13 +302,16 @@ class WangyihaoAriticleSpider(scrapy.Spider):
             article.platform = WeMedia.WANG_YI.value.id
             article.article_id = article_id
             article.title = item['title']
-            article.create_at = item['showTime']
+
+        article.create_at = item['showTime']
         article.exposure_num = item['recommendCount'] + item['pvCount']
         article.recommend_num = item['recommendCount']
         article.read_num = item['pvCount']
         article.forward_num = item['shareCount']
         article.like_num = 0
         article.comment_num = item['commentCount']
+        article.account_id = account_id
+        article.account_name = account_name
         article.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         return article
 
@@ -315,8 +319,7 @@ class WangyihaoAriticleSpider(scrapy.Spider):
         content = response.xpath('//*[@id="content"]').extract_first()
         article = response.meta['article']
         article.content = content
-        article.account_id = response.meta['account_id']
-        article.account_name = response.meta['account_name']
+
         self.article_spot(article)
         yield article
 
@@ -324,8 +327,7 @@ class WangyihaoAriticleSpider(scrapy.Spider):
         content = response.xpath('/html/body/div/section[1]/article[1]/div[1]/div[3]').extract_first()
         article = response.meta['article']
         article.content = content
-        article.account_id = response.meta['account_id']
-        article.account_name = response.meta['account_name']
+
         self.article_spot(article)
         yield article
 
@@ -455,6 +457,7 @@ class WangyihaoDailyReportSpider(scrapy.Spider):
         data = json.loads(response.body.decode('utf-8'))
         # 当日发布量
         day_publish_num = data['data']['total']
+
         millisecond = self.get_millisecond()
         start = end = self.get_yesterday()
 
@@ -550,14 +553,16 @@ class WangyihaoDailyReportSpider(scrapy.Spider):
     @staticmethod
     def daily_report_data(data, follow):
 
-        ts = int(time.mktime(time.strptime(str(follow[0]['statsDate']), '%Y-%m-%d'))) * 1000
+        ts = int(time.mktime(time.strptime(str(follow[0]['statsDate']), '%Y-%m-%d')))
+
         marketing_daily_report = marketing.MarketingDailyReport.objects(type=WeMediaType.WE_MEDIA.value.id,
                                                                         platform=WeMedia.WANG_YI.value.id,
-                                                                        day_time=ts,
+                                                                        day_time=time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                                               time.localtime(ts)),
                                                                         account_id=data['account_id']).first()
+
         if not marketing_daily_report:
             marketing_daily_report = marketing.MarketingDailyReport()
-            marketing_daily_report.platform_type = WeMediaType.WE_MEDIA.value.id
             marketing_daily_report.platform = WeMedia.WANG_YI.value.id
             marketing_daily_report.account_id = data['account_id']
             marketing_daily_report.account_name = data['account_name']
@@ -565,6 +570,8 @@ class WangyihaoDailyReportSpider(scrapy.Spider):
             marketing_daily_report.admin_name = data['admin_name']
             marketing_daily_report.day_time = follow[0]['statsDate']
             marketing_daily_report.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+        marketing_daily_report.type = WeMediaType.WE_MEDIA.value.id
         marketing_daily_report.exposure_num = data['day_read_num'] + data['recommend_num']
         marketing_daily_report.recommend_num = data['recommend_num']
         marketing_daily_report.read_num = data['read_num']
