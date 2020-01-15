@@ -6,6 +6,7 @@ import sys
 from daemon import runner
 import subprocess
 
+cmd = os.getcwd()
 
 class App():
 
@@ -25,7 +26,7 @@ class App():
         formatter = logging.Formatter(u'%(asctime)s [%(levelname)s] %(message)s')
         fh.setFormatter(formatter)
         logs.addHandler(fh)
-        print(os.getcwd())
+        print(cmd)
         sys.argv = ['/home/python/hq-crawler/manage.py', 'runserver', '0.0.0.0:8000']
         import manage
         manage.main()
