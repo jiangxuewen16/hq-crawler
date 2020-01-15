@@ -4,9 +4,9 @@ import os
 import sys
 
 from daemon import runner
-import subprocess
 
 cmd = os.getcwd()
+
 
 class App():
 
@@ -14,22 +14,23 @@ class App():
         self.stdin_path = '/dev/null'
         self.stdout_path = '/dev/tty'
         self.stderr_path = '/dev/tty'
-        self.pidfile_path = '/tmp/foo.pid'
+        self.pidfile_path = '/tmp/hq-crawl.pid'
         self.pidfile_timeout = 5
 
     def run(self):
         logs = logging.getLogger('MyLogger')
         logs.setLevel(logging.DEBUG)
         fh = logging.handlers.RotatingFileHandler(
-            '/tmp/test.log', maxBytes=10000000, backupCount=5)
+            '/tmp/hq-crawl.log', maxBytes=10000000, backupCount=5)
         fh.setLevel(logging.DEBUG)
         formatter = logging.Formatter(u'%(asctime)s [%(levelname)s] %(message)s')
         fh.setFormatter(formatter)
         logs.addHandler(fh)
-        print(cmd)
         sys.argv = [cmd + '/manage.py', 'runserver', '0.0.0.0:8000']
+        logs.info("开始启动! \n")
         import manage
         manage.main()
+        logs.info("启动完成! \n")
 
 
 app = App()
