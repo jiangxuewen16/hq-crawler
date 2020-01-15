@@ -96,7 +96,6 @@ class PublicOpinion(BaseView):
         delta = (datetime.datetime.strptime(con['end_date'], '%Y-%m-%d') - datetime.datetime.strptime(
             con['begin_date'],
             '%Y-%m-%d')).days
-        print(delta, "#" * 10)
         off_day = datetime.timedelta(days=delta)
         begin_date_pre = (datetime.datetime.strptime(con['begin_date'], '%Y-%m-%d') - off_day).strftime("%Y-%m-%d")
         condition = {'begin_date': con['begin_date'], 'end_date': con['end_date'], 'end_date_pre': end_date_pre,
@@ -175,7 +174,6 @@ class PublicOpinion(BaseView):
     @Route.route(path='/spot/ota/list')
     def ota_list(self):
         spot_list = spot.CSpot.objects(self_employed=True).fields(name=1)
-        print(spot_list)
         if spot_list:
             return self.success(json.loads(spot_list))
         else:
@@ -220,7 +218,6 @@ class PublicOpinion(BaseView):
                     "name": "马仁奇峰"
                 }
             ]
-        print(spot_list)
         return self.success(spot_list)
 
     # 实时点评
