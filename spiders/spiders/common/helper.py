@@ -1,3 +1,5 @@
+import datetime
+
 from spiders.items import marketing
 
 
@@ -18,6 +20,7 @@ class String(object):
 
 def get_media_account(cls):
     account_list = marketing.Account.objects(platform=cls.we_media_id).all()
+    result = []
     if len(account_list):
         for account in account_list:
             if account.authorization_information is not None:
@@ -26,10 +29,18 @@ def get_media_account(cls):
                     cls.cookie_list[kv[0]] = kv[1]
                 account.type = cls.we_media_type
                 account.platform = cls.we_media_id
-                return [account, cls.cookie_list]
+                result.append([account, cls.cookie_list])
             else:
                 # todo::报错给推广部
                 pass
+        return result
     else:
         # todo::报错给推广部
         pass
+
+
+def get_yesterday(days=1):
+    today = datetime.date.today()
+    one_day = datetime.timedelta(days=days)
+    yesterday = str(today - one_day).replace('-', '')
+    return yesterday

@@ -24,17 +24,19 @@ class JinritoutiaoSpider(scrapy.Spider):
     cookie_list = {}
 
     def parse(self, response):
-        [account, cookie_list] = helper.get_media_account(self)
-        user_url = 'https://mp.toutiao.com/user_login_status_api/'
-        yield Request(url=user_url, callback=self.parse_user, dont_filter=True, cookies=cookie_list,
-                      meta={'account': account})
+        result = helper.get_media_account(self)
+        for detail in result:
+            [account, cookie_list] = detail
+            user_url = 'https://mp.toutiao.com/user_login_status_api/'
+            yield Request(url=user_url, callback=self.parse_user, dont_filter=True, cookies=cookie_list,
+                          meta={'account': account})
 
     def parse_user(self, response: HtmlResponse):
         account = response.meta['account']
         response_str = response.body.decode('utf-8')
         user_detail = json.loads(response_str)['reason']['media']['media_info']
         account.account_id = user_detail['user_id']
-        start = end = self.get_yesterday()
+        start = end = helper.get_yesterday()
         url = r'https://mp.toutiao.com/mp/agw/statistic/content/content_overview?start_date={start}&end_date={end}' \
             .format(start=start, end=end)
         yield Request(url=url, callback=self.parse_data, dont_filter=True, cookies=self.cookie_list,
@@ -141,7 +143,7 @@ class JinritoutiaoSpider(scrapy.Spider):
         account.update_at = datetime.datetime.now().strftime('%Y-%m-%d')
         yield account
         fans_url = r'https://mp.toutiao.com/mp/agw/statistic/fans/count_trend/?start_date={start}&end_date={end}'
-        start = end = self.get_yesterday()
+        start = end = helper.get_yesterday()
         yield Request(url=fans_url.format(start=start, end=end), callback=self.daily_fans,
                       dont_filter=True, cookies=self.cookie_list,
                       meta={'marketing_daily_report': response.meta['marketing_daily_report']})
@@ -171,13 +173,6 @@ class JinritoutiaoSpider(scrapy.Spider):
         marketing_daily_report.create_at = datetime.datetime.now().strftime('%Y-%m-%d')
         marketing_daily_report.update_at = datetime.datetime.now().strftime('%Y-%m-%d')
         yield marketing_daily_report
-
-    @staticmethod
-    def get_yesterday():
-        today = datetime.date.today()
-        one_day = datetime.timedelta(days=1)
-        yesterday = str(today - one_day).replace('-', '')
-        return yesterday
 
 
 class JinritoutiaoArticleSpider(scrapy.Spider):
