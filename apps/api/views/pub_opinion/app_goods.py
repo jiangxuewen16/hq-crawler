@@ -29,8 +29,12 @@ class PublicOpinion(BaseView):
             url = params['api_url']
             headers = {'Authorization': Authorization}
             if 'request_type' in params:
-                if params['request_type'] == 'POST':
+                if params['request_type'] == 'post':
                     r = requests.post(url, headers=headers, data=params)
+                if params['request_type'] == 'put':
+                    r = requests.put(url, headers=headers, data=params)
+                if params['request_type'] == 'patch':
+                    r = requests.patch(url, headers=headers, data=params)
                 else:
                     r = requests.get(url, headers=headers, params=params)
             else:
