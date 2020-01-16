@@ -35,6 +35,8 @@ class PublicOpinion(BaseView):
                     r = requests.put(url, headers=headers, data=params)
                 if params['request_type'] == 'patch':
                     r = requests.patch(url, headers=headers, data=params)
+                if params['request_type'] == 'delete':
+                    r = requests.delete(url, headers=headers, data=params)
                 else:
                     r = requests.get(url, headers=headers, params=params)
             else:
