@@ -220,25 +220,25 @@ LOGGING = {
             'formatter': 'standard',
             'encoding': 'utf-8',
         },
-        'collect': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
-            'filename': os.path.join(BASE_LOG_DIR, f"{PROJECT_NAME}_collect.log"),
-            'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
-            'backupCount': 5,
-            'formatter': 'collect',
-            'encoding': "utf-8"
-        }
+        # 'collect': {
+        #     'level': 'INFO',
+        #     'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
+        #     'filename': os.path.join(BASE_LOG_DIR, f"{PROJECT_NAME}_collect.log"),
+        #     'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
+        #     'backupCount': 5,
+        #     'formatter': 'collect',
+        #     'encoding': "utf-8"
+        # }
     },
     'loggers': {  # 日志实例
         '': {  # 默认的logger应用如下配置
             'handlers': ['TF', 'console', 'error'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,  # 是否向上一级logger实例传递日志信息
         },
-        'collect': {  # 名为 'collect' 的logger还单独处理
-            'handlers': ['console', 'collect'],
-            'level': 'INFO',
-        }
+        # 'collect': {  # 名为 'collect' 的logger还单独处理
+        #     'handlers': ['console', 'collect'],
+        #     'level': 'INFO',
+        # }
     },
 }

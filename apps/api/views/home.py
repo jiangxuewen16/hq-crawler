@@ -48,7 +48,6 @@ class Home(BaseView):
 
     @Route.route(path='test/redis1')
     def redis1(self):
-        logger.debug('zzzzzzzzzzzzzzzzzzzzz')
         logger.info('xxxxxxxxxxxxxxxxxxxxxxxx')
         logger.error('ttttttttttttttttttttttt')
         raise Exception("error!!!!!!!!!!!!")
