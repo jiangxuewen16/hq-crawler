@@ -1,5 +1,6 @@
 from django.core.cache import cache
 from django.http import FileResponse
+from django.utils.autoreload import logger
 
 from core.common.helper import get_scrapyd_cli
 from core.lib.view import BaseView
@@ -41,6 +42,14 @@ class Home(BaseView):
 
     @Route.route(path='test/redis')
     def redis(self):
-        cache.set('name', 'jiangxuewen', 60)
-        a = cache.get('name')
+        a = 0
+        c = 3/a
         return self.success({"name": a})
+
+    @Route.route(path='test/redis1')
+    def redis1(self):
+        logger.debug('zzzzzzzzzzzzzzzzzzzzz')
+        logger.info('xxxxxxxxxxxxxxxxxxxxxxxx')
+        logger.error('ttttttttttttttttttttttt')
+        raise Exception("error!!!!!!!!!!!!")
+        return self.success({"name": "a"})
