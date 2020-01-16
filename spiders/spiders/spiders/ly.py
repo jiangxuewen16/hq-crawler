@@ -85,7 +85,7 @@ class LyCommentSpider(scrapy.Spider):
     allowed_domains = ['www.ly.com']
     # 默认爬取最新 labId= 1：全部  2：好评 3：中评  4：差评 5：有图  6：最新
     page_num = 1  # 页码
-    page_size = 100 # 默认爬取每页10条
+    page_size = 10 # 默认爬取每页100条
     base_url = r'https://www.ly.com/scenery/AjaxHelper/DianPingAjax.aspx?action=GetDianPingList&sid={ota_spot_id}&page={page_num}&pageSize={page_size}&labId=6&sort=0&iid=0.08141872334931999'
     start_urls = ['https://www.ly.com/scenery/AjaxHelper/DianPingAjax.aspx?action=GetDianPingList&sid=9513&page=1&pageSize=10&labId=6&sort=0&iid=0.08141872334931999']
 
@@ -95,11 +95,11 @@ class LyCommentSpider(scrapy.Spider):
         # 爬取景区列表数据
         for ota_spot_id in LySpider.ota_spot_ids:
             # 更新景区的评论数量
-            url = self.base_url.format(ota_spot_id=ota_spot_id, page_num=1, page_size=100)
+            url = self.base_url.format(ota_spot_id=ota_spot_id, page_num=1, page_size=10)
             data = requests.get(url, headers=headers)
             comment = data.json()
             print(ota_spot_id, "共", comment['pageInfo']['totalCount'], "条", "*" * 20)
-            page_size = 100
+            page_size = 10
             # 网页上总条数
             total_page = comment['pageInfo']['totalCount']
             # 数据库总条数
@@ -110,10 +110,10 @@ class LyCommentSpider(scrapy.Spider):
             # 准备保存的总页数
             total_page = math.ceil(to_save_total / page_size)
             for page_num in range(1, total_page + 1):
-                if page_num == total_page:
-                    page_size = to_save_total - (page_num - 1) * page_size
-                else:
-                    page_size = page_size
+                # if page_num == total_page:
+                #     page_size = to_save_total - (page_num - 1) * page_size
+                # else:
+                #     page_size = page_size
                 url = self.base_url.format(ota_spot_id=ota_spot_id, page_num=page_num, page_size=page_size)
                 print("-" * 30)
                 print(url)
@@ -122,7 +122,7 @@ class LyCommentSpider(scrapy.Spider):
                 comment = data.json()
                 print(ota_spot_id, " 第", page_num, "页: ", "共", page_size, "条 ", "*" * 20)
                 for item in comment['dpList']:
-                    print('正在添加 ', item['dpUserName'], ' 的评论', "*" * 20)
+                    # print('正在添加 ', item['dpUserName'], ' 的评论', "*" * 20)
                     spot_comment = spot.SpotComment()
                     spot_comment.ota_id = OTA.OtaCode.LY.value.id
                     spot_comment.ota_spot_id = ota_spot_id
@@ -150,7 +150,6 @@ class LyCommentSpider(scrapy.Spider):
                     spot_comment.c_from = '同程网'
 
                     yield spot_comment
-
 
 
 class LySpotCity(scrapy.Spider):
