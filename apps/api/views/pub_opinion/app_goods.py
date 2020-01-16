@@ -12,11 +12,13 @@ class PublicOpinion(BaseView):
 
     @Route.route(path='/index')
     def index(self):
-        login_url = "https://api-saas.huiquyun.com/api/account/login"
+        login_url = "https://api-saas.huiquyun.com/api/account/login" #正式
+        # login_url = "https://api-saas.huiquyun.com/api/account/login" #测试
         login_headers = {
             "Content-Type": "application/json"
         }
-        login_payload = {'userName': "ztyyzx", "password": "1q2w3E*"}
+        login_payload = {'userName': "ztyyzx", "password": "1q2w3E*"} #正式
+        # login_payload = {'userName': "admin", "password": "1q2w3E*"}  #测试
 
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         result = r.json()
@@ -27,16 +29,14 @@ class PublicOpinion(BaseView):
 
             params = self.request_param
             url = params['api_url']
-            headers = {'Authorization': Authorization}
+            headers = {'Authorization': Authorization, "Content-Type": "application/json"}
             if 'request_type' in params:
                 if params['request_type'] == 'post':
-                    r = requests.post(url, headers=headers, data=params)
-                if params['request_type'] == 'put':
-                    r = requests.put(url, headers=headers, data=params)
-                if params['request_type'] == 'patch':
-                    r = requests.patch(url, headers=headers, data=params)
-                if params['request_type'] == 'delete':
-                    r = requests.delete(url, headers=headers, data=params)
+                    r = requests.post(url, headers=headers, data=json.dumps(params))
+                elif params['request_type'] == 'put':
+                    r = requests.put(url, headers=headers, data=json.dumps(params))
+                elif params['request_type'] == 'delete':
+                    r = requests.delete(url, headers=headers, data=json.dumps(params))
                 else:
                     r = requests.get(url, headers=headers, params=params)
             else:
