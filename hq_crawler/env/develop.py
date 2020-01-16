@@ -4,7 +4,7 @@ import mongoengine
 from hq_crawler import celery, settings
 import djcelery
 
-from hq_crawler.settings import BASE_DIR
+from hq_crawler.settings import BASE_DIR, PROJECT_NAME
 
 DEBUG = True
 
@@ -37,11 +37,14 @@ CACHES = {
 
 # 日志配置
 BASE_LOG_DIR = os.path.join(BASE_DIR, "log")
+if not os.path.isdir(BASE_LOG_DIR):
+    os.mkdir(BASE_LOG_DIR)
 
 LOGGING = {
     'version': 1,  # 保留字
-    'disable_existing_loggers': False,  # 是否禁用已经存在的日志实例
-    'formatters': {  # 定义日志的格式
+    'disable_existing_loggers': False,  # True 表示禁用loggers
+
+    'formatters': {     # 可以设置多种格式，根据需要选择保存的格式
         'standard': {
             'format': '[%(asctime)s][%(threadName)s:%(thread)d][task_id:%(name)s][%(filename)s:%(lineno)d]'
                       '[%(levelname)s][%(message)s]'
@@ -68,7 +71,7 @@ LOGGING = {
         'SF': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，根据文件大小自动切
-            'filename': os.path.join(BASE_LOG_DIR, "xxx_info.log"),  # 日志文件
+            'filename': os.path.join(BASE_LOG_DIR, f"{PROJECT_NAME}_info.log"),  # 日志文件
             'maxBytes': 1024 * 1024 * 500,  # 日志大小 50M（最好不要超过1G）
             'backupCount': 3,  # 备份数为3 xx.log --> xx.log.1 --> xx.log.2 --> xx.log.3
             'formatter': 'standard',
@@ -77,7 +80,7 @@ LOGGING = {
         'TF': {
             'level': 'INFO',
             'class': 'logging.handlers.TimedRotatingFileHandler',  # 保存到文件，根据时间自动切
-            'filename': os.path.join(BASE_LOG_DIR, "xxx_info.log"),  # 日志文件
+            'filename': os.path.join(BASE_LOG_DIR, f"{PROJECT_NAME}_info.log"),  # 日志文件
             'backupCount': 3,  # 备份数为3 xx.log --> xx.log.2018-08-23_00-00-00 --> xx.log.2018-08-24_00-00-00 --> ...
             'when': 'D',  # 每天一切， 可选值有S/秒 M/分 H/小时 D/天 W0-W6/周(0=周一) midnight/如果没指定时间就默认在午夜
             'formatter': 'standard',
@@ -86,7 +89,7 @@ LOGGING = {
         'error': {
             'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
-            'filename': os.path.join(BASE_LOG_DIR, "xxx_err.log"),  # 日志文件
+            'filename': os.path.join(BASE_LOG_DIR, f"{PROJECT_NAME}_err.log"),  # 日志文件
             'maxBytes': 1024 * 1024 * 5,  # 日志大小 50M
             'backupCount': 5,
             'formatter': 'standard',
@@ -95,7 +98,7 @@ LOGGING = {
         'collect': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
-            'filename': os.path.join(BASE_LOG_DIR, "xxx_collect.log"),
+            'filename': os.path.join(BASE_LOG_DIR, f"{PROJECT_NAME}_collect.log"),
             'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
             'backupCount': 5,
             'formatter': 'collect',
