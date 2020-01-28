@@ -3,6 +3,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr
 from enum import Enum
+from django.utils.autoreload import logger
+
 
 
 class EmailType(Enum):
@@ -61,7 +63,7 @@ class Email(object):
             server.close()  # 关闭邮箱
             server.quit()  # 关闭连接
         except smtplib.SMTPException as e:  # 如果 try 中的语句没有执行，则会执行下面的
-            print('发送失败:', e)
+            logger.info('发送失败:', e)
 
     def build_end_data(self):
         pass

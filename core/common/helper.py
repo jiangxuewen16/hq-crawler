@@ -5,6 +5,8 @@ import pkgutil
 import random
 import string
 import sys
+from django.utils.autoreload import logger
+
 
 from scrapyd_api import ScrapydAPI
 
@@ -44,7 +46,7 @@ def auto_import_module(moduleName: str, maxLevel=2):
         if ispkg:
             auto_import_module(moduleName + '.' + name)
         importlib.import_module(moduleName + '.' + name)
-        # print("{0} name: {1:12}, is_sub_package: {2}".format(filefiner, name, ispkg))
+        # logger.info("{0} name: {1:12}, is_sub_package: {2}".format(filefiner, name, ispkg))
 
 
 """

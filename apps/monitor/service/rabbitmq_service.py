@@ -4,6 +4,7 @@ import requests
 
 from apps.monitor.common import helper
 from hq_crawler import settings
+from django.utils.autoreload import logger
 
 default_email = '445251692@qq.com'
 
@@ -55,7 +56,7 @@ def rabbit_api(route):
     password = conf.get('password')
     # url = 'http://39.108.101.109:65531/api/channels'
     url = 'http://' + host + ':' + port + '/api/' + route
-    # print(url)
+    # logger.info(url)
     return requests.get(url, auth=(user, password), timeout=5)
 
 

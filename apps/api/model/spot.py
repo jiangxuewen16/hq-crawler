@@ -3,6 +3,7 @@ import datetime
 import json
 import re
 import queue
+from django.utils.autoreload import logger
 
 from apps.api.common.helper.helper import getDayList
 from spiders.common import OTA
@@ -1972,7 +1973,7 @@ class SpotCity:
     @classmethod
     def detail_spot(cls, ota_spot_id):
         # spot_city = spot.SpotCity.objects(ota_spot_id=ota_spot_id).fields(slice__comments=[5, 10]).first()
-        # print(spot_city.to_mongo())
+        # logger.info(spot_city.to_mongo())
         pipeline = [
             {
                 '$match': {
@@ -1990,7 +1991,7 @@ class SpotCity:
         spot_city_s = spot.SpotCity.objects.aggregate(*pipeline)
         L = {}
         for p in spot_city_s:
-            # print(p)
+            # logger.info(p)
             p['create_at'] = p['create_at'].strftime("%Y-%m-%d %H:%M:%S")
             p['update_at'] = p['update_at'].strftime("%Y-%m-%d %H:%M:%S")
 
@@ -2007,10 +2008,10 @@ class SpotCity:
                     for content in contents:
                         if 'type' not in content:
                             if 'text' in content:
-                                print('=' * 20, content)
+                                logger.info('=' * 20, content)
                                 s_desc += '<p>' + content['text'] + '</p>'
                             else:
-                                print(content)
+                                logger.info(content)
                         elif content['type'] == 'text':
                             s_desc += '<p>' + content['content']['text'] + '</p>'
                         elif content['type'] == 'img':
@@ -2055,6 +2056,6 @@ class SpotCity:
                 p['s_ticket'] = ticket_info
 
             L = p
-            print(p)
+            logger.info(p)
             # L.append(dict(p))
         return L

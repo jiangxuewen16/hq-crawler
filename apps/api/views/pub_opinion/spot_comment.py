@@ -8,6 +8,7 @@ import threading
 import time
 import operator
 from django.http import HttpResponse, Http404
+from django.utils.autoreload import logger
 
 from apps.api.common import helper
 from apps.api.common.helper.helper import dateRange, getDayList
@@ -25,7 +26,7 @@ class PublicOpinion(BaseView):
     @Route.route(path='/index')
     def index(self):
         spot_city = spot.Spot.objects(ota_spot_id=5427075).first()
-        print(spot_city.list_indexes())
+        logger.info(spot_city.list_indexes())
         return self.success(spot_city.to_json())
 
     # 字典化 一条记录
@@ -337,7 +338,7 @@ class PublicOpinion(BaseView):
     def now_time(self):
         now_time = datetime.date.today()
         # now_time = datetime.datetime.now()
-        print(str(now_time))
+        logger.info(str(now_time))
         return self.success(helper.get_yesterday())
 
     # 获取post请求
@@ -438,10 +439,10 @@ class PublicOpinion(BaseView):
             # 设置csv数据,这里的数据格式是字典型
             result_count = Spot.all_comment(condition=condition, skip=0, limit=10000, topic='export')
             for key, value in enumerate(result_count):
-                print(value['_id']['spot_name'], "-" * 20)
+                logger.info(value['_id']['spot_name'], "-" * 20)
 
-                print(value['avg_10001'], "+" * 20)
-                print(value['avg_10001_percent'], "+" * 20)
+                logger.info(value['avg_10001'], "+" * 20)
+                logger.info(value['avg_10001_percent'], "+" * 20)
                 # pass
                 result = [{'全部景区': value['_id']['spot_name'], '美团': value['avg_10004'],
                            '去哪儿': value['avg_10006'], '携程': value['avg_10002'],

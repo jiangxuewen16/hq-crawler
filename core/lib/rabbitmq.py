@@ -1,4 +1,6 @@
 from collections import namedtuple
+from django.utils.autoreload import logger
+
 
 import pika
 
@@ -46,7 +48,7 @@ class RabbitMq(object):
     def receive(self):
         receive_list = Decorator.RECEIVE_FUNC_LIST
         for item in receive_list:
-            print('=' * 20, item)
+            logger.info('=' * 20, item)
             self.channel.exchange_declare(exchange=item.exchange, exchange_type='topic',
                                           passive=self.config['passive'], durable=self.config['durable'],
                                           auto_delete=self.config['auto_delete'])
@@ -56,7 +58,7 @@ class RabbitMq(object):
                                                 auto_delete=self.config['auto_delete'])
             queue_name = result.method.queue
             self.channel.queue_bind(exchange=item.exchange, queue=queue_name, routing_key=item.routing_key)
-            print(' [*] 启动监听:', item.exchange, queue_name, item.routing_key)
+            logger.info(' [*] 启动监听:', item.exchange, queue_name, item.routing_key)
             self.channel.basic_consume(queue=queue_name, on_message_callback=item.callback,
                                        auto_ack=item.no_ack)
         self.channel.start_consuming()
@@ -75,7 +77,7 @@ class RabbitMq(object):
                                       passive=self.config['passive'], durable=self.config['durable'],
                                       auto_delete=self.config['auto_delete'])
         self.channel.basic_publish(exchange='topic_logs', routing_key=routing_key, body=message)
-        print(" [x] Sent %r:%r" % (routing_key, message))
+        logger.info(" [x] Sent %r:%r" % (routing_key, message))
         self.close()
 
     def close(self):

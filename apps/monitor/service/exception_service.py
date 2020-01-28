@@ -5,11 +5,13 @@ from collections import namedtuple
 from apps.models.crawler import ExceptionLog
 from apps.models.passport import DocInterface, DocUser, DocProject
 from apps.monitor.common import helper
+from django.utils.autoreload import logger
 
 exception_api = namedtuple('exception_api', 'num exception_item')
 
 default_email = '445251692@qq.com'
 end_time_step = 10 * 60
+
 
 
 def receive_exception(data: dict):
@@ -75,7 +77,7 @@ def receive_exception(data: dict):
 def send_email():
     pre_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time() - end_time_step))
     exception_log_list = ExceptionLog.objects(create_at__gte=pre_time).all()
-    print('=' * 20, exception_log_list)
+    logger.info('=' * 20, exception_log_list)
 
     if exception_log_list:
         send_list = {}
@@ -89,7 +91,7 @@ def send_email():
             send_list[key] = exception_api(num, item)
 
         for _, item in send_list.items():
-            print('=' * 20, item)
+            logger.info('=' * 20, item)
             exception_item = item.exception_item
             api_doc_url = ''
             docInterface = DocInterface.objects(path=exception_item.api_url).fields(uid=1, title=1, _id=1).first()

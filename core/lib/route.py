@@ -5,6 +5,8 @@ from types import FunctionType
 # from django.urls import re_path
 from django.urls import re_path
 from hq_crawler import settings
+from django.utils.autoreload import logger
+
 
 
 """
@@ -23,7 +25,7 @@ class Route:
     @classmethod
     def route(cls, path):
         def my_decorator(func):
-            # print('调用的方法列表：', func)
+            # logger.info('调用的方法列表：', func)
             # 类的路由
             if not isinstance(func, FunctionType):
                 cls.classRoute.append(cls.classRouteTuple(func.__module__, func.__qualname__, path))
@@ -58,4 +60,4 @@ class Route:
                     urlpatterns.append(re_path(path_str + classItem.path, routeClass.as_view())),
                     routeKeyList.append(classItem.path)
 
-        print('路由列表:', urlpatterns)
+        logger.info('路由列表:', urlpatterns)

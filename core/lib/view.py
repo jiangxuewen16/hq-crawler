@@ -10,6 +10,8 @@ from core.common import helper
 from core.common.service_code import ServiceCode
 from core.lib.route import Route
 from hq_crawler import settings
+from django.utils.autoreload import logger
+
 
 """
 基础view类型
@@ -36,7 +38,7 @@ class BaseView(View):
         self.__init()
         if request.path_info not in Route.routeList:
             pass
-        # print('='*20,request.path_info.lstrip('/').lstrip('crawler'))
+        # logger.info('='*20,request.path_info.lstrip('/').lstrip('crawler'))
         return methodcaller(self._route_url(request.path_info))(self)  # 自调方法
 
     """
@@ -46,7 +48,7 @@ class BaseView(View):
     def get(self, request: WSGIRequest) -> HttpResponse:
         if request.path_info not in Route.routeList:
             pass
-        print(Route.routeList, request.path_info)
+        logger.info(Route.routeList, request.path_info)
 
         return methodcaller(self._route_url(request.path_info))(self)  # 自调方法
 
