@@ -148,6 +148,7 @@ STATIC_URL = '/static/'
 
 # 设置环境
 APP_ENV = os.getenv('APP_ENV')
+print('项目环境：', APP_ENV)
 if APP_ENV == 'production':
     DEBUG = False
     from .env.production import *
