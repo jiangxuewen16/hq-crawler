@@ -26,7 +26,7 @@ from django.utils.autoreload import logger
 
 @register_job(scheduler, "cron", hour='02', minute='10', id='spot_comment')
 def spot_comment():
-    logger.info("==========【开启评论景区】==========")
+    logger.info("==========【景区评论：开启】==========")
     jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_comment')
     jobid = get_scrapyd_cli().schedule('spiders', 'lvmama_comment')
     jobid = get_scrapyd_cli().schedule('spiders', 'mafengwo_comment')
@@ -34,7 +34,19 @@ def spot_comment():
     jobid = get_scrapyd_cli().schedule('spiders', 'fliggy_comment')
     jobid = get_scrapyd_cli().schedule('spiders', 'qunar_comment')
     jobid = get_scrapyd_cli().schedule('spiders', 'ly_comment')
-    logger.info("==========【结束评论景区】==========")
+    logger.info("==========【景区评论：结束】==========")
+
+
+@register_job(scheduler, "cron", hour='03', minute='10', id='spot_comment')
+def spot_price():
+    logger.info("==========【价格监控：开启】==========")
+    jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_price')
+    jobid = get_scrapyd_cli().schedule('spiders', 'fliggy_spot')
+    jobid = get_scrapyd_cli().schedule('spiders', 'lvmama_spot_price')
+    jobid = get_scrapyd_cli().schedule('spiders', 'ly_price')
+    jobid = get_scrapyd_cli().schedule('spiders', 'Mafengwo_price')
+    jobid = get_scrapyd_cli().schedule('spiders', 'MeituanPrice')
+    logger.info("==========【价格监控：结束】==========")
 
 
 
