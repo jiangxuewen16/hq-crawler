@@ -61,4 +61,4 @@ class Route:
                     urlpatterns.append(re_path(path_str + classItem.path, routeClass.as_view())),
                     routeKeyList.append(classItem.path)
 
-        logger.info('路由列表:', json.dumps(urlpatterns))
+        # logger.info('路由列表:', json.dumps(urlpatterns))
