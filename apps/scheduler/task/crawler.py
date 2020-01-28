@@ -26,20 +26,16 @@ from django.utils.autoreload import logger
 
 @register_job(scheduler, "cron", hour='02', minute='10', id='spot_comment')
 def spot_comment():
+    logger.info("==========【开启评论景区】==========")
     jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_comment')
-    logger.info('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
     jobid = get_scrapyd_cli().schedule('spiders', 'lvmama_comment')
-    logger.info('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
     jobid = get_scrapyd_cli().schedule('spiders', 'mafengwo_comment')
-    logger.info('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
     jobid = get_scrapyd_cli().schedule('spiders', 'meituan_comment')
-    logger.info('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
     jobid = get_scrapyd_cli().schedule('spiders', 'fliggy_comment')
-    logger.info('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
     jobid = get_scrapyd_cli().schedule('spiders', 'qunar_comment')
-    logger.info('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
     jobid = get_scrapyd_cli().schedule('spiders', 'ly_comment')
-    logger.info('=' * 30, '爬虫定时任务:::', '景区评论:::', ':::', jobid)
+    logger.info("==========【结束评论景区】==========")
+
 
 
 # 订单接口检测 每2秒执行一次
@@ -50,4 +46,4 @@ def spot_comment():
 
 @register_job(scheduler, "interval", seconds=5)
 def order_check():
-    logger.info('=' * 30, 'test:::', 'test:::', "测试定时任务")
+    logger.info('=' * 30 + "测试定时任务")
