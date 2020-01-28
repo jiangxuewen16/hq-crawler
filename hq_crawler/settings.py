@@ -155,9 +155,9 @@ if APP_ENV == 'production':
 elif APP_ENV == 'develop':
     DEBUG = True
     from .env.develop import *
-else:       # todo: 正式环境www用户获取不到环境变量APP_ENV
-    DEBUG = False
-    from .env.production import *
+else:
+    DEBUG = True
+    from .env.develop import *
 
 # 日志配置
 BASE_LOG_DIR = os.path.join(BASE_DIR, "log")
