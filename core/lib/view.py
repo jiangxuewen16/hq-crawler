@@ -24,7 +24,7 @@ class BaseView(View):
 
     def __init(self):
         request = json.loads(self.request.body)
-        logger.info('请求参数：' + self.request.body)
+        logger.info('请求参数：' + str(self.request.body))
         self._request_param = request['data']
         self.version = request['head']['version']
         self.time = request['head']['time']
