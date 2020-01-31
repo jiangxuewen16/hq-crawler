@@ -46,6 +46,7 @@ def spot_price():
     jobid = get_scrapyd_cli().schedule('spiders', 'ly_price')
     jobid = get_scrapyd_cli().schedule('spiders', 'Mafengwo_price')
     jobid = get_scrapyd_cli().schedule('spiders', 'MeituanPrice')
+    jobid = get_scrapyd_cli().schedule('spiders', 'qunar_price')
     logger.info("==========【价格监控：结束】==========")
 
 
