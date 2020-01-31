@@ -29,7 +29,7 @@ class FliggySpider(scrapy.Spider):
 
 
 class FliggySpotSpider(scrapy.Spider):
-    name = 'fliggy_spot'
+    name = 'fliggy_spot_price'
     app_key = '12574478'
     sign_cookie = ''
     sign_header = {}
@@ -126,8 +126,6 @@ class FliggySpotSpider(scrapy.Spider):
         type_name = data['productName']
         type_id = self.get_spot_name(response.meta['ota_spot_id']) + data['ticketKindName'] + '_' + str(data['productId'])
         for product in o_price.ota_product:
-            print(product)
-            print(type_id)
             if product['type_id'] == type_id:
                 normal_price = product['normal_price']
                 type_name = product['type_name']
