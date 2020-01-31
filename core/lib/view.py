@@ -24,6 +24,7 @@ class BaseView(View):
 
     def __init(self):
         request = json.loads(self.request.body)
+        logger.info('请求参数：' + self.request.body)
         self._request_param = request['data']
         self.version = request['head']['version']
         self.time = request['head']['time']
@@ -67,7 +68,7 @@ class BaseView(View):
     def __response(self, data: dict, service_code: ServiceCode, contentType: str = 'application/json') -> HttpResponse:
         response: dict = {'head': {'token': self.token, 'time': int(time.time()), 'code': service_code.value.code,
                                    'message': service_code.value.msg}, 'data': data}
-
+        logger.info('请求参数：' + json.dumps(response))
         return HttpResponse(json.dumps(response), contentType)
 
     """
