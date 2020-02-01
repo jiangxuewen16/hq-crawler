@@ -50,8 +50,10 @@ class PublicOpinion(BaseView):
                 r = requests.get(url, headers=headers, params=params)
 
         if r.status_code == 200:
-            result = r.json()
-            return self.success(result)
+            if r.text:
+                result = r.json()
+                return self.success(result)
+            return self.success()
         else:
             return self.success("接口错误！请检查参数或联系惠趣云相关技术人员！！")
 
