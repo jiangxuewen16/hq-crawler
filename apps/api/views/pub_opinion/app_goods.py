@@ -49,8 +49,7 @@ class PublicOpinion(BaseView):
             else:
                 r = requests.get(url, headers=headers, params=params)
 
-        print('x' * 30, r.status_code)
-        if r.text:
+        if r.status_code == 200:
             result = r.json()
             return self.success(result)
         else:
