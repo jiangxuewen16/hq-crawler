@@ -66,7 +66,7 @@ class FliggySpotSpider(scrapy.Spider):
     def parse_item(self, response: HtmlResponse):
         response_str = response.body.decode('utf-8')
         charging_item_group_list = json.loads(response_str)['data']['data'][1]['list'][0]['chargingItemGroupList']
-        o_price = price.OPrice.objects(ota_id=OTA.OtaCode.FLIGGY.value.id, ota_spot_id=response.meta['ota_spot_id'])\
+        o_price = price.OPrice.objects(ota_id=OTA.OtaCode.FLIGGY.value.id, ota_spot_id=response.meta['ota_spot_id']) \
             .first()
         if not o_price:
             o_price = price.OPrice()
@@ -75,7 +75,7 @@ class FliggySpotSpider(scrapy.Spider):
             o_price.ota_spot_id = response.meta['ota_spot_id']
             o_price.ota_spot_name = self.get_spot_name(response.meta['ota_spot_id'])
             o_price.ota_product = []
-        o_price.update_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
+            o_price.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         for charging_item_group in charging_item_group_list:
             for charge_item in charging_item_group['chargeItems']:
                 detail_url = r'https://h5api.m.taobao.com/h5/mtop.trip.travelspdetail.scenic.product.itemsearch/1.0' \
@@ -124,11 +124,14 @@ class FliggySpotSpider(scrapy.Spider):
                    r'%2Ftrip%2Frx-poi%2Fdetail%2Findex.weex.js&_fli_newpage=1&poiId={ota_spot_id}&_projVer=0.5.17'
         normal_price = 0
         type_name = data['productName']
-        type_id = self.get_spot_name(response.meta['ota_spot_id']) + data['ticketKindName'] + '_' + str(data['productId'])
+        type_id = self.get_spot_name(response.meta['ota_spot_id']) + data['ticketKindName'] + '_' + str(
+            data['productId'])
+        flag = False
         for product in o_price.ota_product:
             if product['type_id'] == type_id:
                 normal_price = product['normal_price']
                 type_name = product['type_name']
+                flag = True
                 break
         ota_product = {
             'type_id': type_id,
@@ -151,8 +154,15 @@ class FliggySpotSpider(scrapy.Spider):
             i = i + 1
             total_price = total_price + float(ticket['price'])
             ota_product['tickets'].append(ticket_info)
-        o_price.ota_product.append(ota_product)
-        yield o_price
+        if not flag:
+            o_price.ota_product.append(ota_product)
+            yield o_price
+        else:
+            price.OPrice.objects(ota_id=OTA.OtaCode.FLIGGY.value.id,
+                                 ota_spot_id=response.meta['ota_spot_id'],
+                                 ota_product__type_id=type_id).update_one(
+                set__ota_product__S__tickets=ota_product['tickets'],
+                set__update_at=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         o_price_calendar = price.OPriceCalendar()
         o_price_calendar.ota_id = OTA.OtaCode.FLIGGY.value.id
         o_price_calendar.ota_spot_id = response.meta['ota_spot_id']
