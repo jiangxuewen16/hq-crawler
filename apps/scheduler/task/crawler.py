@@ -57,6 +57,6 @@ def spot_price():
 #     jobid = get_scrapyd_cli().schedule('spiders', 'hqlx_order')
 #     logger.info('=' * 30, 'test:::', 'test:::', jobid)
 
-@register_job(scheduler, "interval", seconds=5)
-def order_check():
-    logger.info('=' * 30 + "测试定时任务")
+# @register_job(scheduler, "interval", seconds=5)
+# def order_check():
+#     logger.info('=' * 30 + "测试定时任务")
