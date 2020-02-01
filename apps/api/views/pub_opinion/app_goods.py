@@ -49,11 +49,13 @@ class PublicOpinion(BaseView):
             else:
                 r = requests.get(url, headers=headers, params=params)
 
-        print('=' * 30, r.text)
         if r.text:
+            print('=' * 30, r.text)
+            print('=' * 30, bool(r.text))
             result = r.json()
             return self.success(result)
         else:
+            print('=' * 30, 'xxxxxxxxxxxxxxxxxxxxxxxxx')
             return self.success("接口错误！请检查参数或联系惠趣云相关技术人员！！")
 
     @Route.route(path='/test')
