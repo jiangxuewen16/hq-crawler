@@ -55,7 +55,8 @@ class PublicOpinion(BaseView):
             result = r.json()
             return self.success(result)
         else:
-            print('=' * 30, 'xxxxxxxxxxxxxxxxxxxxxxxxx')
+            print('x' * 30, r.text)
+            print('x' * 30, bool(r.text))
             return self.success("接口错误！请检查参数或联系惠趣云相关技术人员！！")
 
     @Route.route(path='/test')
