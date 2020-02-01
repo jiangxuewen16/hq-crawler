@@ -12,12 +12,12 @@ class PublicOpinion(BaseView):
 
     @Route.route(path='/index')
     def index(self):
-        login_url = "https://api-saas.huiquyun.com/api/account/login" #正式
+        login_url = "https://api-saas.huiquyun.com/api/account/login"  # 正式
         # login_url = "https://api-saas.huiquyun.com/api/account/login" #测试
         login_headers = {
             "Content-Type": "application/json"
         }
-        login_payload = {'userName': "ztyyzx", "password": "1q2w3E*"} #正式
+        login_payload = {'userName': "ztyyzx", "password": "1q2w3E*"}  # 正式
         # login_payload = {'userName': "admin", "password": "1q2w3E*"}  #测试
 
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
@@ -49,14 +49,11 @@ class PublicOpinion(BaseView):
             else:
                 r = requests.get(url, headers=headers, params=params)
 
+        print('x' * 30, r.status_code)
         if r.text:
-            print('=' * 30, r.text)
-            print('=' * 30, bool(r.text))
             result = r.json()
             return self.success(result)
         else:
-            print('x' * 30, r.text)
-            print('x' * 30, bool(r.text))
             return self.success("接口错误！请检查参数或联系惠趣云相关技术人员！！")
 
     @Route.route(path='/test')
