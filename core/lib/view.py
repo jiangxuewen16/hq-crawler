@@ -75,7 +75,7 @@ class BaseView(View):
     成功返回方法
     """
 
-    def success(self, data: dict, service_code: ServiceCode = ServiceCode.other_success) -> HttpResponse:
+    def success(self, data: dict = {}, service_code: ServiceCode = ServiceCode.other_success) -> HttpResponse:
         return self.__response(data, service_code)
 
     """
