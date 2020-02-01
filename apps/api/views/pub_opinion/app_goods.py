@@ -30,6 +30,11 @@ class PublicOpinion(BaseView):
             params = self.request_param
             url = params['api_url']
             headers = {'Authorization': Authorization, "Content-Type": "application/json"}
+
+            # 处理.net那边没有名字的数组数据
+            if 'php-list' in params:
+                params = params['php-list']
+
             if 'request_type' in params:
                 if params['request_type'] == 'post':
                     r = requests.post(url, headers=headers, data=json.dumps(params))

@@ -38,7 +38,8 @@ class Home(BaseView):
 
     @Route.route(path='home')
     def home1(self):
-        return self.response(self.request_param)
+        print(self.request_param)
+        return self.success(self.request_param)
 
     @Route.route(path='test/redis')
     def redis(self):

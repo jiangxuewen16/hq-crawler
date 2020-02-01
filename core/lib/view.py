@@ -68,7 +68,7 @@ class BaseView(View):
     def __response(self, data: dict, service_code: ServiceCode, contentType: str = 'application/json') -> HttpResponse:
         response: dict = {'head': {'token': self.token, 'time': int(time.time()), 'code': service_code.value.code,
                                    'message': service_code.value.msg}, 'data': data}
-        logger.info('请求参数：' + json.dumps(response))
+        logger.info('返回参数：' + json.dumps(response))
         return HttpResponse(json.dumps(response), contentType)
 
     """
