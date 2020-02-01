@@ -36,6 +36,7 @@ class BaseView(View):
     """
 
     def post(self, request: WSGIRequest):
+        print('rrrrrrrrrrrrrrrrrrrrrrrr:', request.method)
         if request.method == 'OPTIONS':
             return HttpResponse()
         self.__init()
