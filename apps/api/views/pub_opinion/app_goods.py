@@ -31,16 +31,18 @@ class PublicOpinion(BaseView):
             url = params['api_url']
             headers = {'Authorization': Authorization, "Content-Type": "application/json"}
 
-            # 处理.net那边没有名字的数组数据
-            if 'php-list' in params:
-                params = params['php-list']
-
             if 'request_type' in params:
-                if params['request_type'] == 'post':
+
+                request_type = params['request_type']
+                # 处理.net那边没有名字的数组数据
+                if 'php-list' in params:
+                    params = params['php-list']
+
+                if request_type == 'post':
                     r = requests.post(url, headers=headers, data=json.dumps(params))
-                elif params['request_type'] == 'put':
+                elif request_type == 'put':
                     r = requests.put(url, headers=headers, data=json.dumps(params))
-                elif params['request_type'] == 'delete':
+                elif request_type == 'delete':
                     r = requests.delete(url, headers=headers, data=json.dumps(params))
                 else:
                     r = requests.get(url, headers=headers, params=params)
