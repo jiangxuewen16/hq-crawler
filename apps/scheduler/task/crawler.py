@@ -41,7 +41,7 @@ def spot_comment():
 def spot_price():
     logger.info("==========【价格监控：开启】==========")
     jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_price')
-    jobid = get_scrapyd_cli().schedule('spiders', 'fliggy_spot')
+    jobid = get_scrapyd_cli().schedule('spiders', 'fliggy_spot_price')
     jobid = get_scrapyd_cli().schedule('spiders', 'lvmama_spot_price')
     jobid = get_scrapyd_cli().schedule('spiders', 'ly_price')
     jobid = get_scrapyd_cli().schedule('spiders', 'Mafengwo_price')
