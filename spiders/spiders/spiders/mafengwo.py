@@ -274,7 +274,7 @@ class MafengwoCitySpot(scrapy.Spider):
                 product_item['type_key'] = type_key
                 product_item['type_name'] = item.css('td.ticket-name::text').extract_first()
                 product_item['normal_price'] = item.css('td.ticket-price::text').extract_first().strip('¥起')
-                product_item['tickets'] = {'price_id': product_item['type_id'], 'title': product_item['type_name'],
+                product_item['tickets'][0] = {'price_id': product_item['type_id'], 'title': product_item['type_name'],
                                            'seller_nick': product_item['type_name'],
                                            'price': product_item['normal_price'], 'cash_back': 0, 'cut_price': 0,
                                            'sale_num': sale_num,
