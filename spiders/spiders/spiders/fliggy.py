@@ -34,11 +34,11 @@ class FliggySpotSpider(scrapy.Spider):
     sign_cookie = ''
     sign_header = {}
     allowed_domains = ['h5.m.taobao.com/']
-    base_url = r'https://h5api.m.taobao.com/h5/mtop.alitrip.tripmdd.querypoiinfo/3.9?type=originaljson&api=mtop' \
-               r'.alitrip.tripmdd.querypoiinfo&v=3.9&data={data}&ttid=12mtb0000155&appKey=12574478&t={' \
+    base_url = r'https://h5api.m.taobao.com/h5/mtop.alitrip.tripmdd.querypoiinfo/4.0?type=originaljson&api=mtop' \
+               r'.alitrip.tripmdd.querypoiinfo&v=4.0&data={data}&ttid=12mtb0000155&appKey=12574478&t={' \
                r'time}&sign={sign}'
-    start_urls = ['https://h5api.m.taobao.com/h5/mtop.alitrip.tripmdd.querypoiinfo/3.9?type=originaljson&api=mtop'
-                  '.alitrip.tripmdd.querypoiinfo&v=3.9&data={data}&ttid=12mtb0000155&appKey=12574478&t={'
+    start_urls = ['https://h5api.m.taobao.com/h5/mtop.alitrip.tripmdd.querypoiinfo/4.0?type=originaljson&api=mtop'
+                  '.alitrip.tripmdd.querypoiinfo&v=4.0&data={data}&ttid=12mtb0000155&appKey=12574478&t={'
                   'time}&sign={sign}']
 
     def parse(self, response: HtmlResponse):
@@ -65,7 +65,59 @@ class FliggySpotSpider(scrapy.Spider):
 
     def parse_item(self, response: HtmlResponse):
         response_str = response.body.decode('utf-8')
-        charging_item_group_list = json.loads(response_str)['data']['data'][1]['list'][0]['chargingItemGroupList']
+        for data in json.loads(response_str)['data']['data']:
+            if 'list' in data and 'chargingItemGroupList' in data['list'][0]:
+                charging_item_group_list = data['list'][0]['chargingItemGroupList']
+                for charging_item_group in charging_item_group_list:
+                    for charge_item in charging_item_group['chargeItems']:
+                        detail_url = r'https://h5api.m.taobao.com/h5/mtop.trip.travelspdetail.scenic.product.itemsearch/1.0' \
+                                     r'?type=originaljson&api=mtop.trip.travelspdetail.scenic.product.itemsearch&v=1.0&data={' \
+                                     r'data}&AntiCreep=true&AntiFlood=true&ttid=201300@travel_h5_3.1.0&appKey=12574478&t={' \
+                                     r'timestamp}&sign={sign}'
+                        data = {
+                            "searchType": "TICKET",
+                            "startRow": 0,
+                            "pageSize": 2,
+                            "source": "scenic",
+                            "poiId": response.meta['ota_spot_id'],
+                            "ticketKindName": charge_item['ticketTypeName'],
+                            "productName": charge_item['value'],
+                            "productId": charge_item['productVid'],
+                            "h5Version": "0.5.17"
+                        }
+                        timestamp = str(int(round(time.time() * 1000)))
+                        sign = self.encode_token(timestamp, data)
+                        url_request_data = quote(json.dumps(data, ensure_ascii=False).replace(' ', ''), 'utf-8')
+                        url = detail_url.format(data=url_request_data, timestamp=timestamp, sign=sign)
+                        yield Request(url=url, callback=self.parse_detail, dont_filter=True, headers=self.sign_header,
+                                      meta={'ota_spot_id': response.meta['ota_spot_id'],
+                                            'data': data, 'detail_url': detail_url})
+
+    def parse_detail(self, response: HtmlResponse):
+        response_str = response.body.decode('utf-8')
+        products_detail = json.loads(response_str)
+        data = response.meta['data']
+        data['pageSize'] = products_detail['data']['totalCount']
+        timestamp = str(int(round(time.time() * 1000)))
+        sign = self.encode_token(timestamp, data)
+        url_request_data = quote(json.dumps(data, ensure_ascii=False).replace(' ', ''), 'utf-8')
+        request_url = response.meta['detail_url'].format(data=url_request_data, timestamp=timestamp, sign=sign)
+        yield Request(url=request_url, callback=self.parse_data, dont_filter=True, headers=self.sign_header,
+                      meta={'ota_spot_id': response.meta['ota_spot_id'], 'data': data})
+
+    def parse_data(self, response: HtmlResponse):
+        response_str = response.body.decode('utf-8')
+        products_detail = json.loads(response_str)['data']['itemInfos']
+        data = response.meta['data']
+        total_price = i = 0
+        init_url = r'https://h5.m.taobao.com/trip/rx-poi/detail/index.html?_wx_tpl=https%3A%2F%2Fh5.m.taobao.com' \
+                   r'%2Ftrip%2Frx-poi%2Fdetail%2Findex.weex.js&_fli_newpage=1&poiId={ota_spot_id}&_projVer=0.5.17'
+        normal_price = 0
+        type_name = data['productName']
+        type_id = self.get_spot_name(response.meta['ota_spot_id']) + data['ticketKindName'] + '_' + str(
+            data['productId'])
+        # 判断当前产品是否已经存在数据库
+        flag = False
         o_price = price.OPrice.objects(ota_id=OTA.OtaCode.FLIGGY.value.id, ota_spot_id=response.meta['ota_spot_id']) \
             .first()
         if not o_price:
@@ -76,57 +128,6 @@ class FliggySpotSpider(scrapy.Spider):
             o_price.ota_spot_name = self.get_spot_name(response.meta['ota_spot_id'])
             o_price.ota_product = []
             o_price.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        for charging_item_group in charging_item_group_list:
-            for charge_item in charging_item_group['chargeItems']:
-                detail_url = r'https://h5api.m.taobao.com/h5/mtop.trip.travelspdetail.scenic.product.itemsearch/1.0' \
-                             r'?type=originaljson&api=mtop.trip.travelspdetail.scenic.product.itemsearch&v=1.0&data={' \
-                             r'data}&AntiCreep=true&AntiFlood=true&ttid=201300@travel_h5_3.1.0&appKey=12574478&t={' \
-                             r'timestamp}&sign={sign}'
-                data = {
-                    "searchType": "TICKET",
-                    "startRow": 0,
-                    "pageSize": 2,
-                    "source": "scenic",
-                    "poiId": response.meta['ota_spot_id'],
-                    "ticketKindName": charge_item['ticketTypeName'],
-                    "productName": charge_item['value'],
-                    "productId": charge_item['productVid'],
-                    "h5Version": "0.5.17"
-                }
-                timestamp = str(int(round(time.time() * 1000)))
-                sign = self.encode_token(timestamp, data)
-                url_request_data = quote(json.dumps(data, ensure_ascii=False).replace(' ', ''), 'utf-8')
-                url = detail_url.format(data=url_request_data, timestamp=timestamp, sign=sign)
-                yield Request(url=url, callback=self.parse_detail, dont_filter=True, headers=self.sign_header,
-                              meta={'ota_spot_id': response.meta['ota_spot_id'],
-                                    'data': data, 'detail_url': detail_url, 'o_price': o_price})
-
-    def parse_detail(self, response: HtmlResponse):
-        response_str = response.body.decode('utf-8')
-        products_detail = json.loads(response_str)
-        o_price = response.meta['o_price']
-        data = response.meta['data']
-        data['pageSize'] = products_detail['data']['totalCount']
-        timestamp = str(int(round(time.time() * 1000)))
-        sign = self.encode_token(timestamp, data)
-        url_request_data = quote(json.dumps(data, ensure_ascii=False).replace(' ', ''), 'utf-8')
-        request_url = response.meta['detail_url'].format(data=url_request_data, timestamp=timestamp, sign=sign)
-        yield Request(url=request_url, callback=self.parse_data, dont_filter=True, headers=self.sign_header,
-                      meta={'ota_spot_id': response.meta['ota_spot_id'], 'data': data, 'o_price': o_price})
-
-    def parse_data(self, response: HtmlResponse):
-        response_str = response.body.decode('utf-8')
-        products_detail = json.loads(response_str)['data']['itemInfos']
-        data = response.meta['data']
-        o_price = response.meta['o_price']
-        total_price = i = 0
-        init_url = r'https://h5.m.taobao.com/trip/rx-poi/detail/index.html?_wx_tpl=https%3A%2F%2Fh5.m.taobao.com' \
-                   r'%2Ftrip%2Frx-poi%2Fdetail%2Findex.weex.js&_fli_newpage=1&poiId={ota_spot_id}&_projVer=0.5.17'
-        normal_price = 0
-        type_name = data['productName']
-        type_id = self.get_spot_name(response.meta['ota_spot_id']) + data['ticketKindName'] + '_' + str(
-            data['productId'])
-        flag = False
         for product in o_price.ota_product:
             if product['type_id'] == type_id:
                 normal_price = product['normal_price']
