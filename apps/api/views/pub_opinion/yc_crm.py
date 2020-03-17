@@ -6,8 +6,13 @@ from core.lib.route import Route
 from core.lib.view import BaseView
 from django.core.cache import cache
 
+
 @Route.route(path='api/yc/crm/opinion')
 class PublicOpinion(BaseView):
+    CORP_ID = 'ding36d91e596177829935c2f4657eb6378f'
+    APP_ID = '27d1f87c661c4493abe3bb53195ec66c'
+    APP_SECRET = '13ABCDD4D8E6B0F812074B42E8A64ACD'
+    CORE_ACCESS_TOKEN = 'b99dee9141d63559f761da5d8ef0ce9f7b74f0'
 
     # 0简单示例（corpAccessToken）
     @Route.route(path='/index')
@@ -16,9 +21,9 @@ class PublicOpinion(BaseView):
         login_headers = {
             'Content-Type': 'application/json'
         }
-        login_payload = {'corpId': 'ding36d91e596177829935c2f4657eb6378f',
-                         'appId': '27d1f87c661c4493abe3bb53195ec66c',
-                         'appSecret': '13ABCDD4D8E6B0F812074B42E8A64ACD'}
+        login_payload = {'corpId': self.CORP_ID,
+                         'appId': self.APP_ID,
+                         'appSecret': self.APP_SECRET}
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         result = r.json()
         return self.success(result)
@@ -30,8 +35,8 @@ class PublicOpinion(BaseView):
         login_headers = {
             'Content-Type': 'application/json'
         }
-        login_payload = {'corpId': 'ding36d91e596177829935c2f4657eb6378f',
-                         'corpAccessToken': 'b99dee9141d63559f761da5d8ef0ce9f7b74f0'}
+        login_payload = {'corpId': self.CORP_ID,
+                         'corpAccessToken': self.CORE_ACCESS_TOKEN}
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         result = r.json()
         return self.success(result)
@@ -43,8 +48,8 @@ class PublicOpinion(BaseView):
         login_headers = {
             'Content-Type': 'application/json'
         }
-        login_payload = {'corpId': 'ding36d91e596177829935c2f4657eb6378f',
-                         'corpAccessToken': 'b99dee9141d63559f761da5d8ef0ce9f7b74f0',
+        login_payload = {'corpId': self.CORP_ID,
+                         'corpAccessToken': self.CORE_ACCESS_TOKEN,
                          'deployId': 'customer'}  # deployId从上接口获取
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         result = r.json()
@@ -58,8 +63,8 @@ class PublicOpinion(BaseView):
             'Content-Type': 'application/json'
         }
         login_payload = {
-            "corpAccessToken": "8355993e7777895b9859f4771511530992ad4c",
-            "corpId": "ding2037cc74cbb0f5e735c2f4657eb6378f",
+            "corpAccessToken": self.CORE_ACCESS_TOKEN,
+            "corpId": self.CORP_ID,
             "deployId": "customer",
             "conditionConfig": [{
                 "conditions": [
@@ -95,9 +100,9 @@ class PublicOpinion(BaseView):
         login_headers = {
             'Content-Type': 'application/json'
         }
-        login_payload = {'corpId': 'ding36d91e596177829935c2f4657eb6378f',
-                         'corpAccessToken': '8f1be5fce9488dd1188d355701869f4c327831',
-                         'deployId': 'DEPLOY_ID',
+        login_payload = {'corpId': self.CORP_ID,
+                         'corpAccessToken': self.CORE_ACCESS_TOKEN,
+                         'deployId': 'customer',
                          'dataId': 'DATA_ID'}
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         result = r.json()
