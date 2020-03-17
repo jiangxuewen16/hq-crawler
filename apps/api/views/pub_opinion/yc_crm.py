@@ -12,7 +12,7 @@ class PublicOpinion(BaseView):
     CORP_ID = 'ding36d91e596177829935c2f4657eb6378f'
     APP_ID = '27d1f87c661c4493abe3bb53195ec66c'
     APP_SECRET = '13ABCDD4D8E6B0F812074B42E8A64ACD'
-    CORE_ACCESS_TOKEN = 'b99dee9141d63559f761da5d8ef0ce9f7b74f0'
+    CORE_ACCESS_TOKEN = cache.get('CORE_ACCESS_TOKEN')
 
     # 0简单示例（corpAccessToken）
     @Route.route(path='/index')
@@ -111,20 +111,5 @@ class PublicOpinion(BaseView):
     # redis测试
     @Route.route(path='/data/redis')
     def data_redis(self):
-        login_url = 'http://crmapi.superboss.cc/oapi/corp/corp_access_token/get.json'
-        login_headers = {
-            'Content-Type': 'application/json'
-        }
-        login_payload = {'corpId': self.CORP_ID,
-                         'appId': self.APP_ID,
-                         'appSecret': self.APP_SECRET}
-        r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
-        result = r.json()
-        corpAccessToken = result['data']['corpAccessToken']
-
-        if cache.get('CORE_ACCESS_TOKEN'):
-            data = cache.get('CORE_ACCESS_TOKEN')
-        else:
-            cache.set("CORE_ACCESS_TOKEN", corpAccessToken, timeout=10)
-            data = cache.get("CORE_ACCESS_TOKEN")
-        return self.success(data)
+        cache.set('CORE_ACCESS_TOKEN', self.request_param['CORE_ACCESS_TOKEN'])
+        return self.success(cache.get('CORE_ACCESS_TOKEN'))
