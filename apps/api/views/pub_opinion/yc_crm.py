@@ -44,8 +44,8 @@ class PublicOpinion(BaseView):
             'Content-Type': 'application/json'
         }
         login_payload = {'corpId': 'ding36d91e596177829935c2f4657eb6378f',
-                         'corpAccessToken': '8f1be5fce9488dd1188d355701869f4c327831',
-                         'deployId': 'DEPLOY_ID'}  # deployId从上接口获取
+                         'corpAccessToken': 'b99dee9141d63559f761da5d8ef0ce9f7b74f0',
+                         'deployId': 'customer'}  # deployId从上接口获取
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         result = r.json()
         return self.success(result)
