@@ -71,19 +71,19 @@ class PublicOpinion(BaseView):
                     {
                         "comparison": "CONTAIN",
                         "deployId": "customer",
-                        "fieldName": "custom_name",
-                        "fieldTitle": "客户名称",
-                        "fieldValue": "名字",
-                        "domType": "INPUT"
-                    },
-                    {
-                        "comparison": "CONTAIN",
-                        "deployId": "customer",
-                        "fieldName": "custom_nick",
-                        "fieldTitle": "客户简称",
-                        "fieldValue": "名字",
+                        "fieldName": "customer_input_2",
+                        "fieldTitle": "团长经销ID",
+                        "fieldValue": "test团长经销ID",
                         "domType": "INPUT"
                     }
+                    # {
+                    #     "comparison": "CONTAIN",
+                    #     "deployId": "customer",
+                    #     "fieldName": "custom_nick",
+                    #     "fieldTitle": "客户简称",
+                    #     "fieldValue": "名字",
+                    #     "domType": "INPUT"
+                    # }
                 ]
             }],
             "page": 1,
