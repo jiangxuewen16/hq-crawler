@@ -111,6 +111,20 @@ class PublicOpinion(BaseView):
     # redis测试
     @Route.route(path='/data/redis')
     def data_redis(self):
-        cache.set("foooo", "value", timeout=25)
-        data = cache.ttl("foooo")
+        login_url = 'http://crmapi.superboss.cc/oapi/corp/corp_access_token/get.json'
+        login_headers = {
+            'Content-Type': 'application/json'
+        }
+        login_payload = {'corpId': self.CORP_ID,
+                         'appId': self.APP_ID,
+                         'appSecret': self.APP_SECRET}
+        r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
+        result = r.json()
+        corpAccessToken = result['data']['corpAccessToken']
+
+        if cache.get('CORE_ACCESS_TOKEN'):
+            data = cache.get('CORE_ACCESS_TOKEN')
+        else:
+            cache.set("CORE_ACCESS_TOKEN", corpAccessToken, timeout=1)
+            data = cache.get("CORE_ACCESS_TOKEN")
         return self.success(data)
