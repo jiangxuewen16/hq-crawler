@@ -12,7 +12,7 @@ class PublicOpinion(BaseView):
     CORP_ID = 'ding36d91e596177829935c2f4657eb6378f'
     APP_ID = '27d1f87c661c4493abe3bb53195ec66c'
     APP_SECRET = '13ABCDD4D8E6B0F812074B42E8A64ACD'
-    CORE_ACCESS_TOKEN = cache.get('CORE_ACCESS_TOKEN')
+    CORE_ACCESS_TOKEN = 'b99dee9141d63559f761da5d8ef0ce9f7b74f0'
 
     # 0简单示例（corpAccessToken）
     @Route.route(path='/index')
