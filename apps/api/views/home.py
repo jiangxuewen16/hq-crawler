@@ -41,15 +41,3 @@ class Home(BaseView):
         print(self.request_param)
         return self.success(self.request_param)
 
-    @Route.route(path='test/redis')
-    def redis(self):
-        a = 0
-        c = 3/a
-        return self.success({"name": a})
-
-    @Route.route(path='test/redis1')
-    def redis1(self):
-        logger.info('xxxxxxxxxxxxxxxxxxxxxxxx')
-        logger.error('ttttttttttttttttttttttt')
-        raise Exception("error!!!!!!!!!!!!")
-        return self.success({"name": "a"})
