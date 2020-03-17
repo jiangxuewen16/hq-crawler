@@ -4,7 +4,7 @@ import requests
 
 from core.lib.route import Route
 from core.lib.view import BaseView
-
+from django.core.cache import cache
 
 @Route.route(path='api/yc/crm/opinion')
 class PublicOpinion(BaseView):
@@ -25,20 +25,20 @@ class PublicOpinion(BaseView):
 
     # 1开放业务对象列表（object列表）
     @Route.route(path='/object/list')
-    def index(self):
+    def object_list(self):
         login_url = 'http://crmapi.superboss.cc/oapi/corp/v1/object/list.json'
         login_headers = {
             'Content-Type': 'application/json'
         }
         login_payload = {'corpId': 'ding36d91e596177829935c2f4657eb6378f',
-                         'corpAccessToken': '8f1be5fce9488dd1188d355701869f4c327831'}
+                         'corpAccessToken': 'b99dee9141d63559f761da5d8ef0ce9f7b74f0'}
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         result = r.json()
         return self.success(result)
 
     # 2业务对象字段列表（field列表）
     @Route.route(path='/object/field')
-    def index(self):
+    def object_field(self):
         login_url = 'http://crmapi.superboss.cc/oapi/corp/v1/object/field/list.json'
         login_headers = {
             'Content-Type': 'application/json'
@@ -52,7 +52,7 @@ class PublicOpinion(BaseView):
 
     # 3业务对象数据列表（data列表）
     @Route.route(path='/corp/data')
-    def index(self):
+    def corp_data(self):
         login_url = 'http://crmapi.superboss.cc/oapi/corp/v1/data/list.json'
         login_headers = {
             'Content-Type': 'application/json'
@@ -90,7 +90,7 @@ class PublicOpinion(BaseView):
 
     # 4业务对象数据详情（object列表）
     @Route.route(path='/data/detail')
-    def index(self):
+    def data_detail(self):
         login_url = 'http://crmapi.superboss.cc/oapi/corp/v1/data/detail.json'
         login_headers = {
             'Content-Type': 'application/json'
@@ -102,3 +102,10 @@ class PublicOpinion(BaseView):
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         result = r.json()
         return self.success(result)
+
+    # redis测试
+    @Route.route(path='/data/redis')
+    def data_redis(self):
+        cache.set("foooo", "value", timeout=25)
+        data = cache.ttl("foooo")
+        return self.success(data)
