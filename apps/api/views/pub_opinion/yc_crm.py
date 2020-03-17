@@ -120,11 +120,11 @@ class PublicOpinion(BaseView):
                          'appSecret': self.APP_SECRET}
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         result = r.json()
-        corpAccessToken = result['data']['corpAccessToken']
-
-        if cache.get('CORE_ACCESS_TOKEN'):
-            data = cache.get('CORE_ACCESS_TOKEN')
-        else:
-            cache.set("CORE_ACCESS_TOKEN", corpAccessToken, timeout=1)
-            data = cache.get("CORE_ACCESS_TOKEN")
-        return self.success(data)
+        corpAccessToken = result['data']
+        # corpAccessToken = 'value'
+        # if cache.get('CORE_ACCESS_TOKEN'):
+        #     data = cache.get('CORE_ACCESS_TOKEN')
+        # else:
+        #     cache.set("CORE_ACCESS_TOKEN", corpAccessToken, timeout=10)
+        #     data = cache.get("CORE_ACCESS_TOKEN")
+        return self.success(corpAccessToken)
