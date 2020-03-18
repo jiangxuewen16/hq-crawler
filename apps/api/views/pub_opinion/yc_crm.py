@@ -36,7 +36,7 @@ class PublicOpinion(BaseView):
             'Content-Type': 'application/json'
         }
         login_payload = {'corpId': self.CORP_ID,
-                         'corpAccessToken': self.CORE_ACCESS_TOKEN}
+                         'corpAccessToken': cache.get('CORE_ACCESS_TOKEN')}
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         result = r.json()
         return self.success(result)
@@ -49,7 +49,7 @@ class PublicOpinion(BaseView):
             'Content-Type': 'application/json'
         }
         login_payload = {'corpId': self.CORP_ID,
-                         'corpAccessToken': self.CORE_ACCESS_TOKEN,
+                         'corpAccessToken': cache.get('CORE_ACCESS_TOKEN'),
                          'deployId': 'customer'}  # deployId从上接口获取
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         result = r.json()
@@ -63,7 +63,7 @@ class PublicOpinion(BaseView):
             'Content-Type': 'application/json'
         }
         login_payload = {
-            "corpAccessToken": self.CORE_ACCESS_TOKEN,
+            "corpAccessToken": cache.get('CORE_ACCESS_TOKEN'),
             "corpId": self.CORP_ID,
             "deployId": "customer",
             "conditionConfig": [{
@@ -101,7 +101,7 @@ class PublicOpinion(BaseView):
             'Content-Type': 'application/json'
         }
         login_payload = {'corpId': self.CORP_ID,
-                         'corpAccessToken': self.CORE_ACCESS_TOKEN,
+                         'corpAccessToken': cache.get('CORE_ACCESS_TOKEN'),
                          'deployId': 'customer',
                          'dataId': 'DATA_ID'}
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
