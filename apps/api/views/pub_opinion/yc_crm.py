@@ -103,7 +103,7 @@ class PublicOpinion(BaseView):
         login_payload = {'corpId': self.CORP_ID,
                          'corpAccessToken': cache.get('CORE_ACCESS_TOKEN'),
                          'deployId': 'customer',
-                         'dataId': 'DATA_ID'}
+                         'dataId': '456633'}
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         result = r.json()
         return self.success(result)
