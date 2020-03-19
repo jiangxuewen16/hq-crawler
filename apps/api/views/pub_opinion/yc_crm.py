@@ -111,5 +111,5 @@ class PublicOpinion(BaseView):
     # redis测试
     @Route.route(path='/data/redis')
     def data_redis(self):
-        cache.set('CORE_ACCESS_TOKEN', self.request_param['CORE_ACCESS_TOKEN'])
+        cache.set('CORE_ACCESS_TOKEN', self.request_param['CORE_ACCESS_TOKEN'], 7200)
         return self.success(cache.get('CORE_ACCESS_TOKEN'))
