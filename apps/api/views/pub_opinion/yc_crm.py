@@ -113,3 +113,15 @@ class PublicOpinion(BaseView):
     def data_redis(self):
         cache.set('CORE_ACCESS_TOKEN', self.request_param['CORE_ACCESS_TOKEN'], 7200)
         return self.success(cache.get('CORE_ACCESS_TOKEN'))
+
+    """
+    ---------------------corp/data字段说明-------------------------
+    日期：【创建日期 created】
+    团长名称：【 】
+    团长ID:【团长经销ID customer_input_2】
+    团长姓名：【团长姓名 custom_nick】
+    团长手机号：【团长电话 custom_tele】
+    负责人：【负责人 charger_name】
+    
+    还有所属团队  团队负责人 不能确定
+    """
