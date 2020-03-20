@@ -6,6 +6,7 @@ from scrapy.http import HtmlResponse
 
 from spiders.common import OTA, helper, marketing
 from spiders.common.marketing import WeMedia, WeMediaType
+from spiders.items.common import core
 
 
 class MeituanSpider(scrapy.Spider):
@@ -13,17 +14,20 @@ class MeituanSpider(scrapy.Spider):
     allowed_domains = ['api.huiqulx.com']
     start_urls = ['https://api.huiqulx.com/release/user/user/test']
 
-    def start_requests(self):
-        formdata = {
-            "head": {"token": "", "time": 1563965531895, "version": "1.0", "platform": "43", "excode": "", "qrcode": "",
-                     "recode": ""}, "data": {}}
-        yield Request(self.start_urls[0], method="POST", body=json.dumps(formdata),
-                      headers={'Content-Type': 'application/json'},
-                      callback=self.parse)
+    # def start_requests(self):
+    #     formdata = {
+    #         "head": {"token": "", "time": 1563965531895, "version": "1.0", "platform": "43", "excode": "", "qrcode": "",
+    #                  "recode": ""}, "data": {}}
+    #     yield Request(self.start_urls[0], method="POST", body=json.dumps(formdata),
+    #                   headers={'Content-Type': 'application/json'},
+    #                   callback=self.parse)
 
     def parse(self, response: HtmlResponse):
         # items = response.css('div.service_c ul li').extract_first()
-        yield '{"name":"jiangxuewen","age":27}'
+        print("11111111111111111111111")
+        data = core.BaseData()
+        data.data = '{"name":"jiangxuewen","age":27}'
+        yield data
 
 
 if __name__ == '__main__':

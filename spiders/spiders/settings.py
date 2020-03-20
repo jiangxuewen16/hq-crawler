@@ -85,7 +85,8 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'spiders.pipelines.MongoDBPipeline': 300,
+    # 'spiders.pipelines.MongoDBPipeline': 300,
+    'spiders.pipelines.SpidersPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -130,7 +131,7 @@ from .env.production import *
 
 SCRAPYD_DEPLOY = 'http://172.18.113.141:6800/'
 
-KAFKA_CLIENT = KafkaClient(hosts="106.13.28.248:9092")
+KAFKA_HOSTS = ["106.13.28.248:9092"]
 KAFKA_TOPIC = 'log2kafka'
 
 """
