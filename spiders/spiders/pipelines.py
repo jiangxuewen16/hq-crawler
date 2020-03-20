@@ -7,6 +7,8 @@
 import mongoengine
 from scrapy.exceptions import DropItem
 
+from spiders import settings
+
 
 class SpidersPipeline(object):
     def process_item(self, item, spider):
@@ -31,4 +33,9 @@ class MongoDBPipeline(object):
         pass
 
     def process_item(self, item, spider):
-        item.save(force_insert=False, validate=False, clean=True, )
+        if type(item).__name__ == "str":
+            kafka_client = settings.KAFKA_CLIENT
+            kafka_client.topics(settings.KAFKA_TOPIC.encode())
+            kafka_client.produce(item.encode())
+        else:
+            item.save(force_insert=False, validate=False, clean=True, )

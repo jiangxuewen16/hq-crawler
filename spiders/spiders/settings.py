@@ -11,6 +11,8 @@
 import os
 import sys
 
+from pykafka import KafkaClient
+
 BOT_NAME = 'spiders'
 
 SPIDER_MODULES = ['spiders.spiders']
@@ -127,6 +129,9 @@ PROXIES = ['118.126.105.239:8008', '106.15.39.21:8008', '193.112.181.35:8008']
 from .env.production import *
 
 SCRAPYD_DEPLOY = 'http://172.18.113.141:6800/'
+
+KAFKA_CLIENT = KafkaClient(hosts="106.13.28.248:9092")
+KAFKA_TOPIC = 'log2kafka'
 
 """
 引入django配置

@@ -22,3 +22,5 @@ anyjson==0.3.3
 # 爬虫第三方user-agent库
 fake-useragent==0.1.11
 python-daemon==2.2.4
+
+pykafka==2.8.0

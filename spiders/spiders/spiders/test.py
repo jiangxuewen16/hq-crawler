@@ -23,7 +23,7 @@ class MeituanSpider(scrapy.Spider):
 
     def parse(self, response: HtmlResponse):
         # items = response.css('div.service_c ul li').extract_first()
-        print(response.body.decode('utf-8'))
+        yield '{"name":"jiangxuewen","age":27}'
 
 
 if __name__ == '__main__':
