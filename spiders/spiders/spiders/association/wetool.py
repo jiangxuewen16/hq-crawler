@@ -94,7 +94,7 @@ class WeToolListMemberSpider(scrapy.Spider):
     @staticmethod
     def parse_wx(response):
         """
-        处理群组消息 放入数据库
+        处理群组消息 传入kafka
         :param response:
         :return:
         """
