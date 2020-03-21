@@ -132,7 +132,7 @@ from .env.production import *
 SCRAPYD_DEPLOY = 'http://172.18.113.141:6800/'
 
 KAFKA_HOSTS = ["106.13.28.248:9092"]
-KAFKA_TOPIC = 'log2kafka'
+KAFKA_TOPIC = 'hq-crawler-topic'
 
 """
 引入django配置
