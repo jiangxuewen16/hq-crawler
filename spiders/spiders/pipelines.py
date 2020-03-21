@@ -4,12 +4,13 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-import mongoengine
+import json
+
 from pykafka import KafkaClient
 from scrapy.crawler import Crawler
-from scrapy.exceptions import DropItem
 
 from spiders import settings
+from spiders.items.common import core
 
 
 class SpidersPipeline(object):
@@ -27,8 +28,9 @@ class SpidersPipeline(object):
         self._producer = self._client.topics[kafka_topic].get_producer()
 
     def process_item(self, item, spider: Crawler):
-        if type(item).__name__ == 'BaseData':
-            self._producer.produce(item.data.encode())
+        if type(item).__name__ == core.BaseData.__name__:
+            json_str = json.dumps(item, default=lambda obj: obj.__dict__, sort_keys=True, indent=4)
+            self._producer.produce(json_str.encode())
         else:
             item.save(force_insert=False, validate=False, clean=True, )
 
@@ -54,10 +56,4 @@ class MongoDBPipeline(object):
         pass
 
     def process_item(self, item, spider):
-        print('=' * 20, spider, '=' * 20)
-        if type(item).__name__ == "str":
-            kafka_client = settings.KAFKA_CLIENT
-            kafka_client.topics(settings.KAFKA_TOPIC.encode())
-            kafka_client.produce(item.encode())
-        else:
-            item.save(force_insert=False, validate=False, clean=True, )
+        item.save(force_insert=False, validate=False, clean=True, )
