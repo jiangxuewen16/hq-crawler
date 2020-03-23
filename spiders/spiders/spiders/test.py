@@ -25,10 +25,10 @@ class MeituanSpider(scrapy.Spider):
     def parse(self, response: HtmlResponse):
         # items = response.css('div.service_c ul li').extract_first()
         print("11111111111111111111111")
-        data = core.BaseData()
-        data.data = {"name": "jiangxuewen", "age": 27}
-        data.event = "test"
-        data.create_at = "2019-01-01 22:44:44"
+        data = core.BaseData("test", {"name": "jiangxuewen", "age": 27})
+        # data.data = {"name": "jiangxuewen", "age": 27}
+        #         # data.event = "test"
+        #         # data.createAt = "2019-01-01 22:44:44"
         yield data
 
 
