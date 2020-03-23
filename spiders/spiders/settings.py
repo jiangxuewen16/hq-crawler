@@ -134,6 +134,9 @@ SCRAPYD_DEPLOY = 'http://172.18.113.141:6800/'
 KAFKA_HOSTS = ["106.13.28.248:9092"]
 KAFKA_TOPIC = 'hq-crawler-topic'
 
+# 应用租户id
+DISTINCT_ID = '1740009e-5946-44c4-acd7-e07af010a359'
+
 """
 引入django配置
 """
