@@ -33,32 +33,32 @@ class CrmSpider(scrapy.Spider):
         json_data = json.loads(response_str)
         print(json_data['result'])
         print(json_data)
-        url = self.start_urls[1]
-        post_data = {
-            # "corpAccessToken": json_data['data']['corpAccessToken'],
-            "corpAccessToken": "caaac76ac9bbec7a4db09aac0b9977d2c3524c",
-            "corpId": self.CORP_ID,
-            "deployId": "customer",
-            "conditionConfig": [{
-                "conditions": [
-                    {
-                        "comparison": "CONTAIN",
-                        "deployId": "customer",
-                        "domType": "INPUT"
-                    }
-                ]
-            }],
-            "page": 1,
-            "pageSize": 2
-        }
-        headers = {
-            'Content-Type': 'application/json'
-        }
-        yield scrapy.FormRequest(url=url, body=json.dumps(post_data), method='POST', headers=headers,
-                                 callback=self.parse_data)
-
-    def parse_data(self, response):
-        response_str = response.body.decode('utf-8')
-        json_data = json.loads(response_str)
-        print(json_data['result'])
-        print(json_data)
+    #     url = self.start_urls[1]
+    #     post_data = {
+    #         # "corpAccessToken": json_data['data']['corpAccessToken'],
+    #         "corpAccessToken": "caaac76ac9bbec7a4db09aac0b9977d2c3524c",
+    #         "corpId": self.CORP_ID,
+    #         "deployId": "customer",
+    #         "conditionConfig": [{
+    #             "conditions": [
+    #                 {
+    #                     "comparison": "CONTAIN",
+    #                     "deployId": "customer",
+    #                     "domType": "INPUT"
+    #                 }
+    #             ]
+    #         }],
+    #         "page": 1,
+    #         "pageSize": 2
+    #     }
+    #     headers = {
+    #         'Content-Type': 'application/json'
+    #     }
+    #     yield scrapy.FormRequest(url=url, body=json.dumps(post_data), method='POST', headers=headers,
+    #                              callback=self.parse_data)
+    #
+    # def parse_data(self, response):
+    #     response_str = response.body.decode('utf-8')
+    #     json_data = json.loads(response_str)
+    #     print(json_data['result'])
+    #     print(json_data)
