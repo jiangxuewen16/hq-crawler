@@ -1,8 +1,11 @@
 import json
+import time
 from urllib import parse
 
 import scrapy
 from scrapy.http import HtmlResponse
+
+from spiders.items.association.association import Association
 from spiders.items.common import core
 
 
@@ -102,7 +105,15 @@ class WeToolListMemberSpider(scrapy.Spider):
         list_member = json.loads(response_str)
         if list_member['errcode'] == 0:
             for chat_info in list_member['data']:
-                data = core.BaseData()
-                data.data = chat_info
-                data.event = 'wetool_list_member'
-                yield data
+                association = Association.objects(chat_room_id=chat_info['wxid']).first()
+                if not association:
+                    association = Association()
+                    association.chat_room_id = chat_info['wxid']
+                    association.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                association.chat_room_member_count = chat_info['member_count']
+                association.chat_room_nickname = chat_info['nickname']
+                association.chat_room_owner_wxid = chat_info['owner_wxid']
+                association.chat_room_avatar = 'http' + chat_info['avatar']
+                association.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                yield association
+
