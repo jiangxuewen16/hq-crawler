@@ -71,9 +71,9 @@ class PublicOpinion(BaseView):
                     {
                         "comparison": "CONTAIN",
                         "deployId": "customer",
-                        # "fieldName": "customer_input_2",
-                        # "fieldTitle": "团长经销ID",
-                        # "fieldValue": "test团长经销ID",
+                        "fieldName": "customer_input_2",
+                        "fieldTitle": "团长经销ID",
+                        "fieldValue": "团长经销IDtest",
                         "domType": "INPUT"
                     }
                     # {
@@ -124,4 +124,7 @@ class PublicOpinion(BaseView):
     负责人：【负责人 charger_name】
     
     还有所属团队  团队负责人 不能确定
+    
+    
+    # 那个覆盖社区数 是 crm中的 地推单位
     """
