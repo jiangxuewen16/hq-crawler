@@ -29,9 +29,3 @@ class CrmSpider(scrapy.Spider):
         response_str = response.body.decode('utf-8')
         json_data = json.loads(response_str)
         print(json_data)
-        client = KafkaClient(hosts="192.168.56.100:9092")
-        print(client.topics)
-        topic = client.topics['moercredit_log_test']
-        with topic.get_sync_producer() as producer:
-            for i in range(4):
-                producer.produce(bytes('this is message', encoding='utf-8'))
