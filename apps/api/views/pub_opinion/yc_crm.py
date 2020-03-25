@@ -118,6 +118,7 @@ class PublicOpinion(BaseView):
     ---------------------corp/data字段说明-------------------------
     日期：【创建日期 created】 create_at
     团长名称：【 】
+    群ID:【团长群编码 customer_input_4】chat_room_id
     团长ID:【团长经销ID customer_input_2】team_leader_id（用户ID）
     团长姓名：【团长姓名 custom_nick】team_leader_name
     团长手机号：【团长电话 custom_tele】team_leader_tel
