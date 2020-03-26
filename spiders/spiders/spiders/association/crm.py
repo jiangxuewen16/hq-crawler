@@ -108,7 +108,7 @@ class CrmSpider(scrapy.Spider):
                 print(self.get_param(param=value, in_name='customer_input_4', default=''))
                 if 'customer_input_4' in value:
                     print('正在添加'+self.get_param(param=value, in_name='custom_nick', default='')+'---------------团长数据')
-                    yield TAssociation.objects(chat_room_id=value['customer_input_4']).update_one(  # 团长群编码
+                    yield TAssociation.objects(team_group_id=value['customer_input_4']).update_one(  # 团长群编码
                         set__team_leader_id=self.get_param(param=value, in_name='customer_input_2', default=''),
                         # 团长ID(用户ID)
                         set__team_leader_name=self.get_param(param=value, in_name='custom_nick', default=''),  # 团长姓名
