@@ -6,7 +6,6 @@ import scrapy
 from scrapy.http import HtmlResponse
 
 from spiders.items.association.association import TAssociation
-from spiders.items.common import core
 
 
 class WeToolListMemberSpider(scrapy.Spider):
@@ -19,6 +18,7 @@ class WeToolListMemberSpider(scrapy.Spider):
         '中惠旅内购客服2': 'wxid_08ey7r0i9dvz12',
         '中惠旅内购客服3': 'wxid_bqi9qznshsmy12',
     }
+    crm_list = []
 
     def start_requests(self):
         """
@@ -26,6 +26,9 @@ class WeToolListMemberSpider(scrapy.Spider):
         scrapy默认get请求，所以重写初始方法
         :return:
         """
+        self.get_all_crm()
+        if not self.crm_list:
+            return
         url = self.start_urls[0]
         post_data = parse.urlencode({
             'captcha': '',
@@ -94,8 +97,7 @@ class WeToolListMemberSpider(scrapy.Spider):
             request_cookie += bytes.decode(cookie) + '; '
         return request_cookie
 
-    @staticmethod
-    def parse_wx(response):
+    def parse_wx(self, response):
         """
         处理群组消息 传入kafka
         :param response:
@@ -104,16 +106,23 @@ class WeToolListMemberSpider(scrapy.Spider):
         response_str = response.body.decode('utf-8')
         list_member = json.loads(response_str)
         if list_member['errcode'] == 0:
-            for chat_info in list_member['data']:
-                association = TAssociation.objects(chat_room_id=chat_info['wxid']).first()
-                if not association:
-                    association = TAssociation()
-                    association.chat_room_id = chat_info['wxid']
-                    association.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                association.chat_room_member_count = chat_info['member_count']
-                association.chat_room_nickname = chat_info['nickname']
-                association.chat_room_owner_wxid = chat_info['owner_wxid']
-                association.chat_room_avatar = 'http' + chat_info['avatar']
-                association.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                yield association
+            for crm_id in self.crm_list:
+                for chat_info in list_member['data']:
+                    if crm_id in chat_info['nickname']:
+                        association = TAssociation.objects(team_group_id=crm_id).first()
+                        association.chat_room_id = chat_info['wxid']
+                        association.chat_room_member_count = chat_info['member_count']
+                        association.chat_room_nickname = chat_info['nickname']
+                        association.chat_room_owner_wxid = chat_info['owner_wxid']
+                        association.chat_room_avatar = 'http' + chat_info['avatar']
+                        association.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                        yield association
 
+    def get_all_crm(self):
+        """
+        获取所有crm团长群编码
+        :return:
+        """
+        association = TAssociation.objects().all()
+        for ass in association:
+            self.crm_list.append(ass.team_group_id)
