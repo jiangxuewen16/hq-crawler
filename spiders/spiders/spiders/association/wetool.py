@@ -5,7 +5,7 @@ from urllib import parse
 import scrapy
 from scrapy.http import HtmlResponse
 
-from spiders.items.association.association import Association
+from spiders.items.association.association import TAssociation
 from spiders.items.common import core
 
 
@@ -105,9 +105,9 @@ class WeToolListMemberSpider(scrapy.Spider):
         list_member = json.loads(response_str)
         if list_member['errcode'] == 0:
             for chat_info in list_member['data']:
-                association = Association.objects(chat_room_id=chat_info['wxid']).first()
+                association = TAssociation.objects(chat_room_id=chat_info['wxid']).first()
                 if not association:
-                    association = Association()
+                    association = TAssociation()
                     association.chat_room_id = chat_info['wxid']
                     association.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 association.chat_room_member_count = chat_info['member_count']
