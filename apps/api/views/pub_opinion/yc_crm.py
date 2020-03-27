@@ -123,6 +123,7 @@ class PublicOpinion(BaseView):
     团长姓名：【团长姓名 custom_nick】team_leader_name
     团长手机号：【团长电话 custom_tele】team_leader_tel
     负责人：【负责人 charger_name】
+    地摊单位：【地摊单位 custom_name】custom_name (覆盖社区数 需要用到)
     
     还有所属团队  团队负责人 不能确定
     

@@ -114,4 +114,5 @@ class CrmSpider(scrapy.Spider):
                         set__team_leader_name=self.get_param(param=value, in_name='custom_nick', default=''),  # 团长姓名
                         set__team_leader_tel=self.get_param(param=value, in_name='custom_tele', default=''),  # 团长电话
                         set__charger_name=self.get_param(param=value, in_name='charger_name', default=''),  # 负责人
+                        set__custom_name=self.get_param(param=value, in_name='custom_name', default=''),  # 地毯单位（社区覆盖数需要用）
                         upsert=True)
