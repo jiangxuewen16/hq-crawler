@@ -71,9 +71,9 @@ class PublicOpinion(BaseView):
                     {
                         "comparison": "CONTAIN",
                         "deployId": "customer",
-                        "fieldName": "customer_input_2",
-                        "fieldTitle": "团长经销ID",
-                        "fieldValue": "团长经销IDtest",
+                        # "fieldName": "customer_input_2",
+                        # "fieldTitle": "团长经销ID",
+                        # "fieldValue": "团长经销IDtest",
                         "domType": "INPUT"
                     }
                     # {
