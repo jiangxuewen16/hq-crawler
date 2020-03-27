@@ -87,7 +87,7 @@ class PublicOpinion(BaseView):
                 ]
             }],
             "page": 1,
-            "pageSize": 2
+            "pageSize": 20
         }
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         result = r.json()
