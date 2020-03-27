@@ -1,4 +1,5 @@
 import json
+import re
 import time
 from urllib import parse
 
@@ -106,10 +107,11 @@ class WeToolListMemberSpider(scrapy.Spider):
         response_str = response.body.decode('utf-8')
         list_member = json.loads(response_str)
         if list_member['errcode'] == 0:
-            for crm_id in self.crm_list:
-                for chat_info in list_member['data']:
-                    if crm_id in chat_info['nickname']:
-                        association = TAssociation.objects(team_group_id=crm_id).first()
+            for chat_info in list_member['data']:
+                match = re.search(r'惠[旅|趣]商城\D*(\d*)', chat_info['nickname'])
+                if match:
+                    association = TAssociation.objects(team_group_id=match.group(1)).first()
+                    if association:
                         association.chat_room_id = chat_info['wxid']
                         association.chat_room_member_count = chat_info['member_count']
                         association.chat_room_nickname = chat_info['nickname']
