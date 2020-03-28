@@ -117,7 +117,7 @@ class WeToolListMemberSpider(scrapy.Spider):
                         association.chat_room_nickname = chat_info['nickname']
                         association.chat_room_owner_wxid = chat_info['owner_wxid']
                         association.chat_room_avatar = 'http' + chat_info['avatar']
-                        association.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                        association.update_at = time.strftime("%Y-%m-%d", time.localtime())
                         yield association
 
     def get_all_crm(self):
