@@ -1,5 +1,6 @@
 import json
 import math
+import time
 
 import scrapy
 
@@ -102,17 +103,30 @@ class CrmSpider(scrapy.Spider):
         response_str = response.body.decode('utf-8')
         json_data = json.loads(response_str)
         # print(json_data['data']['list'])
-
+        publishTime = time.strftime("%Y-%m-%d", time.strptime('2020/03/28', u"%Y/%m/%d"))[0:10]
+        print(publishTime + '###########' + time.strftime("%Y-%m-%d"))
         if 'data' in json_data and 'list' in json_data['data']:
             for key, value in enumerate(json_data['data']['list']):
-                print(self.get_param(param=value, in_name='customer_input_4', default=''))
+                create = self.get_param(param=value, in_name='created', default=time.strftime("%Y/%m/%d"))[0:10]
+                create_at = time.strftime("%Y-%m-%d", time.strptime(create, u"%Y/%m/%d"))
+
+                modified = self.get_param(param=value, in_name='modified', default=time.strftime("%Y/%m/%d"))[0:10]
+                update_at = time.strftime("%Y-%m-%d", time.strptime(modified, u"%Y/%m/%d"))
+
+                print(create)
                 if 'customer_input_4' in value:
-                    print('正在添加'+self.get_param(param=value, in_name='custom_nick', default='')+'---------------团长数据')
+                    print(
+                        '正在添加' + self.get_param(param=value, in_name='custom_nick', default='') + '---------------团长数据')
+                    print(self.get_param(param=value, in_name='created',
+                                         default=time.strftime("%Y/%m/%d")))
                     yield TAssociation.objects(team_group_id=value['customer_input_4']).update_one(  # 团长群编码
                         set__team_leader_id=self.get_param(param=value, in_name='customer_input_2', default=''),
                         # 团长ID(用户ID)
                         set__team_leader_name=self.get_param(param=value, in_name='custom_nick', default=''),  # 团长姓名
                         set__team_leader_tel=self.get_param(param=value, in_name='custom_tele', default=''),  # 团长电话
                         set__charger_name=self.get_param(param=value, in_name='charger_name', default=''),  # 负责人
-                        set__custom_name=self.get_param(param=value, in_name='custom_name', default=''),  # 地毯单位（社区覆盖数需要用）
+                        set__custom_name=self.get_param(param=value, in_name='custom_name', default=''),
+                        # 地毯单位（社区覆盖数需要用）
+                        set__create_at=create_at,  # 创建时间
+                        set__update_at=update_at,  # 创建时间
                         upsert=True)
