@@ -103,8 +103,8 @@ class CrmSpider(scrapy.Spider):
         response_str = response.body.decode('utf-8')
         json_data = json.loads(response_str)
         # print(json_data['data']['list'])
-        publishTime = time.strftime("%Y-%m-%d", time.strptime('2020/03/28', u"%Y/%m/%d"))[0:10]
-        print(publishTime + '###########' + time.strftime("%Y-%m-%d"))
+        # publishTime = time.strftime("%Y-%m-%d", time.strptime('2020/03/28', u"%Y/%m/%d"))[0:10]
+        # print(publishTime + '###########' + time.strftime("%Y-%m-%d"))
         if 'data' in json_data and 'list' in json_data['data']:
             for key, value in enumerate(json_data['data']['list']):
                 create = self.get_param(param=value, in_name='created', default=time.strftime("%Y/%m/%d"))[0:10]
