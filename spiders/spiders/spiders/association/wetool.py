@@ -114,13 +114,12 @@ class WeToolListMemberSpider(scrapy.Spider):
         if list_member['errcode'] == 0:
             for chat_info in list_member['data']:
                 print('+++++++++++++++++++', int(chat_info['member_count']))
-                match = re.search(r'\.*惠[旅|趣]商城\D*(\w*)', chat_info['nickname'])
+                match = re.search(r'[.]*惠[旅|趣]商城\D*(\w*)', chat_info['nickname'])
                 if match:
                     wetool = TWetool.objects(chat_room_id=chat_info['wxid']).first()
                     association = TAssociation.objects(team_group_id=match.group(1)).first()
 
                     member_count = int(chat_info['member_count'])
-                    group = 0
                     if member_count > 500:
                         member_count = 0
 
