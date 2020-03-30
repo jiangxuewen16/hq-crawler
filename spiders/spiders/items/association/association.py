@@ -13,6 +13,8 @@ class TAssociation(BaseItem, mongoengine.Document):
     charger_name = mongoengine.StringField()            # 负责人
     team_group_id = mongoengine.StringField()           # 团长群编码
     custom_name = mongoengine.StringField()           # 地摊单位 （统计覆盖社区数 需要用到）
+    belong_team = mongoengine.StringField()           # 所属团队
+    belong_team_id = mongoengine.StringField()           # 所属团队ID
     chat_room_id = mongoengine.StringField()            # 群id
     chat_room_owner_wxid = mongoengine.StringField()    # 群所属人id
     chat_room_member_count = mongoengine.IntField()     # 群人数

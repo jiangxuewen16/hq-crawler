@@ -5,6 +5,8 @@ import time
 import scrapy
 
 from spiders.items.association.association import TAssociation
+from spiders.items.channel.channel import CChannel
+from spiders.items.distributor.distributor import CDistributor
 
 
 class CrmSpider(scrapy.Spider):
@@ -117,8 +119,15 @@ class CrmSpider(scrapy.Spider):
                 if 'customer_input_4' in value:
                     print(
                         '正在添加' + self.get_param(param=value, in_name='custom_nick', default='') + '---------------团长数据')
-                    print(self.get_param(param=value, in_name='created',
-                                         default=time.strftime("%Y/%m/%d")))
+                    custom_tele = self.get_param(param=value, in_name='custom_tele', default='')
+                    cd_obj = CDistributor.objects(mobile=custom_tele).first()
+                    belong_team = ''
+                    channel_id = ''
+                    if cd_obj:
+                        channel_id = CDistributor.objects(mobile=custom_tele).first().channel_id
+                        cc_obj = CChannel.objects(channel_id=channel_id).first()
+                        if cc_obj:
+                            belong_team = cc_obj.name
                     yield TAssociation.objects(team_group_id=value['customer_input_4']).update_one(  # 团长群编码
                         set__team_leader_id=self.get_param(param=value, in_name='customer_input_2', default=''),
                         # 团长ID(用户ID)
@@ -127,6 +136,8 @@ class CrmSpider(scrapy.Spider):
                         set__charger_name=self.get_param(param=value, in_name='charger_name', default=''),  # 负责人
                         set__custom_name=self.get_param(param=value, in_name='custom_name', default=''),
                         # 地毯单位（社区覆盖数需要用）
+                        set__belong_team_id=channel_id,  # 所属团队id
+                        set__belong_team=belong_team,  # 所属团队
                         set__create_at=create_at,  # 创建时间
                         set__update_at=update_at,  # 创建时间
                         upsert=True)
