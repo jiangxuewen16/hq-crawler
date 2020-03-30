@@ -6,6 +6,7 @@ from urllib import parse
 import scrapy
 from scrapy.http import HtmlResponse
 
+from spiders.items.association.wetool import TWetool
 from spiders.items.association.association import TAssociation
 
 
@@ -100,7 +101,7 @@ class WeToolListMemberSpider(scrapy.Spider):
 
     def parse_wx(self, response):
         """
-        处理群组消息 传入kafka
+        处理群组消息
         :param response:
         :return:
         """
@@ -110,6 +111,7 @@ class WeToolListMemberSpider(scrapy.Spider):
             for chat_info in list_member['data']:
                 match = re.search(r'惠[旅|趣]商城\D*(\d*)', chat_info['nickname'])
                 if match:
+                    wetool = TWetool.objects(chat_room_id=chat_info['wxid']).first()
                     association = TAssociation.objects(team_group_id=match.group(1)).first()
                     if association:
                         association.chat_room_id = chat_info['wxid']
@@ -119,6 +121,16 @@ class WeToolListMemberSpider(scrapy.Spider):
                         association.chat_room_avatar = 'http' + chat_info['avatar']
                         association.update_at = time.strftime("%Y-%m-%d", time.localtime())
                         yield association
+                    if not wetool:
+                        wetool = TWetool()
+                        wetool.chat_room_id = chat_info['wxid']
+                        wetool.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                    wetool.chat_room_member_count = chat_info['member_count']
+                    wetool.chat_room_nickname = chat_info['nickname']
+                    wetool.chat_room_owner_wxid = chat_info['owner_wxid']
+                    wetool.chat_room_avatar = 'http' + chat_info['avatar']
+                    wetool.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                    yield wetool
 
     def get_all_crm(self):
         """
