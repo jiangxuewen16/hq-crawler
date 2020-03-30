@@ -123,6 +123,7 @@ class WeToolListMemberSpider(scrapy.Spider):
                     if member_count > 500:
                         member_count = 0
 
+                    print('==' * 20, match.group(1))
                     cd = CDistributor.objects(team_group_id=match.group(1)).first()
 
                     if association:
