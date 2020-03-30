@@ -8,6 +8,7 @@ from scrapy.http import HtmlResponse
 
 from spiders.items.association.wetool import TWetool
 from spiders.items.association.association import TAssociation
+from spiders.items.distributor.distributor import CDistributor
 
 
 class WeToolListMemberSpider(scrapy.Spider):
@@ -130,6 +131,8 @@ class WeToolListMemberSpider(scrapy.Spider):
                             num_list[match.group(1)] = [member_count, 1]
                             #num_list[match.group(1)] = member_count
 
+                        cd = CDistributor.objects(team_group_id=match.group(1)).first()
+
                         association.chat_room_id = chat_info['wxid']
                         association.chat_room_member_count = num_list[match.group(1)][0]
                         association.chat_room_nickname = chat_info['nickname']
@@ -137,6 +140,7 @@ class WeToolListMemberSpider(scrapy.Spider):
                         association.char_room_sum = num_list[match.group(1)][1]
                         association.chat_room_avatar = 'http' + chat_info['avatar']
                         association.update_at = time.strftime("%Y-%m-%d", time.localtime())
+                        association.channel_id = cd.channel_id
                         yield association
                     if not wetool:
                         wetool = TWetool()

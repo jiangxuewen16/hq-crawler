@@ -21,5 +21,6 @@ class TAssociation(BaseItem, mongoengine.Document):
     char_room_sum = mongoengine.IntField()              # 群数
     chat_room_nickname = mongoengine.StringField()      # 群名称
     chat_room_avatar = mongoengine.StringField()        # 群头像
+    channel_id = mongoengine.StringField()      # 渠道id/部门id
     create_at = mongoengine.StringField()  # 创建时间
     update_at = mongoengine.StringField()  # 更新时间
