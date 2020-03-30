@@ -99,7 +99,8 @@ class WeToolListMemberSpider(scrapy.Spider):
             request_cookie += bytes.decode(cookie) + '; '
         return request_cookie
 
-    def parse_wx(self, response):
+    @staticmethod
+    def parse_wx(response):
         """
         处理群组消息
         :param response:
