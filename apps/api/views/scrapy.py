@@ -72,3 +72,11 @@ class Scrapy(BaseView):
         jobid = get_scrapyd_cli().schedule('spiders', 'hqlx_order')
         logger.info('=' * 30, 'test:::test', jobid)
         return self.success({'jobid': jobid})
+
+    @Route.route(path='run')
+    def hqlx_order_(self):
+        param = self.request_param
+        logger.info("==========【开启】==========", param['spider_name'])
+        jobid = get_scrapyd_cli().schedule('spiders', param['spider_name'])
+        logger.info("==========【结束】==========", param['spider_name'])
+        return self.success({'jobid': jobid})
