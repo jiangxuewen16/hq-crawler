@@ -124,7 +124,10 @@ class WeToolListMemberSpider(scrapy.Spider):
                         member_count = 0
 
                     print('==' * 20, match.group(1))
+                    channel_id = 0;
                     cd = CDistributor.objects(team_group_id=match.group(1)).first()
+                    if cd is not None:
+                        channel_id = cd.channel_id
 
                     if association:
                         if match.group(1) in num_list:
@@ -141,7 +144,7 @@ class WeToolListMemberSpider(scrapy.Spider):
                         association.char_room_sum = num_list[match.group(1)][1]
                         association.chat_room_avatar = 'http' + chat_info['avatar']
                         association.update_at = time.strftime("%Y-%m-%d", time.localtime())
-                        association.channel_id = cd.channel_id
+                        association.channel_id = channel_id
                         yield association
                     if not wetool:
                         wetool = TWetool()
@@ -153,7 +156,7 @@ class WeToolListMemberSpider(scrapy.Spider):
                     wetool.chat_room_owner_wxid = chat_info['owner_wxid']
                     wetool.chat_room_avatar = 'http' + chat_info['avatar']
                     wetool.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                    wetool.channel_id = cd.channel_id
+                    wetool.channel_id = channel_id
                     yield wetool
 
     def get_all_crm(self):
