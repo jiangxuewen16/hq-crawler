@@ -114,9 +114,15 @@ class WeToolListMemberSpider(scrapy.Spider):
                 if match:
                     wetool = TWetool.objects(chat_room_id=chat_info['wxid']).first()
                     association = TAssociation.objects(team_group_id=match.group(1)).first()
+                    num_list = {}
                     if association:
+                        if match.group(1) in num_list:
+                            num_list[match.group(1)] = num_list[match.group(1)] + chat_info['member_count']
+                        else:
+                            num_list[match.group(1)] = chat_info['member_count']
+
                         association.chat_room_id = chat_info['wxid']
-                        association.chat_room_member_count = chat_info['member_count']
+                        association.chat_room_member_count = num_list[match.group(1)]
                         association.chat_room_nickname = chat_info['nickname']
                         association.chat_room_owner_wxid = chat_info['owner_wxid']
                         association.chat_room_avatar = 'http' + chat_info['avatar']
