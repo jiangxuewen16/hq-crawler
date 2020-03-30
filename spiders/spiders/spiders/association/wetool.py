@@ -109,6 +109,7 @@ class WeToolListMemberSpider(scrapy.Spider):
         response_str = response.body.decode('utf-8')
         list_member = json.loads(response_str)
         num_list = {}
+        group_list = {}
         if list_member['errcode'] == 0:
             for chat_info in list_member['data']:
                 print('+++++++++++++++++++', int(chat_info['member_count']))
@@ -119,17 +120,21 @@ class WeToolListMemberSpider(scrapy.Spider):
 
 
                     member_count = int(chat_info['member_count'])
+                    group = 0;
                     if member_count > 500:
                         member_count = 0
                     if association:
                         if match.group(1) in num_list:
-                            num_list[match.group(1)] = num_list[match.group(1)] + member_count
+                            num_list[match.group(1)] = [num_list[match.group(1)][0] + member_count, num_list[match.group(1)][1] + 1]
                         else:
-                            num_list[match.group(1)] = member_count
+                            num_list[match.group(1)] = [member_count, 1]
+                            #num_list[match.group(1)] = member_count
+
                         association.chat_room_id = chat_info['wxid']
-                        association.chat_room_member_count = num_list[match.group(1)]
+                        association.chat_room_member_count = num_list[match.group(1)][0]
                         association.chat_room_nickname = chat_info['nickname']
                         association.chat_room_owner_wxid = chat_info['owner_wxid']
+                        association.char_room_sum = num_list[match.group(1)][1]
                         association.chat_room_avatar = 'http' + chat_info['avatar']
                         association.update_at = time.strftime("%Y-%m-%d", time.localtime())
                         yield association
