@@ -50,7 +50,7 @@ def spot_price():
     logger.info("==========【价格监控：结束】==========")
 
 
-@register_job(scheduler, "cron", hour='04', minute='10', id='association')
+@register_job(scheduler, "interval", seconds=2 * 60 * 60, id='association')
 def association():
     logger.info("==========【社群监控：开启】==========")
     jobid = get_scrapyd_cli().schedule('spiders', 'crm')
