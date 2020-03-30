@@ -50,6 +50,12 @@ def spot_price():
     logger.info("==========【价格监控：结束】==========")
 
 
+@register_job(scheduler, "cron", hour='04', minute='10', id='association')
+def association():
+    logger.info("==========【社群监控：开启】==========")
+    jobid = get_scrapyd_cli().schedule('spiders', 'crm')
+    jobid = get_scrapyd_cli().schedule('spiders', 'wetool_list_member')
+    logger.info("==========【社群监控：结束】==========")
 
 # 订单接口检测 每2秒执行一次
 # @register_job(scheduler, "interval", seconds=5 * 60 * 60)
