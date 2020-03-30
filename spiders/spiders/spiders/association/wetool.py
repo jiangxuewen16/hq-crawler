@@ -117,9 +117,9 @@ class WeToolListMemberSpider(scrapy.Spider):
                     num_list = {}
                     if association:
                         if match.group(1) in num_list:
-                            num_list[match.group(1)] = num_list[match.group(1)] + chat_info['member_count']
+                            num_list[match.group(1)] = num_list[match.group(1)] + int(chat_info['member_count'])
                         else:
-                            num_list[match.group(1)] = chat_info['member_count']
+                            num_list[match.group(1)] = int(chat_info['member_count'])
 
                         association.chat_room_id = chat_info['wxid']
                         association.chat_room_member_count = num_list[match.group(1)]
