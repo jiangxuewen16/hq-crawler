@@ -12,5 +12,6 @@ class TWetool(BaseItem, mongoengine.Document):
     chat_room_member_count = mongoengine.IntField()     # 群人数
     chat_room_nickname = mongoengine.StringField()      # 群名称
     chat_room_avatar = mongoengine.StringField()        # 群头像
+    channel_id = mongoengine.StringField()        # 渠道\部门
     create_at = mongoengine.StringField()  # 创建时间
     update_at = mongoengine.StringField()  # 更新时间

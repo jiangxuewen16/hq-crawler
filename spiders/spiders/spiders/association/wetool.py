@@ -119,19 +119,20 @@ class WeToolListMemberSpider(scrapy.Spider):
                     wetool = TWetool.objects(chat_room_id=chat_info['wxid']).first()
                     association = TAssociation.objects(team_group_id=match.group(1)).first()
 
-
                     member_count = int(chat_info['member_count'])
-                    group = 0;
+                    group = 0
                     if member_count > 500:
                         member_count = 0
+
+                    cd = CDistributor.objects(team_group_id=match.group(1)).first()
+
                     if association:
                         if match.group(1) in num_list:
-                            num_list[match.group(1)] = [num_list[match.group(1)][0] + member_count, num_list[match.group(1)][1] + 1]
+                            num_list[match.group(1)] = [num_list[match.group(1)][0] + member_count,
+                                                        num_list[match.group(1)][1] + 1]
                         else:
                             num_list[match.group(1)] = [member_count, 1]
-                            #num_list[match.group(1)] = member_count
-
-                        cd = CDistributor.objects(team_group_id=match.group(1)).first()
+                            # num_list[match.group(1)] = member_count
 
                         association.chat_room_id = chat_info['wxid']
                         association.chat_room_member_count = num_list[match.group(1)][0]
@@ -152,6 +153,7 @@ class WeToolListMemberSpider(scrapy.Spider):
                     wetool.chat_room_owner_wxid = chat_info['owner_wxid']
                     wetool.chat_room_avatar = 'http' + chat_info['avatar']
                     wetool.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                    wetool.channel_id = cd.channel_id
                     yield wetool
 
     def get_all_crm(self):
