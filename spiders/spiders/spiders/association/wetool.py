@@ -108,6 +108,7 @@ class WeToolListMemberSpider(scrapy.Spider):
         """
         response_str = response.body.decode('utf-8')
         list_member = json.loads(response_str)
+        num_list = {}
         if list_member['errcode'] == 0:
             for chat_info in list_member['data']:
                 print('+++++++++++++++++++', int(chat_info['member_count']))
@@ -115,7 +116,7 @@ class WeToolListMemberSpider(scrapy.Spider):
                 if match:
                     wetool = TWetool.objects(chat_room_id=chat_info['wxid']).first()
                     association = TAssociation.objects(team_group_id=match.group(1)).first()
-                    num_list = {}
+
 
                     member_count = int(chat_info['member_count'])
                     if member_count > 500:
