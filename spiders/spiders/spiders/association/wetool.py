@@ -124,7 +124,7 @@ class WeToolListMemberSpider(scrapy.Spider):
                         member_count = 0
 
                     print('==' * 20, match.group(1))
-                    channel_id = 0;
+                    channel_id = "0"
                     cd = CDistributor.objects(team_group_id=match.group(1)).first()
                     if cd is not None:
                         channel_id = cd.channel_id
