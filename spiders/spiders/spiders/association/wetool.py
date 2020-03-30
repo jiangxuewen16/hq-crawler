@@ -34,9 +34,9 @@ class WeToolListMemberSpider(scrapy.Spider):
         url = self.start_urls[0]
         post_data = parse.urlencode({
             'captcha': '',
-            'email': '15616882820@jxw',
+            'email': '15616882820@zhaowei',
             'from': 'https://wp.wxb.com/',
-            'password': 'jxw123456',
+            'password': 'zhlzhaowei',
             'remember': 'on'
         })
         headers = {
