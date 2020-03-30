@@ -11,6 +11,10 @@ class Scrapy(BaseView):
     def list(self):
         return self.success({'sd': get_scrapyd_cli().list_projects()})
 
+    @Route.route(path='spider/list')
+    def list(self):
+        return self.success({'sd': get_scrapyd_cli().list_spiders("spiders")})
+
     @Route.route(path='schedule')
     def schedule(self):
         return self.success({'sd': get_scrapyd_cli().schedule('spiders', 'mafengwo_spot')})

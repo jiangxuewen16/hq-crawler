@@ -37,7 +37,7 @@ def spot_comment():
     logger.info("==========【景区评论：结束】==========")
 
 
-@register_job(scheduler, "cron", hour='03', minute='10', id='spot_comment')
+@register_job(scheduler, "cron", hour='03', minute='10', id='spot_price')
 def spot_price():
     logger.info("==========【价格监控：开启】==========")
     jobid = get_scrapyd_cli().schedule('spiders', 'ctrip_price')
