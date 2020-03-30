@@ -125,6 +125,7 @@ class WeToolListMemberSpider(scrapy.Spider):
                         wetool = TWetool()
                         wetool.chat_room_id = chat_info['wxid']
                         wetool.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                    wetool.team_group_id = match.group(1)
                     wetool.chat_room_member_count = chat_info['member_count']
                     wetool.chat_room_nickname = chat_info['nickname']
                     wetool.chat_room_owner_wxid = chat_info['owner_wxid']
