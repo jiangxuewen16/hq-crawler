@@ -118,7 +118,7 @@ class WeToolListMemberSpider(scrapy.Spider):
                                              create_date=time.strftime("%Y-%m-%d", time.localtime())).first()
                     association = TAssociation.objects(team_group_id=match.group(1)).first()
                     member_count = int(chat_info['member_count'])
-                    if member_count > 500 or member_count < 0:
+                    if member_count > 500:
                         member_count = 0
                     distributor_id = channel_id = "0"
                     cd = CDistributor.objects(team_group_id=match.group(1)).first()
@@ -149,7 +149,7 @@ class WeToolListMemberSpider(scrapy.Spider):
                         wetool.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                         wetool.create_date = time.strftime("%Y-%m-%d", time.localtime())
                     wetool.team_group_id = match.group(1)
-                    wetool.chat_room_member_count = member_count
+                    wetool.chat_room_member_count = chat_info['member_count']
                     wetool.chat_room_nickname = chat_info['nickname']
                     wetool.chat_room_owner_wxid = chat_info['owner_wxid']
                     wetool.chat_room_avatar = 'http' + chat_info['avatar']
