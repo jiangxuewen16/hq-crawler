@@ -54,6 +54,7 @@ def spot_price():
 def association():
     logger.info("==========【社群监控：开启】==========")
     jobid = get_scrapyd_cli().schedule('spiders', 'crm')
+    jobid = get_scrapyd_cli().schedule('spiders', 'crm_contactor')
     jobid = get_scrapyd_cli().schedule('spiders', 'wetool_list_member')
     logger.info("==========【社群监控：结束】==========")
 
