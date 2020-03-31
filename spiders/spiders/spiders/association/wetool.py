@@ -110,24 +110,21 @@ class WeToolListMemberSpider(scrapy.Spider):
         response_str = response.body.decode('utf-8')
         list_member = json.loads(response_str)
         num_list = {}
-        group_list = {}
         if list_member['errcode'] == 0:
             for chat_info in list_member['data']:
-                print('+++++++++++++++++++', int(chat_info['member_count']))
-                match = re.search(r'.*惠[旅|趣]商城\D*(\d*)\W*', chat_info['nickname'])
+                match = re.search(r'.*惠[旅|趣]\D*[商城|内购]\D*(\d*)\W*', chat_info['nickname'])
                 if match:
-                    wetool = TWetool.objects(chat_room_id=chat_info['wxid']).first()
+                    wetool = TWetool.objects(chat_room_id=chat_info['wxid'],
+                                             create_date=time.strftime("%Y-%m-%d", time.localtime())).first()
                     association = TAssociation.objects(team_group_id=match.group(1)).first()
-
                     member_count = int(chat_info['member_count'])
                     if member_count > 500:
                         member_count = 0
-
-                    print('==' * 20, match.group(1))
-                    channel_id = "0"
+                    distributor_id = channel_id = "0"
                     cd = CDistributor.objects(team_group_id=match.group(1)).first()
                     if cd is not None:
                         channel_id = cd.channel_id
+                        distributor_id = cd.distributor_id
 
                     if association:
                         if match.group(1) in num_list:
@@ -150,13 +147,15 @@ class WeToolListMemberSpider(scrapy.Spider):
                         wetool = TWetool()
                         wetool.chat_room_id = chat_info['wxid']
                         wetool.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                        wetool.create_date = time.strftime("%Y-%m-%d", time.localtime())
                     wetool.team_group_id = match.group(1)
                     wetool.chat_room_member_count = chat_info['member_count']
                     wetool.chat_room_nickname = chat_info['nickname']
                     wetool.chat_room_owner_wxid = chat_info['owner_wxid']
                     wetool.chat_room_avatar = 'http' + chat_info['avatar']
-                    wetool.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                     wetool.channel_id = channel_id
+                    wetool.distributor_id = distributor_id
+                    wetool.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                     yield wetool
 
     def get_all_crm(self):

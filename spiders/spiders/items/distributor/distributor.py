@@ -8,6 +8,7 @@ class CDistributor(BaseItem, mongoengine.Document):
     id = ObjectId()  # 必须定义
 
     channel_id = mongoengine.StringField()  # 渠道ID
+    distributor_id = mongoengine.StringField()  # 分销商id
     team_group_id = mongoengine.StringField()  # 群编码
     mobile = mongoengine.StringField()  # 手机号
     create_at = mongoengine.StringField()  # 创建时间
