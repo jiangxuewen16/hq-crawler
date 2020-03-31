@@ -70,7 +70,8 @@ class PublicOpinion(BaseView):
                 "conditions": [
                     {
                         "comparison": "CONTAIN",
-                        "deployId": "customer",
+                        # "deployId": "customer",
+                        "deployId": "contactor",
                         # "fieldName": "customer_input_2",
                         # "fieldTitle": "团长经销ID",
                         # "fieldValue": "团长经销IDtest",
