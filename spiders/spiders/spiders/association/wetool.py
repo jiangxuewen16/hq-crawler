@@ -152,7 +152,7 @@ class WeToolListMemberSpider(scrapy.Spider):
                     wetool.chat_room_member_count = chat_info['member_count']
                     wetool.chat_room_nickname = chat_info['nickname']
                     wetool.chat_room_owner_wxid = chat_info['owner_wxid']
-                    wetool.chat_room_avatar = 'http' + chat_info['avatar']
+                    wetool.chat_room_avatar = 'http:' + chat_info['avatar']
                     wetool.channel_id = channel_id
                     wetool.distributor_id = distributor_id
                     wetool.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
