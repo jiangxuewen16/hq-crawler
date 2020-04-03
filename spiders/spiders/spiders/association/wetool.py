@@ -21,6 +21,8 @@ class WeToolListMemberSpider(scrapy.Spider):
         '中惠旅内购客服2': 'wxid_08ey7r0i9dvz12',
         '中惠旅内购客服3': 'wxid_bqi9qznshsmy12',
         '中惠旅内购客服4': 'wxid_1yya6xpk3yre22',
+        '趣哥': 'wxid_39iil8tclrdb22',
+        '惠旅生活内购客服1': 'wxid_ogz10j91aix112',
     }
     crm_list = []
 
