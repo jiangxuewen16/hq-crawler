@@ -112,7 +112,7 @@ class WeToolListMemberSpider(scrapy.Spider):
         num_list = {}
         if list_member['errcode'] == 0:
             for chat_info in list_member['data']:
-                match = re.search(r'.*惠[旅|趣]\D*[商城|内购][\s\S]*?(\d{3,6})\W*', chat_info['nickname'])
+                match = re.search(r'.*惠[旅|趣]\D*[商城|内购][\s\S]*?(\d{3,10})\W*', chat_info['nickname'])
                 if match:
                     wetool = TWetool.objects(chat_room_id=chat_info['wxid'],
                                              create_date=time.strftime("%Y-%m-%d", time.localtime())).first()
