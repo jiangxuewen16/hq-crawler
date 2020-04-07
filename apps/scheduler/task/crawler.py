@@ -49,6 +49,12 @@ def spot_price():
     jobid = get_scrapyd_cli().schedule('spiders', 'qunar_price')
     logger.info("==========【价格监控：结束】==========")
 
+@register_job(scheduler, "cron", hour='15', minute='50', id='spot_price_qunar')
+def spot_price():
+    logger.info("==========【qunar价格监控：开启】==========")
+    jobid = get_scrapyd_cli().schedule('spiders', 'qunar_price')
+    logger.info("==========【qunar价格监控：结束】==========")
+
 
 @register_job(scheduler, "interval", seconds=2 * 60 * 60, id='association')
 def association():
