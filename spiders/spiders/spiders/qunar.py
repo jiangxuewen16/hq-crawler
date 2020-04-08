@@ -229,6 +229,8 @@ class PriceSpider(scrapy.Spider):
     allowed_domains = ['piao.qunar.com']
     login_url = 'http://piao.qunar.com/ticket/detail/getTickets.json'
 
+    import ssl
+    ssl._create_default_https_context = ssl._create_unverified_context
     def start_requests(self):
         price.OPrice.objects(ota_id=10006).delete()
         price.OPriceCalendar.objects(ota_id=10006, create_at=time.strftime("%Y-%m-%d", time.localtime())).delete()
