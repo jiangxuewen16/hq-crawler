@@ -24,3 +24,4 @@ fake-useragent==0.1.11
 python-daemon==2.2.4
 
 pykafka==2.8.0
+topsdk==19.4.13.20
