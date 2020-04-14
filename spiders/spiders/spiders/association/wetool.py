@@ -151,8 +151,12 @@ class WeToolListMemberSpider(scrapy.Spider):
                         wetool.chat_room_id = chat_info['wxid']
                         wetool.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                         wetool.create_date = time.strftime("%Y-%m-%d", time.localtime())
+                        wetool.chat_room_member_count = chat_info['member_count']
+                    else:
+                        # 只有之前存在数据 而且小于500的时候才更新
+                        if member_count < 500:
+                            wetool.chat_room_member_count = chat_info['member_count']
                     wetool.team_group_id = match.group(1)
-                    wetool.chat_room_member_count = chat_info['member_count']
                     wetool.chat_room_nickname = chat_info['nickname']
                     wetool.chat_room_owner_wxid = chat_info['owner_wxid']
                     wetool.chat_room_avatar = 'http:' + chat_info['avatar']
