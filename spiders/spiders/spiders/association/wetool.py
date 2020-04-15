@@ -119,13 +119,12 @@ class WeToolListMemberSpider(scrapy.Spider):
                 if match:
                     wetool = TWetool.objects(chat_room_id=chat_info['wxid']).order_by('-update_at').first()
                     association = TAssociation.objects(team_group_id=match.group(1)).first()
-                    original_member_count = member_count = int(chat_info['member_count'])
+                    cal_member_count = original_member_count = member_count = int(chat_info['member_count'])
                     if wetool:
                         if 500 > wetool.chat_room_member_count > 0 and (member_count > 500 or member_count < 0):
-                            member_count = wetool.chat_room_member_count
-                    else:
-                        if member_count > 500 or member_count < 0:
-                            member_count = 0
+                            cal_member_count = member_count = wetool.chat_room_member_count
+                    if member_count > 500 or member_count < 0:
+                        cal_member_count = 0
                     distributor_id = channel_id = "0"
                     cd = CDistributor.objects(team_group_id=match.group(1)).first()
                     if cd is not None:
@@ -134,10 +133,10 @@ class WeToolListMemberSpider(scrapy.Spider):
 
                     if association:
                         if match.group(1) in num_list:
-                            num_list[match.group(1)] = [num_list[match.group(1)][0] + member_count,
+                            num_list[match.group(1)] = [num_list[match.group(1)][0] + cal_member_count,
                                                         num_list[match.group(1)][1] + 1]
                         else:
-                            num_list[match.group(1)] = [member_count, 1]
+                            num_list[match.group(1)] = [cal_member_count, 1]
 
                         association.chat_room_id = chat_info['wxid']
                         association.chat_room_member_count = num_list[match.group(1)][0]
