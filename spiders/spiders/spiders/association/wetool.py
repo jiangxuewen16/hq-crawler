@@ -117,12 +117,15 @@ class WeToolListMemberSpider(scrapy.Spider):
             for chat_info in list_member['data']:
                 match = re.search(r'.*?(\d{4,10})', chat_info['nickname'])
                 if match:
-                    wetool = TWetool.objects(chat_room_id=chat_info['wxid'],
-                                             create_date=time.strftime("%Y-%m-%d", time.localtime())).first()
+                    wetool = TWetool.objects(chat_room_id=chat_info['wxid']).order_by('-update_at').first()
                     association = TAssociation.objects(team_group_id=match.group(1)).first()
-                    member_count = int(chat_info['member_count'])
-                    if member_count > 500:
-                        member_count = 0
+                    original_member_count = member_count = int(chat_info['member_count'])
+                    if wetool:
+                        if 500 > wetool.chat_room_member_count > 0 and (member_count > 500 or member_count < 0):
+                            member_count = wetool.chat_room_member_count
+                    else:
+                        if member_count > 500 or member_count < 0:
+                            member_count = 0
                     distributor_id = channel_id = "0"
                     cd = CDistributor.objects(team_group_id=match.group(1)).first()
                     if cd is not None:
@@ -135,7 +138,6 @@ class WeToolListMemberSpider(scrapy.Spider):
                                                         num_list[match.group(1)][1] + 1]
                         else:
                             num_list[match.group(1)] = [member_count, 1]
-                            # num_list[match.group(1)] = member_count
 
                         association.chat_room_id = chat_info['wxid']
                         association.chat_room_member_count = num_list[match.group(1)][0]
@@ -151,11 +153,14 @@ class WeToolListMemberSpider(scrapy.Spider):
                         wetool.chat_room_id = chat_info['wxid']
                         wetool.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                         wetool.create_date = time.strftime("%Y-%m-%d", time.localtime())
-                        wetool.chat_room_member_count = chat_info['member_count']
+                        wetool.chat_room_member_count = original_member_count
                     else:
-                        # 只有之前存在数据 而且小于500的时候才更新
-                        if member_count < 500:
-                            wetool.chat_room_member_count = chat_info['member_count']
+                        if time.strftime("%Y-%m-%d", time.localtime()) != wetool.create_date:
+                            wetool = TWetool()
+                            wetool.chat_room_id = chat_info['wxid']
+                            wetool.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                            wetool.create_date = time.strftime("%Y-%m-%d", time.localtime())
+                        wetool.chat_room_member_count = member_count
                     wetool.team_group_id = match.group(1)
                     wetool.chat_room_nickname = chat_info['nickname']
                     wetool.chat_room_owner_wxid = chat_info['owner_wxid']
