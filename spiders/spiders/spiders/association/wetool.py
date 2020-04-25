@@ -121,7 +121,7 @@ class WeToolListMemberSpider(scrapy.Spider):
                     association = TAssociation.objects(team_group_id=match.group(1)).first()
                     cal_member_count = original_member_count = member_count = int(chat_info['member_count'])
                     if wetool:
-                        if 500 > wetool.chat_room_member_count > 0 and (member_count > 500 or member_count < 0):
+                        if 500 > wetool.chat_room_member_count > 0 and (member_count > 500 or member_count <= 0):
                             cal_member_count = member_count = wetool.chat_room_member_count
                     if member_count > 500 or member_count < 0:
                         cal_member_count = 0
