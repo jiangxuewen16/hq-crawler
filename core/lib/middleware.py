@@ -10,3 +10,6 @@ class MiddleSetMethod(MiddlewareMixin):
 
     def process_response(self, request, response):
         return response  # 执行完了这个中间件一定要 传递给下一个中间件
+
+    def process_exception(self, request, exception):
+        print('MiddleSetMethod的process_exception')
