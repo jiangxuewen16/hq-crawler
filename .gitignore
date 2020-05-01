@@ -2,4 +2,5 @@
 /venv
 !.gitignore
 /log
+*.py[cod]
 
