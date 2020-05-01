@@ -13,6 +13,10 @@ class UdeskSpider(scrapy.Spider):
     cookie_list = {}
 
     def start_requests(self):
+        """
+        后台登录 cookie与authenticity_token具有关联性
+        :return:
+        """
         url = 'https://shanshui.udesk.cn/users/sign_in'
         cookies_list = {
             'aliyungf_tc': 'AQAAAN6WoW6MCAcA3TQUOtrdKEYB6Vcq',
