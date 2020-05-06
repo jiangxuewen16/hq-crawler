@@ -47,10 +47,10 @@ class UdeskSpider(scrapy.Spider):
             'sms_captcha': '',
         })
         yield Request(url=url, body=body, dont_filter=True, method='POST', cookies=cookies_list,
-                      meta={'dont_redirect': True, "handle_httpstatus_list": [302]})
+                      callback=self.parse, meta={'dont_redirect': True, "handle_httpstatus_list": [302]})
 
     def parse(self, response):
-        response_str = response.body.decode('utf-8')
+        self.detail_cookie(response)
 
     def detail_cookie(self, response: HtmlResponse):
         """
