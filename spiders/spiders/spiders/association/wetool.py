@@ -88,7 +88,7 @@ class WeToolListMemberSpider(scrapy.Spider):
             for name in self.wx_list:
                 yield scrapy.Request(url='https://wp-api.wxb.com/chat/listMember?wxid=' + self.wx_list[name] +
                                          '&member_type=2', headers=headers, method='GET',
-                                     callback=self.parse_wx, dont_filter=True)
+                                     callback=self.parse_wx, dont_filter=True, meta={'account': self.wx_list[name]})
 
     @staticmethod
     def detail_cookie(response: HtmlResponse):
@@ -114,6 +114,7 @@ class WeToolListMemberSpider(scrapy.Spider):
         list_member = json.loads(response_str)
         num_list = {}
         if list_member['errcode'] == 0:
+            account = response.meta['account']
             for chat_info in list_member['data']:
                 match = re.search(r'.*?(\d{4,10})', chat_info['nickname'])
                 if match:
@@ -153,12 +154,14 @@ class WeToolListMemberSpider(scrapy.Spider):
                         wetool.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                         wetool.create_date = time.strftime("%Y-%m-%d", time.localtime())
                         wetool.chat_room_member_count = original_member_count
+                        wetool.account = account
                     else:
                         if time.strftime("%Y-%m-%d", time.localtime()) != wetool.create_date:
                             wetool = TWetool()
                             wetool.chat_room_id = chat_info['wxid']
                             wetool.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                             wetool.create_date = time.strftime("%Y-%m-%d", time.localtime())
+                            wetool.account = account
                         wetool.chat_room_member_count = member_count
                     wetool.team_group_id = match.group(1)
                     wetool.chat_room_nickname = chat_info['nickname']
