@@ -16,7 +16,7 @@ redis==3.3.8
 # eventlet==0.25.1
 django-celery-beat==1.5.0
 django-redis==4.10.0
-py-micro==0.0.3
+#py-micro==0.0.3
 anyjson==0.3.3
 
 # 爬虫第三方user-agent库
