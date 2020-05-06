@@ -1,16 +1,24 @@
+import datetime
+import json
+import time
 from urllib import parse
 
 import scrapy
 from scrapy import Request
 from scrapy.http import HtmlResponse
 
+from spiders.items.customer import customer
+
 
 class UdeskSpider(scrapy.Spider):
     name = 'udesk'
-    allowed_domains = ['shanshui.udesk.cn']
+    allowed_domains = ['shanshui.udesk.cn', 'cbi.udesk.cn']
     start_urls = ['https://shanshui.udesk.cn/users/sign_in']
     login_url = 'https://shanshui.udesk.cn/users/sign_in'
+
+    search_url = 'https://shanshui.udesk.cn/spa1/customers/search'
     cookie_list = {}
+    page_size = 100  # 默认爬取每页100条
 
     def start_requests(self):
         """
@@ -51,6 +59,141 @@ class UdeskSpider(scrapy.Spider):
 
     def parse(self, response):
         self.detail_cookie(response)
+        cookie = self.cookie_list
+
+        post_data = json.dumps({
+            "filter_id": "596016",
+            "order": "",
+            "column": "",
+            "page": 1,
+            "page_size": 100,
+            "sort_by": [["created_at", "desc"]]
+        })
+
+        url = self.search_url
+        yield Request(url=url, method="POST", body=post_data,
+                      headers={'Content-Type': 'application/json'},
+                      cookies=cookie, callback=self.parse_count,
+                      dont_filter=True,
+                      meta={'cookies': cookie}
+                      )
+
+    def parse_count(self, response: HtmlResponse):
+        data = json.loads(response.body.decode('utf-8'))
+        total_pages = data['meta']['total_pages']
+        cookies = response.meta['cookies']
+        page_size = self.page_size
+        page = 1
+        post_data = json.dumps({
+            "filter_id": "596016",
+            "order": "",
+            "column": "",
+            "page": page,
+            "page_size": page_size,
+            "sort_by": [["created_at", "desc"]]
+        })
+        url = self.search_url
+
+        yield Request(url=url,
+                      method="POST",
+                      body=post_data,
+                      cookies=cookies,
+                      headers={'Content-Type': 'application/json'},
+                      callback=self.parse_page,
+                      dont_filter=True,
+                      meta={'page': page,
+                            'page_size': page_size,
+                            'total_pages': total_pages,
+                            'cookies': cookies})
+
+    def parse_page(self, response: HtmlResponse):
+        data = json.loads(response.body.decode('utf-8'))
+        for item in data['customers']:
+            customer_consultation = customer.CustomerConsultation.objects(
+                udesk_id=item['id'],
+                stat_at=item['updated_at'].split('T')[0]).first()
+            if not customer_consultation:
+                customer_consultation = customer.CustomerConsultation()
+                customer_consultation.udesk_id = item['id']
+                customer_consultation.agent = item['owner_name']
+                customer_consultation.work_id = item['owner_id']
+                customer_consultation.stat_at = item['updated_at'].split('T')[0]
+                customer_consultation.nick_name = item['nick_name']
+                customer_consultation.tags = item['tags']
+                customer_consultation.cellphone = item['cellphones'][0]['content'] if \
+                    len(item['cellphones']) > 0 else ''
+                customer_consultation.source_channel = item['source_channel']
+                if item['custom_fields']:
+                    if 'SelectField_15208' in item['custom_fields']:
+                        customer_consultation.source_platform = item['custom_fields']['SelectField_15208'][0]
+                    else:
+                        customer_consultation.source_platform = ''
+
+                    if 'SelectField_15210' in item['custom_fields']:
+                        customer_consultation.consulting_scenic_spot = item['custom_fields']['SelectField_15210'][0]
+                    else:
+                        customer_consultation.consulting_scenic_spot = ''
+                else:
+                    customer_consultation.source_platform = ''
+                    customer_consultation.consulting_scenic_spot = ''
+                customer_consultation.phone_service_provider = item['phone_service_provider'] if \
+                    item['phone_service_provider'] is not None else item['from']
+                customer_consultation.province = item['province']
+                customer_consultation.city = item['city']
+                customer_consultation.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+            customer_consultation.agent = item['owner_name']
+            customer_consultation.work_id = item['owner_id']
+            customer_consultation.stat_at = item['updated_at'].split('T')[0]
+            customer_consultation.nick_name = item['nick_name']
+            customer_consultation.tags = item['tags']
+            customer_consultation.cellphone = item['cellphones'][0]['content'] if \
+                len(item['cellphones']) > 0 else ''
+            customer_consultation.source_channel = item['source_channel']
+            if item['custom_fields']:
+                if 'SelectField_15208' in item['custom_fields']:
+                    customer_consultation.source_platform = item['custom_fields']['SelectField_15208'][0]
+                else:
+                    customer_consultation.source_platform = ''
+
+                if 'SelectField_15210' in item['custom_fields']:
+                    customer_consultation.consulting_scenic_spot = item['custom_fields']['SelectField_15210'][0]
+                else:
+                    customer_consultation.consulting_scenic_spot = ''
+            else:
+                customer_consultation.source_platform = ''
+                customer_consultation.consulting_scenic_spot = ''
+            customer_consultation.phone_service_provider = item['phone_service_provider'] if \
+                item['phone_service_provider'] is not None else item['from']
+            customer_consultation.province = item['province']
+            customer_consultation.city = item['city']
+            customer_consultation.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            yield customer_consultation
+
+        start_offset = response.meta['page'] + 1
+        if start_offset <= response.meta['total_pages']:
+            post_data = json.dumps({
+                "filter_id": "596016",
+                "order": "",
+                "column": "",
+                "page": start_offset,
+                "page_size": response.meta['page_size'],
+                "sort_by": [["created_at", "desc"]]
+            })
+            url = self.search_url
+            yield Request(url=url,
+                          method="POST",
+                          body=post_data,
+                          cookies=response.meta['cookies'],
+                          headers={'Content-Type': 'application/json'},
+                          callback=self.parse_page,
+                          dont_filter=True,
+                          meta={'page': start_offset,
+                                'page_size': response.meta['page_size'],
+                                'total_pages': response.meta['total_pages'],
+                                'cookies': response.meta['cookies']})
+
+
 
     def detail_cookie(self, response: HtmlResponse):
         """
@@ -60,6 +203,188 @@ class UdeskSpider(scrapy.Spider):
         """
         request_cookie = ''
         cookie_list = response.headers.getlist('Set-Cookie')
+
         for cookie in cookie_list:
-            request_cookie += bytes.decode(cookie) + '; '
-        self.cookie_list = request_cookie
+            kv = bytes.decode(cookie).strip().split('=')
+            self.cookie_list[kv[0]] = kv[1]
+
+
+
+class CustomerDailyReportSpider(scrapy.Spider):
+    name = 'customer_daily_report'
+    allowed_domains = ['shanshui.udesk.cn', 'cbi.udesk.cn']
+    base_url = 'https://cbi.udesk.cn/backend/report/cc_agent_callin?source=CS&token=QUhom_xcgsQKQifVR_fH'
+    start_urls = [
+        'https://cbi.udesk.cn/backend/report/cc_agent_callin?source=CS&token=QUhom_xcgsQKQifVR_fH']
+
+    callout_url = 'https://cbi.udesk.cn/backend/report/cc_agent_callout?source=CS&token=QUhom_xcgsQKQifVR_fH'
+    im_agent_workload_url = 'https://cbi.udesk.cn/backend/report/im_agent_workload?source=CS&token=QUhom_xcgsQKQifVR_fH'
+    im_agent_workquality_url = 'https://cbi.udesk.cn/backend/report/im_agent_workquality?source=CS&token=QUhom_xcgsQ' \
+                               'KQifVR_fH'
+
+    def start_requests(self):
+        start_time = self.get_time('startTime')
+        end_time = self.get_time('endTime')
+        post_data = json.dumps({
+            'ids': [],
+            'orderField': '',
+            'orderType': 'none',
+            'pageNum': 1,
+            'pageSize': 20,
+            'permission': 'all',
+            'statAt': [start_time, end_time],
+            'timeStrategy': 'work',
+        })
+
+        url = self.base_url
+        yield Request(url=url
+                      , method="POST"
+                      , body=post_data
+                      , headers={'Content-Type': 'application/json'}
+                      , callback=self.callin_daily_report)
+
+    def callin_daily_report(self, response: HtmlResponse):
+        json_data = json.loads(response.body.decode('utf-8'))
+        start_time = self.get_time('startTime')
+        end_time = self.get_time('endTime')
+        if json_data['code'] == 200:
+            data = json_data['data']['rows']
+            for telephone_data in data:
+                post_data = json.dumps({
+                    'ids': [telephone_data['cc_agent_callin__agent_id']],
+                    'orderField': '',
+                    'orderType': 'none',
+                    'pageNum': 1,
+                    'pageSize': 20,
+                    'permission': 'all',
+                    'statAt': [start_time, end_time],
+                    'timeStrategy': 'work',
+                })
+                url = self.callout_url
+                yield Request(url=url
+                              , method="POST"
+                              , body=post_data
+                              , headers={'Content-Type': 'application/json'}
+                              , callback=self.callout_daily_report
+                              , meta={'telephone_data': telephone_data})
+
+    def callout_daily_report(self, response: HtmlResponse):
+        json_data = json.loads(response.body.decode('utf-8'))
+        telephone_data = response.meta['telephone_data']
+        start_time = self.get_time('startTime')
+        end_time = self.get_time('endTime')
+        if json_data['code'] == 200:
+            callout_data = json_data['data']['rows']
+            post_data = json.dumps({
+                'ids': [telephone_data['cc_agent_callin__agent_id']],
+                'orderField': '',
+                'orderType': 'none',
+                'pageNum': 1,
+                'pageSize': 20,
+                'permission': 'all',
+                'statAt': [start_time, end_time],
+                'timeStrategy': 'work',
+            })
+            url = self.im_agent_workload_url
+            yield Request(url=url
+                          , method="POST"
+                          , body=post_data
+                          , headers={'Content-Type': 'application/json'}
+                          , callback=self.im_agent_workload
+                          , meta={'telephone_data': telephone_data, 'callout_data': callout_data})
+
+    def im_agent_workload(self, response: HtmlResponse):
+        json_data = json.loads(response.body.decode('utf-8'))
+        telephone_data = response.meta['telephone_data']
+        callout_data = response.meta['callout_data']
+        start_time = self.get_time('startTime')
+        end_time = self.get_time('endTime')
+        if json_data['code'] == 200:
+            workload = json_data['data']['rows']
+            post_data = json.dumps({
+                'ids': [telephone_data['cc_agent_callin__agent_id']],
+                'orderField': '',
+                'orderType': 'none',
+                'pageNum': 1,
+                'pageSize': 20,
+                'permission': 'all',
+                'statAt': [start_time, end_time],
+                'timeStrategy': 'work',
+            })
+            url = self.im_agent_workquality_url
+            yield Request(url=url
+                          , method="POST"
+                          , body=post_data
+                          , headers={'Content-Type': 'application/json'}
+                          , callback=self.im_agent_workquality
+                          , meta={'telephone_data': telephone_data, 'callout_data': callout_data,
+                                  'workload_data': workload})
+
+    def im_agent_workquality(self, response: HtmlResponse):
+        json_data = json.loads(response.body.decode('utf-8'))
+        telephone_data = response.meta['telephone_data']
+        callout_data = response.meta['callout_data']
+        workload_data = response.meta['workload_data']
+        if json_data['code'] == 200:
+            workquality_data = json_data['data']['rows']
+            customer_daily_report = customer.CustomerDailyReport.objects(
+                work_id=telephone_data['cc_agent_callin__agent_id'],
+                stat_at=telephone_data['cc_agent_callin__stat_at'].split(' ')[0]).first()
+
+            if not customer_daily_report:
+                customer_daily_report = customer.CustomerDailyReport()
+                customer_daily_report.agent = telephone_data['cc_agent_callin__agent']
+                customer_daily_report.work_id = telephone_data['cc_agent_callin__agent_id']
+                customer_daily_report.stat_at = telephone_data['cc_agent_callin__stat_at'].split(' ')[0]
+                customer_daily_report.telephone_proportion = {
+                    'callin_count': telephone_data['cc_agent_callin__callin_count'],
+                    'callin_answered_total_time': telephone_data[
+                        'cc_agent_callin__callin_answered_total_time'],
+                    'callin_ringing_answered_avg_time': telephone_data[
+                        'cc_agent_callin__callin_ringing_answered_avg_time'],
+                    'callin_answered_rate': telephone_data[
+                        'cc_agent_callin__callin_answered_rate'],
+                    'callout_count': callout_data[0]['cc_agent_callout__callout_count'],
+                    'callout_answered_total_time': callout_data[0][
+                        'cc_agent_callout__callout_answered_duration_total_time'],
+                    'satisfied': '100%'}
+                customer_daily_report.im_proportion = {
+                    'customer_message_count': workload_data[0][
+                        'im_agent_workload__valid_dialog_count'],
+                    'agent_message_count': workload_data[0][
+                        'im_agent_workload__served_client_cnt'],
+                    'avg_first_answered_seconds': workquality_data[0][
+                        'im_agent_workquality__avg_first_answered_seconds'],
+                    'appraise_avg_score': workquality_data[0][
+                        'im_agent_workquality__appraise_avg_score']}
+                customer_daily_report.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+            customer_daily_report.telephone_proportion = {
+                'callin_count': telephone_data['cc_agent_callin__callin_count'],
+                'callin_answered_total_time': telephone_data[
+                    'cc_agent_callin__callin_answered_total_time'],
+                'callin_ringing_answered_avg_time': telephone_data[
+                    'cc_agent_callin__callin_ringing_answered_avg_time'],
+                'callin_answered_rate': telephone_data[
+                    'cc_agent_callin__callin_answered_rate'],
+                'callout_count': callout_data[0]['cc_agent_callout__callout_count'],
+                'callout_answered_total_time': callout_data[0][
+                    'cc_agent_callout__callout_answered_duration_total_time'],
+                'satisfied': '100%'}
+            customer_daily_report.im_proportion = {
+                'customer_message_count': workload_data[0][
+                    'im_agent_workload__valid_dialog_count'],
+                'agent_message_count': workload_data[0][
+                    'im_agent_workload__served_client_cnt'],
+                'avg_first_answered_seconds': workquality_data[0]['im_agent_workquality__avg_first_answered_seconds'],
+                'appraise_avg_score': workquality_data[0][
+                    'im_agent_workquality__appraise_avg_score']}
+            customer_daily_report.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            yield customer_daily_report
+
+    @staticmethod
+    def get_time(tip='startTime'):
+        if tip == 'startTime':
+            return datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')
+        else:
+            return datetime.datetime.now().strftime('%Y-%m-%d 23:59:59')
