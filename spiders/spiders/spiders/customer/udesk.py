@@ -60,8 +60,10 @@ class UdeskSpider(scrapy.Spider):
     def parse(self, response):
         self.detail_cookie(response)
         cookie = self.cookie_list
-
+        start_time = self.get_time('startTime')
+        end_time = self.get_time('endTime')
         post_data = json.dumps({
+            "all_conditions": [{"field_name": "updated_at", "operation": "range", "value":  start_time + "," + end_time}],
             "filter_id": "596016",
             "order": "",
             "column": "",
@@ -69,7 +71,6 @@ class UdeskSpider(scrapy.Spider):
             "page_size": 100,
             "sort_by": [["created_at", "desc"]]
         })
-
         url = self.search_url
         yield Request(url=url, method="POST", body=post_data,
                       headers={'Content-Type': 'application/json'},
@@ -84,7 +85,11 @@ class UdeskSpider(scrapy.Spider):
         cookies = response.meta['cookies']
         page_size = self.page_size
         page = 1
+        start_time = self.get_time('startTime')
+        end_time = self.get_time('endTime')
         post_data = json.dumps({
+            "all_conditions": [
+                {"field_name": "updated_at", "operation": "range", "value": start_time + "," + end_time}],
             "filter_id": "596016",
             "order": "",
             "column": "",
@@ -172,7 +177,11 @@ class UdeskSpider(scrapy.Spider):
 
         start_offset = response.meta['page'] + 1
         if start_offset <= response.meta['total_pages']:
+            start_time = self.get_time('startTime')
+            end_time = self.get_time('endTime')
             post_data = json.dumps({
+                "all_conditions": [
+                    {"field_name": "updated_at", "operation": "range", "value": start_time + "," + end_time}],
                 "filter_id": "596016",
                 "order": "",
                 "column": "",
@@ -193,8 +202,6 @@ class UdeskSpider(scrapy.Spider):
                                 'total_pages': response.meta['total_pages'],
                                 'cookies': response.meta['cookies']})
 
-
-
     def detail_cookie(self, response: HtmlResponse):
         """
         将cookie转换为字符串方便放入header
@@ -208,6 +215,12 @@ class UdeskSpider(scrapy.Spider):
             kv = bytes.decode(cookie).strip().split('=')
             self.cookie_list[kv[0]] = kv[1]
 
+    @staticmethod
+    def get_time(tip='startTime'):
+        if tip == 'startTime':
+            return datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')
+        else:
+            return datetime.datetime.now().strftime('%Y-%m-%d 23:59:59')
 
 
 class CustomerDailyReportSpider(scrapy.Spider):
