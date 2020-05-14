@@ -61,9 +61,11 @@ class UdeskSpider(scrapy.Spider):
         self.detail_cookie(response)
         cookie = self.cookie_list
         start_time = self.get_time('startTime')
+
         end_time = self.get_time('endTime')
         post_data = json.dumps({
-            "all_conditions": [{"field_name": "updated_at", "operation": "range", "value":  start_time + "," + end_time}],
+            "all_conditions": [
+                {"field_name": "updated_at", "operation": "range", "value": start_time + "," + end_time}],
             "filter_id": "596016",
             "order": "",
             "column": "",
@@ -125,33 +127,8 @@ class UdeskSpider(scrapy.Spider):
                 customer_consultation.stat_at = item['updated_at'].split('T')[0]
                 customer_consultation.nick_name = item['nick_name']
                 customer_consultation.tags = item['tags']
-                customer_consultation.cellphone = item['cellphones'][0]['content'] if \
-                    len(item['cellphones']) > 0 else ''
-                customer_consultation.source_channel = item['source_channel']
-                if item['custom_fields']:
-                    if 'SelectField_15208' in item['custom_fields']:
-                        customer_consultation.source_platform = item['custom_fields']['SelectField_15208'][0]
-                    else:
-                        customer_consultation.source_platform = ''
-
-                    if 'SelectField_15210' in item['custom_fields']:
-                        customer_consultation.consulting_scenic_spot = item['custom_fields']['SelectField_15210'][0]
-                    else:
-                        customer_consultation.consulting_scenic_spot = ''
-                else:
-                    customer_consultation.source_platform = ''
-                    customer_consultation.consulting_scenic_spot = ''
-                customer_consultation.phone_service_provider = item['phone_service_provider'] if \
-                    item['phone_service_provider'] is not None else item['from']
-                customer_consultation.province = item['province']
-                customer_consultation.city = item['city']
                 customer_consultation.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
-            customer_consultation.agent = item['owner_name']
-            customer_consultation.work_id = item['owner_id']
-            customer_consultation.stat_at = item['updated_at'].split('T')[0]
-            customer_consultation.nick_name = item['nick_name']
-            customer_consultation.tags = item['tags']
             customer_consultation.cellphone = item['cellphones'][0]['content'] if \
                 len(item['cellphones']) > 0 else ''
             customer_consultation.source_channel = item['source_channel']
@@ -165,9 +142,14 @@ class UdeskSpider(scrapy.Spider):
                     customer_consultation.consulting_scenic_spot = item['custom_fields']['SelectField_15210'][0]
                 else:
                     customer_consultation.consulting_scenic_spot = ''
+                if 'SelectField_54171' in item['custom_fields']:
+                    customer_consultation.consulting_type = item['custom_fields']['SelectField_54171'][0]
+                else:
+                    customer_consultation.consulting_type = ''
             else:
                 customer_consultation.source_platform = ''
                 customer_consultation.consulting_scenic_spot = ''
+                customer_consultation.consulting_type = ''
             customer_consultation.phone_service_provider = item['phone_service_provider'] if \
                 item['phone_service_provider'] is not None else item['from']
             customer_consultation.province = item['province']
@@ -217,10 +199,15 @@ class UdeskSpider(scrapy.Spider):
 
     @staticmethod
     def get_time(tip='startTime'):
+        today = datetime.date.today()
+        oneday = datetime.timedelta(days=1)
+        yesterday = today - oneday
         if tip == 'startTime':
-            return datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')
+            # return datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')
+            return yesterday.strftime('%Y-%m-%d 00:00:00')
         else:
             return datetime.datetime.now().strftime('%Y-%m-%d 23:59:59')
+            # return yesterday.strftime('%Y-%m-%d 23:59:59')
 
 
 class CustomerDailyReportSpider(scrapy.Spider):
@@ -231,6 +218,7 @@ class CustomerDailyReportSpider(scrapy.Spider):
         'https://cbi.udesk.cn/backend/report/cc_agent_callin?source=CS&token=QUhom_xcgsQKQifVR_fH']
 
     callout_url = 'https://cbi.udesk.cn/backend/report/cc_agent_callout?source=CS&token=QUhom_xcgsQKQifVR_fH'
+    performance_url = 'https://cbi.udesk.cn/backend/report/cc_agent_performance?source=CS&token=QUhom_xcgsQKQifVR_fH'
     im_agent_workload_url = 'https://cbi.udesk.cn/backend/report/im_agent_workload?source=CS&token=QUhom_xcgsQKQifVR_fH'
     im_agent_workquality_url = 'https://cbi.udesk.cn/backend/report/im_agent_workquality?source=CS&token=QUhom_xcgsQ' \
                                'KQifVR_fH'
@@ -238,28 +226,34 @@ class CustomerDailyReportSpider(scrapy.Spider):
     def start_requests(self):
         start_time = self.get_time('startTime')
         end_time = self.get_time('endTime')
-        post_data = json.dumps({
-            'ids': [],
-            'orderField': '',
-            'orderType': 'none',
-            'pageNum': 1,
-            'pageSize': 20,
-            'permission': 'all',
-            'statAt': [start_time, end_time],
-            'timeStrategy': 'work',
-        })
+        time_list = self.get_every_day(start_time, end_time)
 
-        url = self.base_url
-        yield Request(url=url
-                      , method="POST"
-                      , body=post_data
-                      , headers={'Content-Type': 'application/json'}
-                      , callback=self.callin_daily_report)
+        for item in time_list:
+            start_time = item
+            post_data = json.dumps({
+                'ids': [],
+                'orderField': '',
+                'orderType': 'none',
+                'pageNum': 1,
+                'pageSize': 20,
+                'permission': 'all',
+                'statAt': [start_time + ' 00:00:00', start_time + ' 23:59:59'],
+                'timeStrategy': 'work',
+            })
+
+            url = self.base_url
+            yield Request(url=url
+                          , method="POST"
+                          , body=post_data
+                          , headers={'Content-Type': 'application/json'}
+                          , callback=self.callin_daily_report
+                          , meta={'start_time': start_time})
 
     def callin_daily_report(self, response: HtmlResponse):
         json_data = json.loads(response.body.decode('utf-8'))
-        start_time = self.get_time('startTime')
-        end_time = self.get_time('endTime')
+        start_time = response.meta['start_time']
+        # start_time = self.get_time('startTime')
+        # end_time = self.get_time('endTime')
         if json_data['code'] == 200:
             data = json_data['data']['rows']
             for telephone_data in data:
@@ -270,7 +264,7 @@ class CustomerDailyReportSpider(scrapy.Spider):
                     'pageNum': 1,
                     'pageSize': 20,
                     'permission': 'all',
-                    'statAt': [start_time, end_time],
+                    'statAt': [start_time + ' 00:00:00', start_time + ' 23:59:59'],
                     'timeStrategy': 'work',
                 })
                 url = self.callout_url
@@ -279,13 +273,13 @@ class CustomerDailyReportSpider(scrapy.Spider):
                               , body=post_data
                               , headers={'Content-Type': 'application/json'}
                               , callback=self.callout_daily_report
-                              , meta={'telephone_data': telephone_data})
+                              , meta={'telephone_data': telephone_data, 'start_time': start_time})
 
     def callout_daily_report(self, response: HtmlResponse):
         json_data = json.loads(response.body.decode('utf-8'))
         telephone_data = response.meta['telephone_data']
-        start_time = self.get_time('startTime')
-        end_time = self.get_time('endTime')
+        start_time = response.meta['start_time']
+
         if json_data['code'] == 200:
             callout_data = json_data['data']['rows']
             post_data = json.dumps({
@@ -295,7 +289,35 @@ class CustomerDailyReportSpider(scrapy.Spider):
                 'pageNum': 1,
                 'pageSize': 20,
                 'permission': 'all',
-                'statAt': [start_time, end_time],
+                'statAt': [start_time + ' 00:00:00', start_time + ' 23:59:59'],
+                'timeStrategy': 'work',
+            })
+            url = self.performance_url
+            yield Request(url=url
+                          , method="POST"
+                          , body=post_data
+                          , headers={'Content-Type': 'application/json'}
+                          , callback=self.performance_daily_report
+                          , meta={'telephone_data': telephone_data, 'callout_data': callout_data,
+                                  'start_time': start_time})
+
+    def performance_daily_report(self, response: HtmlResponse):
+        json_data = json.loads(response.body.decode('utf-8'))
+        telephone_data = response.meta['telephone_data']
+        callout_data = response.meta['callout_data']
+        start_time = response.meta['start_time']
+        # start_time = self.get_time('startTime')
+        # end_time = self.get_time('endTime')
+        if json_data['code'] == 200:
+            performance_data = json_data['data']['rows']
+            post_data = json.dumps({
+                'ids': [telephone_data['cc_agent_callin__agent_id']],
+                'orderField': '',
+                'orderType': 'none',
+                'pageNum': 1,
+                'pageSize': 20,
+                'permission': 'all',
+                'statAt': [start_time + ' 00:00:00', start_time + ' 23:59:59'],
                 'timeStrategy': 'work',
             })
             url = self.im_agent_workload_url
@@ -304,14 +326,16 @@ class CustomerDailyReportSpider(scrapy.Spider):
                           , body=post_data
                           , headers={'Content-Type': 'application/json'}
                           , callback=self.im_agent_workload
-                          , meta={'telephone_data': telephone_data, 'callout_data': callout_data})
+                          , meta={'telephone_data': telephone_data, 'callout_data': callout_data,
+                                  'performance_data': performance_data,
+                                  'start_time': start_time})
 
     def im_agent_workload(self, response: HtmlResponse):
         json_data = json.loads(response.body.decode('utf-8'))
         telephone_data = response.meta['telephone_data']
         callout_data = response.meta['callout_data']
-        start_time = self.get_time('startTime')
-        end_time = self.get_time('endTime')
+        performance_data = response.meta['performance_data']
+        start_time = response.meta['start_time']
         if json_data['code'] == 200:
             workload = json_data['data']['rows']
             post_data = json.dumps({
@@ -321,7 +345,7 @@ class CustomerDailyReportSpider(scrapy.Spider):
                 'pageNum': 1,
                 'pageSize': 20,
                 'permission': 'all',
-                'statAt': [start_time, end_time],
+                'statAt': [start_time + ' 00:00:00', start_time + ' 23:59:59'],
                 'timeStrategy': 'work',
             })
             url = self.im_agent_workquality_url
@@ -331,15 +355,19 @@ class CustomerDailyReportSpider(scrapy.Spider):
                           , headers={'Content-Type': 'application/json'}
                           , callback=self.im_agent_workquality
                           , meta={'telephone_data': telephone_data, 'callout_data': callout_data,
+                                  'performance_data': performance_data,
                                   'workload_data': workload})
 
     def im_agent_workquality(self, response: HtmlResponse):
         json_data = json.loads(response.body.decode('utf-8'))
         telephone_data = response.meta['telephone_data']
         callout_data = response.meta['callout_data']
+        performance_data = response.meta['performance_data']
         workload_data = response.meta['workload_data']
         if json_data['code'] == 200:
             workquality_data = json_data['data']['rows']
+            # print(float(workquality_data[0][
+            #           'im_agent_workquality__answered_30s_dialog_rate'].strip('%')) /100)
             customer_daily_report = customer.CustomerDailyReport.objects(
                 work_id=telephone_data['cc_agent_callin__agent_id'],
                 stat_at=telephone_data['cc_agent_callin__stat_at'].split(' ')[0]).first()
@@ -349,55 +377,120 @@ class CustomerDailyReportSpider(scrapy.Spider):
                 customer_daily_report.agent = telephone_data['cc_agent_callin__agent']
                 customer_daily_report.work_id = telephone_data['cc_agent_callin__agent_id']
                 customer_daily_report.stat_at = telephone_data['cc_agent_callin__stat_at'].split(' ')[0]
-                customer_daily_report.telephone_proportion = {
-                    'callin_count': telephone_data['cc_agent_callin__callin_count'],
-                    'callin_answered_total_time': telephone_data[
-                        'cc_agent_callin__callin_answered_total_time'],
-                    'callin_ringing_answered_avg_time': telephone_data[
-                        'cc_agent_callin__callin_ringing_answered_avg_time'],
-                    'callin_answered_rate': telephone_data[
-                        'cc_agent_callin__callin_answered_rate'],
-                    'callout_count': callout_data[0]['cc_agent_callout__callout_count'],
-                    'callout_answered_total_time': callout_data[0][
-                        'cc_agent_callout__callout_answered_duration_total_time'],
-                    'satisfied': '100%'}
-                customer_daily_report.im_proportion = {
-                    'customer_message_count': workload_data[0][
-                        'im_agent_workload__valid_dialog_count'],
-                    'agent_message_count': workload_data[0][
-                        'im_agent_workload__served_client_cnt'],
-                    'avg_first_answered_seconds': workquality_data[0][
-                        'im_agent_workquality__avg_first_answered_seconds'],
-                    'appraise_avg_score': workquality_data[0][
-                        'im_agent_workquality__appraise_avg_score']}
+                # customer_daily_report.telephone_proportion = {
+                #     'callin_count': telephone_data['cc_agent_callin__callin_count'],
+                #     'callin_answered_count': telephone_data['cc_agent_callin__callin_answered_count'],
+                #     'callin_ringing_total_time': telephone_data['cc_agent_callin__callin_ringing_total_time'],
+                #     'callin_answered_total_time': telephone_data[
+                #         'cc_agent_callin__callin_answered_total_time'],
+                #     'callin_ringing_answered_avg_time': telephone_data[
+                #         'cc_agent_callin__callin_ringing_answered_avg_time'],
+                #     'callin_answered_rate': telephone_data[
+                #         'cc_agent_callin__callin_answered_rate'],
+                #     'callin_ringing_answered_within_15s_count': telephone_data[
+                #         'cc_agent_callin__callin_ringing_answered_within_15s_count'],
+                #     'callin_ringing_answered_within_15s_rate': telephone_data[
+                #         'cc_agent_callin__callin_ringing_answered_within_15s_rate'],
+                #     'callout_count': callout_data[0]['cc_agent_callout__callout_count'],
+                #     'callout_answered_total_time': callout_data[0][
+                #         'cc_agent_callout__callout_answered_duration_total_time'],
+                #     'satisfied': '100%'}
+                # customer_daily_report.im_proportion = {
+                #     'dialog_count': workload_data[0][
+                #         'im_agent_workload__dialog_count'],
+                #     'customer_message_count': workload_data[0][
+                #         'im_agent_workload__valid_dialog_count'],
+                #     'agent_message_count': workload_data[0][
+                #         'im_agent_workload__served_client_cnt'],
+                #     'avg_first_answered_seconds': workquality_data[0][
+                #         'im_agent_workquality__avg_first_answered_seconds'],
+                #     'appraise_avg_score': workquality_data[0][
+                #         'im_agent_workquality__appraise_avg_score'],
+                #     'answered_30s_dialog_rate': workquality_data[0][
+                #         'im_agent_workquality__first_answered_30s_dialog_rate'],
+                #     'answered_30s_count': float(workquality_data[0][
+                #                           'im_agent_workquality__first_answered_30s_dialog_rate'].strip('%')) / 100 * int(workload_data[0][
+                #                           'im_agent_workload__dialog_count'])
+                # }
                 customer_daily_report.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
             customer_daily_report.telephone_proportion = {
                 'callin_count': telephone_data['cc_agent_callin__callin_count'],
+                'callin_answered_count': telephone_data['cc_agent_callin__callin_answered_count'],
+                'callin_ringing_total_time': telephone_data['cc_agent_callin__callin_ringing_total_time'],
                 'callin_answered_total_time': telephone_data[
                     'cc_agent_callin__callin_answered_total_time'],
                 'callin_ringing_answered_avg_time': telephone_data[
                     'cc_agent_callin__callin_ringing_answered_avg_time'],
                 'callin_answered_rate': telephone_data[
                     'cc_agent_callin__callin_answered_rate'],
+                'callin_ringing_answered_within_15s_count': telephone_data[
+                    'cc_agent_callin__callin_ringing_answered_within_15s_count'],
+                'callin_ringing_answered_within_15s_rate': telephone_data[
+                    'cc_agent_callin__callin_ringing_answered_within_15s_rate'],
+                'callin_survey': float(performance_data[0][
+                    'cc_agent_performance__callin_survey_47061-94285_r@e@value'].strip(
+                    '%')) / 100,
+                'callin_survey_count': '1' if float(performance_data[0][
+                    'cc_agent_performance__callin_survey_47061-94285_r@e@value'].strip(
+                    '%')) / 100 > 0 else '0',
                 'callout_count': callout_data[0]['cc_agent_callout__callout_count'],
                 'callout_answered_total_time': callout_data[0][
                     'cc_agent_callout__callout_answered_duration_total_time'],
                 'satisfied': '100%'}
             customer_daily_report.im_proportion = {
+                'dialog_count': workload_data[0][
+                    'im_agent_workload__dialog_count'],
                 'customer_message_count': workload_data[0][
                     'im_agent_workload__valid_dialog_count'],
                 'agent_message_count': workload_data[0][
                     'im_agent_workload__served_client_cnt'],
                 'avg_first_answered_seconds': workquality_data[0]['im_agent_workquality__avg_first_answered_seconds'],
+                'avg_first_answered_seconds_count': self.split_time(
+                    workquality_data[0]['im_agent_workquality__avg_first_answered_seconds']) * int(workload_data[0][
+                                                                                                       'im_agent_workload__dialog_count']),
+                'appraise_total_score': workquality_data[0][
+                    'im_agent_workquality__appraise_total_score'],
+                'appraise_count': workquality_data[0][
+                    'im_agent_workquality__appraise_count'],
                 'appraise_avg_score': workquality_data[0][
-                    'im_agent_workquality__appraise_avg_score']}
+                    'im_agent_workquality__appraise_avg_score'],
+                'answered_30s_dialog_rate': workquality_data[0][
+                    'im_agent_workquality__first_answered_30s_dialog_rate'],
+                'answered_30s_count': float(workquality_data[0][
+                                                'im_agent_workquality__first_answered_30s_dialog_rate'].strip(
+                    '%')) / 100 * int(workload_data[0][
+                                          'im_agent_workload__dialog_count'])
+            }
             customer_daily_report.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             yield customer_daily_report
 
     @staticmethod
     def get_time(tip='startTime'):
+        today = datetime.date.today()
+        oneday = datetime.timedelta(days=1)
+        yesterday = today - oneday
         if tip == 'startTime':
-            return datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')
+            # return datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')
+            return yesterday.strftime('%Y-%m-%d')
         else:
-            return datetime.datetime.now().strftime('%Y-%m-%d 23:59:59')
+            return datetime.datetime.now().strftime('%Y-%m-%d')
+            # return yesterday.strftime('%Y-%m-%d 23:59:59')
+
+    @staticmethod
+    def split_time(time_str=None):
+        line = time_str.split(":")
+        seconds = int(line[0]) * 3600 + int(line[1]) * 60 + int(line[2])
+        return seconds
+
+    @staticmethod
+    def get_every_day(begin_date, end_date):
+        # 前闭后闭
+        date_list = []
+        begin_date = datetime.datetime.strptime(begin_date, "%Y-%m-%d")
+        end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+        while begin_date <= end_date:
+            date_str = begin_date.strftime("%Y-%m-%d")
+            date_list.append(date_str)
+            begin_date += datetime.timedelta(days=1)
+        return date_list

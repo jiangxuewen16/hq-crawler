@@ -34,6 +34,7 @@ class CustomerConsultation(BaseItem, mongoengine.Document):
     source_channel = mongoengine.StringField()  # 售前售后
     source_platform = mongoengine.StringField()  # 来源平台
     consulting_scenic_spot = mongoengine.StringField()  # 咨询景区
+    consulting_type = mongoengine.StringField()  # 咨询类型
     phone_service_provider = mongoengine.StringField()  # 手机运营商
     province = mongoengine.StringField()  # 省
     city = mongoengine.StringField()  # 市
