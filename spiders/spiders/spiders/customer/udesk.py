@@ -61,37 +61,38 @@ class UdeskSpider(scrapy.Spider):
         self.detail_cookie(response)
         cookie = self.cookie_list
         start_time = self.get_time('startTime')
-
         end_time = self.get_time('endTime')
-        post_data = json.dumps({
-            "all_conditions": [
-                {"field_name": "updated_at", "operation": "range", "value": start_time + "," + end_time}],
-            "filter_id": "596016",
-            "order": "",
-            "column": "",
-            "page": 1,
-            "page_size": 100,
-            "sort_by": [["created_at", "desc"]]
-        })
-        url = self.search_url
-        yield Request(url=url, method="POST", body=post_data,
-                      headers={'Content-Type': 'application/json'},
-                      cookies=cookie, callback=self.parse_count,
-                      dont_filter=True,
-                      meta={'cookies': cookie}
-                      )
+        time_list = self.get_every_day(start_time, end_time)
+        for item in time_list:
+            start_time = item
+            post_data = json.dumps({
+                "all_conditions": [
+                    {"field_name": "updated_at", "operation": "range", "value": start_time + " 00:00:00" + "," + start_time + " 23:59:59"}],
+                "filter_id": "596016",
+                "order": "",
+                "column": "",
+                "page": 1,
+                "page_size": 100,
+                "sort_by": [["created_at", "desc"]]
+            })
+            url = self.search_url
+            yield Request(url=url, method="POST", body=post_data,
+                          headers={'Content-Type': 'application/json'},
+                          cookies=cookie, callback=self.parse_count,
+                          dont_filter=True,
+                          meta={'cookies': cookie, 'start_time': start_time}
+                          )
 
     def parse_count(self, response: HtmlResponse):
         data = json.loads(response.body.decode('utf-8'))
         total_pages = data['meta']['total_pages']
         cookies = response.meta['cookies']
+        start_time = response.meta['start_time']
         page_size = self.page_size
         page = 1
-        start_time = self.get_time('startTime')
-        end_time = self.get_time('endTime')
         post_data = json.dumps({
             "all_conditions": [
-                {"field_name": "updated_at", "operation": "range", "value": start_time + "," + end_time}],
+                {"field_name": "updated_at", "operation": "range", "value": start_time + " 00:00:00" + "," + start_time + " 23:59:59"}],
             "filter_id": "596016",
             "order": "",
             "column": "",
@@ -111,7 +112,8 @@ class UdeskSpider(scrapy.Spider):
                       meta={'page': page,
                             'page_size': page_size,
                             'total_pages': total_pages,
-                            'cookies': cookies})
+                            'cookies': cookies,
+                            'start_time': start_time})
 
     def parse_page(self, response: HtmlResponse):
         data = json.loads(response.body.decode('utf-8'))
@@ -159,11 +161,10 @@ class UdeskSpider(scrapy.Spider):
 
         start_offset = response.meta['page'] + 1
         if start_offset <= response.meta['total_pages']:
-            start_time = self.get_time('startTime')
-            end_time = self.get_time('endTime')
+            start_time = response.meta['start_time']
             post_data = json.dumps({
                 "all_conditions": [
-                    {"field_name": "updated_at", "operation": "range", "value": start_time + "," + end_time}],
+                    {"field_name": "updated_at", "operation": "range", "value": start_time + " 00:00:00" + "," + start_time + " 23:59:59"}],
                 "filter_id": "596016",
                 "order": "",
                 "column": "",
@@ -182,7 +183,8 @@ class UdeskSpider(scrapy.Spider):
                           meta={'page': start_offset,
                                 'page_size': response.meta['page_size'],
                                 'total_pages': response.meta['total_pages'],
-                                'cookies': response.meta['cookies']})
+                                'cookies': response.meta['cookies'],
+                                'start_time': start_time})
 
     def detail_cookie(self, response: HtmlResponse):
         """
@@ -204,10 +206,22 @@ class UdeskSpider(scrapy.Spider):
         yesterday = today - oneday
         if tip == 'startTime':
             # return datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')
-            return yesterday.strftime('%Y-%m-%d 00:00:00')
+            return yesterday.strftime('%Y-%m-%d')
         else:
-            return datetime.datetime.now().strftime('%Y-%m-%d 23:59:59')
+            return datetime.datetime.now().strftime('%Y-%m-%d')
             # return yesterday.strftime('%Y-%m-%d 23:59:59')
+
+    @staticmethod
+    def get_every_day(begin_date, end_date):
+        # 前闭后闭
+        date_list = []
+        begin_date = datetime.datetime.strptime(begin_date, "%Y-%m-%d")
+        end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+        while begin_date <= end_date:
+            date_str = begin_date.strftime("%Y-%m-%d")
+            date_list.append(date_str)
+            begin_date += datetime.timedelta(days=1)
+        return date_list
 
 
 class CustomerDailyReportSpider(scrapy.Spider):
