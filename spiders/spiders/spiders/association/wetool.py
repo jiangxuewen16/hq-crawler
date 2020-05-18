@@ -1,12 +1,13 @@
 import json
 import re
 import time
+import datetime
 from urllib import parse
 
 import scrapy
 from scrapy.http import HtmlResponse
 
-from spiders.items.association.wetool import TWetool
+from spiders.items.association.wetool import TWetool, TWetoolDailyWechat
 from spiders.items.association.association import TAssociation
 from spiders.items.distributor.distributor import CDistributor
 
@@ -181,3 +182,117 @@ class WeToolListMemberSpider(scrapy.Spider):
         association = TAssociation.objects().all()
         for ass in association:
             self.crm_list.append(ass.team_group_id)
+
+
+class WeToolDailyWechatSpider(scrapy.Spider):
+    name = "wetool_daily_wechat"
+    allowed_domains = ['wp.wxb.com', 'account.wxb.com']
+    start_urls = ['http://account.wxb.com/index2/login']
+
+    crm_list = []
+
+    def start_requests(self):
+        """
+        登录
+        scrapy默认get请求，所以重写初始方法
+        :return:
+        """
+        url = self.start_urls[0]
+        post_data = parse.urlencode({
+            'captcha': '',
+            'email': '15616882820@zhaowei',
+            'from': 'https://wp.wxb.com/',
+            'password': 'zhlzhaowei',
+            'remember': 'on'
+        })
+        headers = {
+            'Accept': 'application/json, text/plain, */*',
+            'Sec-Fetch-Dest': 'empty',
+            'X-Requested-With': 'XMLHttpRequest',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/80.0.3987.132 Safari/537.36',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Origin': 'https://account.wxb.com',
+            'Sec-Fetch-Site': 'same-origin',
+            'Sec-Fetch-Mode': 'cors',
+            'Referer': 'https://account.wxb.com/page/login?from=https%3A%2F%2Fwp.wxb.com',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'zh-CN,zh;q=0.9'
+        }
+        yield scrapy.FormRequest(url=url, body=post_data, method='POST', headers=headers)
+
+    def parse(self, response):
+        """
+        获取用户群组
+        :param response: HtmlResponse
+        :return:
+        """
+        start_time = self.get_time('startTime')
+        end_time = self.get_time('endTime')
+        response_str = response.body.decode('utf-8')
+        json_data = json.loads(response_str)
+        if json_data['errcode'] == 0:
+            request_cookie = self.detail_cookie(response)
+            headers = {
+                'Accept': 'application/json, text/plain, */*',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Accept-Language': 'zh-CN,zh;q=0.9',
+                'Connection': 'keep-alive',
+                'Host': 'wp-api.wxb.com',
+                'Origin': 'https://wp.wxb.com',
+                'Referer': 'https://wp.wxb.com/report',
+                'Sec-Fetch-Dest': 'empty',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Site': 'same-site',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) '
+                              'Chrome/80.0.3987.132 Safari/537.36',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Cookie': request_cookie
+            }
+
+            yield scrapy.Request(url='https://wp-api.wxb.com/stat/dailyWechat?s_date=' + start_time + '&e_date=' + end_time,
+                                 headers=headers, method='GET',
+                                 callback=self.daily_wechat, dont_filter=True)
+
+    def daily_wechat(self, response: HtmlResponse):
+        json_data = json.loads(response.body.decode('utf-8'))
+        if json_data['errcode'] == 0:
+            list_data = json_data['list']
+            today_data = json_data['today']
+            data = [list_data[0], today_data]
+            for item in data:
+                wetool_daily_report = TWetoolDailyWechat.objects(
+                    create_date=item['date_key']).first()
+                if not wetool_daily_report:
+                    wetool_daily_report = TWetoolDailyWechat()
+                    wetool_daily_report.create_date = item['date_key']
+                    wetool_daily_report.create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+                wetool_daily_report.group_send_msg_num = str(item['group_send_msg_num'])
+                wetool_daily_report.single_send_msg_num = str(item['single_send_msg_num'])
+                wetool_daily_report.update_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                yield wetool_daily_report
+
+    @staticmethod
+    def detail_cookie(response: HtmlResponse):
+        """
+        将cookie转换为字符串方便放入header
+        :param response:
+        :return: string
+        """
+        request_cookie = ''
+        cookie_list = response.headers.getlist('Set-Cookie')
+        for cookie in cookie_list:
+            request_cookie += bytes.decode(cookie) + '; '
+        return request_cookie
+
+    @staticmethod
+    def get_time(tip='startTime'):
+        today = datetime.date.today()
+        oneday = datetime.timedelta(days=1)
+        yesterday = today - oneday
+        if tip == 'startTime':
+            # return datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')
+            return yesterday.strftime('%Y-%m-%d')
+        else:
+            return datetime.datetime.now().strftime('%Y-%m-%d')
