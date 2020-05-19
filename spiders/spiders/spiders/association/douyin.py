@@ -42,38 +42,6 @@ class DYSpider(scrapy.Spider):
         lenth = len(json_data['aweme_list'])
         print(lenth)
 
-        # media_detail = MediaDetail()
-        # media_detail.team_group_id = 111
-        # media_detail.account_id = 222
-        # media_detail.account = "account"
-        # media_detail.name = "name"
-        # media_detail.city = "city"
-        # media_detail.category_tags = "美食"
-        # media_detail.introduction = "introduction"
-        # media_detail.is_official = 1
-        # media_detail.department = "department"
-        # create_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        #
-        # media_detail.fans_num = 1
-        # media_detail.fans_logs = [{'num': 1, 'create_at': create_at}, {'num': 2, 'create_at': create_at}]
-        # media_detail.total_play = 1
-        # media_detail.play_logs = [{'num': 1, 'create_at': create_at}, {'num': 2, 'create_at': create_at}]
-        # media_detail.total_like = 1
-        # media_detail.like_logs = [{'num': 1, 'create_at': create_at}, {'num': 2, 'create_at': create_at}]
-        # media_detail.comment_num = 1
-        # media_detail.comment_logs = [{'num': 1, 'create_at': create_at}, {'num': 2, 'create_at': create_at}]
-        # media_detail.video_num = 1
-        # media_detail.video_logs = [{'num': 1, 'create_at': create_at}, {'num': 2, 'create_at': create_at}]
-        # media_detail.broadcast_num = 1
-        # media_detail.broadcast_logs = [{'num': 1, 'create_at': create_at}, {'num': 2, 'create_at': create_at}]
-        # media_detail.repost_num = 1
-        # media_detail.repost_logs = [{'num': 1, 'create_at': create_at}, {'num': 2, 'create_at': create_at}]
-        #
-        # media_detail.create_at = create_at
-        # media_detail.update_at = create_at
-
-        # yield media_detail
-
 
 def download():
     url = 'https://s3.pstatp.com/ies/resource/falcon/douyin_falcon/static/font/iconfont_9eb9a50.woff'
@@ -106,6 +74,9 @@ class DYPageSpider(scrapy.Spider):
         读取csv文件
         0 姓名 1部门 2分享链接 3 群编码
         """
+        # 更新抖音字体加密文件
+        download()
+
         csvFile = open("xinxi.csv", "r")
         reader = csv.reader(csvFile)
         for info in reader:
@@ -117,8 +88,7 @@ class DYPageSpider(scrapy.Spider):
     def parse(self, response: HtmlResponse):
         # 获取url信息code
         url_code = re.search(r'(?<=user\/).*(?=\?)', response.url).group(0)
-        # 更新抖音字体加密文件
-        # download()
+
         info = response.meta['info']
         info['url_code'] = url_code
         line = response.body.decode('utf-8')
