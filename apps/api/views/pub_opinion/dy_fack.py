@@ -21,7 +21,7 @@ class PublicOpinion(BaseView):
             code.write(r.content)
         font = TTFont(r'demo.woff')
         ss = font.saveXML('demo.xml')
-        return self.success(1)
+        return self.success(ss)
 
     # 获取单个下的长度
     @Route.route(path='/get/count')

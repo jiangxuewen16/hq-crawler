@@ -15,6 +15,7 @@ class MediaDetail(BaseItem, mongoengine.Document):
     introduction = mongoengine.StringField()  # 简介
     is_official = mongoengine.IntField()  # 是否是官方 【0不是1是】
     department = mongoengine.StringField()  # 所属部门
+    avatar = mongoengine.StringField()  # 头像
 
     fans_num = mongoengine.IntField()  # 粉丝数
     fans_logs = mongoengine.ListField()  # 粉丝数爬取日志 [{'num':2,'create_at':'xxx'},{'num':4,'create_at':'xxx'}]
