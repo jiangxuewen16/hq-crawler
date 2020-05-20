@@ -56,6 +56,7 @@ def association():
     jobid = get_scrapyd_cli().schedule('spiders', 'crm')
     jobid = get_scrapyd_cli().schedule('spiders', 'crm_contactor')
     jobid = get_scrapyd_cli().schedule('spiders', 'wetool_list_member')
+    jobid = get_scrapyd_cli().schedule('spiders', 'dy_page')
     logger.info("==========【社群监控：结束】==========")
 
 # 订单接口检测 每2秒执行一次
