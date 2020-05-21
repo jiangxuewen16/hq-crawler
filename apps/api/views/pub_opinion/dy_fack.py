@@ -1,4 +1,5 @@
 import json
+import os
 import re
 
 import requests
@@ -117,3 +118,16 @@ class PublicOpinion(BaseView):
         liked_list = soup.find(class_=class_1)
         liked_len = liked_list.find_all(class_=class_2)
         return len(liked_len)
+
+    # 尝试杀进程
+    @Route.route(path='/get/pid')
+    def pid(self):
+        from psutil import process_iter
+        from signal import SIGTERM  # or SIGKILL
+
+        for proc in process_iter():
+            for conns in proc.connections(kind='inet'):
+                if conns.laddr.port == 8080:
+                    proc.send_signal(SIGTERM)  # or SIGKILL
+
+        return self.success(1)
