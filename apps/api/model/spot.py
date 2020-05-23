@@ -7,6 +7,7 @@ from django.utils.autoreload import logger
 
 from apps.api.common.helper.helper import getDayList
 from spiders.common import OTA
+from spiders.items.association import douyin
 from spiders.items.spot import spot
 
 spot_queue = queue.Queue()
@@ -2058,4 +2059,155 @@ class SpotCity:
             L = p
             logger.info(p)
             # L.append(dict(p))
+        return L
+
+
+class MediaDetail:
+    @classmethod
+    def dou_yin_new(cls, condition):
+        pipeline = [{
+            "$unwind": {
+                "path": "$tag_list",
+                "preserveNullAndEmptyArrays": True
+            }
+        },
+            {
+                '$match': {
+                    'create_at': {
+                        '$eq': condition['create_at']
+                    }
+                }
+            },
+            {
+                "$group": {
+                    "_id": {
+                        "create_at": "$create_at"
+                    },
+                    "now_fans_count": {  # 今日总粉丝量
+                        "$sum": "$fans_num"
+                    },
+                    "now_total_like_count": {  # 今日总获攒数
+                        "$sum": "$total_like"
+                    },
+                    "now_comment_count": {  # 今日总评论数
+                        "$sum": "$comment_num"
+                    },
+                    "now_broadcast_count": {  # 今日总直播数
+                        "$sum": "$broadcast_num"
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "now_fans_count": 1,
+                    "now_total_like_count": 1,
+                    "now_comment_count": 1,
+                    "now_broadcast_count": 1,
+                }
+
+            }
+        ]
+        comment_tags = douyin.MediaDetail.objects.aggregate(*pipeline)
+        L = []
+        for p in comment_tags:
+            L.append(dict(p))
+        return L
+
+    @classmethod
+    def dou_yin_is_official(cls, condition):
+        pipeline = [{
+            "$unwind": {
+                "path": "$tag_list",
+                "preserveNullAndEmptyArrays": True
+            }
+        },
+            {
+                '$match': {
+                    'is_official': {
+                        '$eq': condition['is_official']
+                    }
+                }
+            },
+            {
+                "$group": {
+                    "_id": None,
+                    "fans_count": {  # 总粉丝量
+                        "$sum": "$fans_count"
+                    },
+                    "total_like_count": {  # 今日总获攒数
+                        "$sum": "$total_like"
+                    },
+                    "broadcast_count": {  # 今日总直播数
+                        "$sum": "$broadcast_num"
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "fans_count": 1,
+                    "total_like_count": 1,
+                    "count": 1,
+                    "broadcast_count": 1,
+                }
+
+            }
+        ]
+        comment_tags = douyin.MediaDetail.objects.aggregate(*pipeline)
+        L = []
+        for p in comment_tags:
+            L.append(dict(p))
+        return L
+
+    @classmethod
+    def dou_yin_user(cls, condition):
+        pipeline = [{
+            "$unwind": {
+                "path": "$tag_list",
+                "preserveNullAndEmptyArrays": True
+            }
+        },
+            {
+                '$match': {
+                    'create_at': {
+                        '$eq': condition['create_at']
+                    }
+                }
+            },
+            {
+                "$group": {
+                    "_id": {
+                        "create_at": "$create_at"
+                    },
+                    "fans_count": {  # 今日总粉丝量
+                        "$sum": "$fans_num"
+                    },
+                    "total_like_count": {  # 今日总获攒数
+                        "$sum": "$total_like"
+                    },
+                    "comment_count": {  # 今日总评论数
+                        "$sum": "$comment_num"
+                    },
+                    "broadcast_count": {  # 今日总直播数
+                        "$sum": "$broadcast_num"
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "fans_count": 1,
+                    "total_like_count": 1,
+                    "comment_count": 1,
+                    "broadcast_count": 1,
+                }
+
+            }
+        ]
+        comment_tags = douyin.DouYinUser.objects.aggregate(*pipeline)
+        print(comment_tags)
+        L = []
+        for p in comment_tags:
+            L.append(dict(p))
         return L

@@ -9,7 +9,9 @@ python-scrapyd-api==2.1.2
 django-apscheduler==0.3.0
 scrapyd-client==1.1.0
 mongoengine==0.18.2
+excel==1.0.0
 pika==1.1.0
+hehey-hupload==1.0.0
 django-cors-headers==3.1.0
 # mysqlclient===1.4.4
 celery==4.3.0

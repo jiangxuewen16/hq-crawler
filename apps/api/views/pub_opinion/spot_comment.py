@@ -12,11 +12,13 @@ from django.utils.autoreload import logger
 
 from apps.api.common import helper
 from apps.api.common.helper.helper import dateRange, getDayList
-from apps.api.model.spot import SpotComment, Spot, SpotCity, spot_queue, spot_queue_list
+from apps.api.model.spot import SpotComment, Spot, SpotCity, spot_queue, spot_queue_list, MediaDetail
 from core.lib.view import BaseView
 from core.lib.route import Route
 from spiders.common import OTA
+from spiders.items.association import douyin
 from spiders.items.spot import spot
+from hupload.upload import UploadManager
 
 
 @Route.route(path='api/spot/public/opinion')
@@ -486,3 +488,86 @@ class PublicOpinion(BaseView):
     def day_list(self):
         result = getDayList()
         return self.success(result)
+
+    # 直播大数据-抖音
+    @Route.route(path='/media_detail/dou_yin')
+    def dou_yin(self):
+        param = self.request_param
+        now_time = datetime.datetime.now().strftime('%Y-%m-%d')  # 当前日期
+        yesterday = (datetime.datetime.now() + datetime.timedelta(-1)).strftime('%Y-%m-%d')  # 昨天
+        condition = {
+            'create_at': now_time,
+        }
+
+        now_data = MediaDetail.dou_yin_new(condition)  # 今日数据
+        yesterday_data = MediaDetail.dou_yin_new({'create_at': yesterday})  # 今日数据
+        douYin_official_data = MediaDetail.dou_yin_is_official({'is_official': 1})
+        douYin_data = MediaDetail.dou_yin_is_official({'is_official': 0})
+        print(douYin_data)
+        data = [
+            {
+                'now_fans_count': now_data[0]['now_fans_count'] - yesterday_data[0]['now_fans_count'],
+                'now_total_like_count': now_data[0]['now_total_like_count'] - yesterday_data[0]['now_total_like_count'],
+                'now_comment_count': now_data[0]['now_comment_count'] - yesterday_data[0]['now_comment_count'],
+                'now_broadcast_count': now_data[0]['now_broadcast_count'] - yesterday_data[0]['now_broadcast_count'],
+                'now_total_play': 0,  # 今日播放量
+                # 官方抖音
+                'official_fans_count': douYin_official_data[0]['fans_count'],
+                'official_total_like_count': douYin_official_data[0]['total_like_count'],
+                # 'official_count': douYin_official_data[0]['count'],
+                'official_broadcast_count': douYin_official_data[0]['broadcast_count'],
+                'official_total_play': 0,  # 总播放量
+                # 全民抖音
+                'fans_count': douYin_data[0]['fans_count'],
+                'total_like_count': douYin_data[0]['total_like_count'],
+                # 'count': douYin_data[0]['count'],
+                'broadcast_count': douYin_data[0]['broadcast_count'],
+                'total_play': 0,  # 总播放量
+
+            }
+        ]
+
+        if data[0]['now_fans_count'] < 0:
+            data[0]['now_fans_count'] = 0
+        if data[0]['now_total_like_count'] < 0:
+            data[0]['now_total_like_count'] = 0
+        if data[0]['now_comment_count'] < 0:
+            data[0]['now_comment_count'] = 0
+        if data[0]['now_broadcast_count'] < 0:
+            data[0]['now_broadcast_count'] = 0
+        return self.success(data)
+
+
+
+    # 抖音用户导入
+    @Route.route(path='/import_excel')
+    def Import_excel(self):
+        param = self.request_param
+        # condition = {
+        #     'file_name': Spot.get_param(param=param, in_name='file_name', default='')
+        # }
+        # if condition['file_name'] is None:
+        #     return self.success('没有上传任何文件')
+
+        from excel import OpenExcel
+        s = OpenExcel(r'D:\zhl\5月17日抖音大数据账号信息汇总.xlsx')
+        for i in range(len(s.data.sheets())):
+            f = OpenExcel(r'D:\zhl\5月17日抖音大数据账号信息汇总.xlsx', i)
+            if f:  # 循环excel子表
+                excel_rows = f.getRows()  # excel表行数
+                for j in range(3, excel_rows + 1):
+                    media_detail = douyin.DouYinUser()
+                    if f.read(2)[1] and f.read(2)[1] == '姓名':
+                        media_detail.name = f.read(j)[1]
+                    if f.read(2)[2] and f.read(2)[2] == '部门':
+                        media_detail.team_name = f.read(j)[2]
+                    if f.read(j)[3][:5] == 'https':
+                        media_detail.url = f.read(j)[3]
+                    media_detail.team_group_id = str(int(f.read(j)[4]))
+                    media_detail.remarks = ''
+                    if len(f.read(j)) >= 6:
+                        media_detail.remarks = f.read(j)[5]
+                    media_detail.save()
+            else:
+                continue
+        return self.success('导入成功')
