@@ -1,3 +1,3 @@
 import mongoengine
 
-mongoengine.connect('hq_crawler', host='mongodb://127.0.0.1:27017')
+mongoengine.connect('hq_data_cloud', host='mongodb://11.75.1.124:27017')
