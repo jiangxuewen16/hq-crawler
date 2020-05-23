@@ -210,12 +210,15 @@ class ContactorSpider(scrapy.Spider):
         response_str = response.body.decode('utf-8')
         json_data = json.loads(response_str)
         print(json_data['data']['count'])
+        print('上面为统计的条数-----------------------------')
         url = self.start_urls[1]
         headers = {
             'Content-Type': 'application/json'
         }
-        page = math.ceil(json_data['data']['count'] / 100)
+        page = math.ceil(json_data['data']['count'] / 10)
         for page_num in range(1, page + 1):
+            print(page_num)
+            print('当前页数为------------------------')
             post_data = {
                 "corpAccessToken": response.meta['corpAccessToken'],
                 "corpId": self.CORP_ID,
@@ -230,8 +233,9 @@ class ContactorSpider(scrapy.Spider):
                     ]
                 }],
                 "page": page_num,
-                "pageSize": 100
+                "pageSize": 10
             }
+
             yield scrapy.FormRequest(url=url, body=json.dumps(post_data), method='POST', headers=headers,
                                      callback=self.parse_list, meta={'page_num': page_num})
 
@@ -240,6 +244,7 @@ class ContactorSpider(scrapy.Spider):
         json_data = json.loads(response_str)
         if 'data' in json_data and 'list' in json_data['data']:
             for key, value in enumerate(json_data['data']['list']):
+                print('正在添加'+'------------------------'+value['charger_name']+value['charger_id'])
                 create = self.get_param(param=value, in_name='created', default=time.strftime("%Y/%m/%d"))[0:10]
                 create_at = time.strftime("%Y-%m-%d", time.strptime(create, u"%Y/%m/%d"))
 

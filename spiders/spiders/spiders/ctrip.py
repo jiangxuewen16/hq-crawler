@@ -399,7 +399,7 @@ class PriceSpider(scrapy.Spider):
         price.OPrice.objects(ota_id=10002).delete()
         price.OPriceCalendar.objects(ota_id=10002, create_at=time.strftime("%Y-%m-%d", time.localtime())).delete()
         for value in self.ota_map:
-            form_data = {"spotid": value['ota_spot_id'], "pageid": 10320662470, "imgsize": "C_640_360",
+            form_data = {"spotid": value['ota_spot_id'], "pageid": 10650022663, "imgsize": "C_640_360",
                          "resourceLimit": True,
                          "contentType": "json",
                          "head": {"cid": "09031019110028741215", "ctok": "", "cver": "1.0", "lang": "01", "sid": "8888",
@@ -415,9 +415,10 @@ class PriceSpider(scrapy.Spider):
     def after_login(self, response):
         print(response.meta['ota_spot_name'])
         result = json.loads(response.body)
-        rs = result['data']['shelfgroupinfo']['shelfresources'][0]['resourceid']
-        print(rs, "*" * 20)
-        if 'data' in result and 'resources' in result['data']:
+        # rs = result['data']['shelfgroupinfo']['shelfresources'][0]['resourceid']
+        # print(rs, "*" * 20)
+        if 'data' in result and 'resources' in result['data'] and result['data']['resources']:
+            print(result['data']['resources'])
             for k1, v1 in enumerate(result['data']['resources']):  # group数据   sightId
                 for k2, v2 in enumerate(result['data']['shelfgroupinfo']['shelfresources']):
                     if v1['resid'] == v2['resourceid']:

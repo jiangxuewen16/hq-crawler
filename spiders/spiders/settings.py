@@ -21,7 +21,7 @@ NEWSPIDER_MODULE = 'spiders.spiders'
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'spiders (+http://www.yourdomain.com)'
 # USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 (+http://www.huiqulx.com)'
-
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.54 Safari/536.5'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
@@ -85,8 +85,8 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    # 'spiders.pipelines.MongoDBPipeline': 300,
-    'spiders.pipelines.SpidersPipeline': 300,
+    'spiders.pipelines.MongoDBPipeline': 300,
+    # 'spiders.pipelines.SpidersPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

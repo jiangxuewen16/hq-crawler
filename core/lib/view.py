@@ -12,7 +12,6 @@ from core.lib.route import Route
 from hq_crawler import settings
 from django.utils.autoreload import logger
 
-
 """
 基础view类型
 """
@@ -26,6 +25,7 @@ class BaseView(View):
         request = json.loads(self.request.body)
         logger.info('请求参数：' + str(self.request.body))
         self._request_param = request['data']
+        # self._request_param = None
         self.version = request['head']['version']
         self.time = request['head']['time']
         self.token = request['head']['token']
@@ -49,8 +49,8 @@ class BaseView(View):
     def get(self, request: WSGIRequest) -> HttpResponse:
         if request.path_info not in Route.routeList:
             pass
-        logger.info(Route.routeList, request.path_info)
-
+        # logger.info(Route.routeList, request.path_info)
+        # print(request.path_info)
         return methodcaller(self._route_url(request.path_info))(self)  # 自调方法
 
     @classmethod
