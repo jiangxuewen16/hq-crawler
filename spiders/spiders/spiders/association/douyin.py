@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from fontTools.ttLib import TTFont
 from scrapy.http import HtmlResponse
 
+from spiders.items.association import douyin
 from spiders.items.association.douyin import MediaDetail
 
 
@@ -30,6 +31,8 @@ class DYSpider(scrapy.Spider):
             'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
             'x-requested-with': 'XMLHttpRequest'
         }
+        all_user = DouYinUser.select_all()
+        print(all_user)
         # yield scrapy.http.Request(url=url, headers=headers, callback=self.parse)
         yield scrapy.FormRequest(url=url, method='GET', headers=headers,
                                  callback=self.parse)
@@ -77,16 +80,29 @@ class DYPageSpider(scrapy.Spider):
         # 更新抖音字体加密文件
         download()
 
-        csvFile = open("xinxi.csv", "r")
-        reader = csv.reader(csvFile)
-        for info in reader:
-            person_info = {'name': info[0], 'department': info[1], 'url': info[2], 'team_group_id': info[3]}
-            yield scrapy.http.Request(url=info[2], headers=headers, callback=self.parse, meta={'info': person_info})
+        # csvFile = open("xinxi.csv", "r")
+        # reader = csv.reader(csvFile)
+        all_user = DouYinUser.select_all()
+        # for info in all_user:
+        #     print(info['name'])
+        #     print(info['team_name'])
+        #     print(info['url'])
+        #     print(info['team_group_id'])
+        for info in all_user:
+            if 'url' in info:
+                person_info = {'name': info['name'], 'department': info['team_name'], 'url': info['url'],
+                               'team_group_id': info['team_group_id']}
+                yield scrapy.http.Request(url=info['url'], headers=headers, callback=self.parse,
+                                          meta={'info': person_info})
             # break
-        csvFile.close()
+        # csvFile.close()
 
     def parse(self, response: HtmlResponse):
         # 获取url信息code
+        print('let me see see.....................................')
+        print(response.url)
+        print(response.meta['info'])
+
         url_code = re.search(r'(?<=user\/).*(?=\?)', response.url).group(0)
 
         info = response.meta['info']
@@ -246,3 +262,17 @@ class DYPageSpider(scrapy.Spider):
         liked_list = soup.find(class_=class_1)
         liked_len = liked_list.find_all(class_=class_2)
         return len(liked_len)
+
+
+class DouYinUser:
+    @classmethod
+    def select_all(cls):
+        pipeline = [
+            {'$project':
+                 {'_id': 0}
+             }]
+        dy_user = douyin.DouYinUser.objects.aggregate(*pipeline)
+        L = []
+        for p in dy_user:
+            L.append(dict(p))
+        return L
