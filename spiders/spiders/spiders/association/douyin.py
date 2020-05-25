@@ -58,7 +58,8 @@ def download():
 
 class DYPageSpider(scrapy.Spider):
     name = "dy_page"
-    allowed_domains = ['www.iesdouyin.com' '192.168.18.243']
+    # allowed_domains = ['www.iesdouyin.com' '192.168.18.243']
+    allowed_domains = ['www.iesdouyin.com' '172.18.113.141']
     start_urls = [
         'https://v.douyin.com/oN7DB7/',
     ]
@@ -110,7 +111,8 @@ class DYPageSpider(scrapy.Spider):
         line = response.body.decode('utf-8')
         like_all = self.get_count(line)
         info['like_all'] = like_all
-        url = 'http://192.168.18.243:5000/data?uid=' + url_code
+        # url = 'http://192.168.18.243:5000/data?uid=' + url_code
+        url = 'http://172.18.113.141:5000/data?uid=' + url_code
 
         yield scrapy.FormRequest(url=url, method='GET',
                                  callback=self.second_parse, meta={'info': info}, dont_filter=True)
