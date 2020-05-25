@@ -68,3 +68,12 @@ def association():
 # @register_job(scheduler, "interval", seconds=5)
 # def order_check():
 #     logger.info('=' * 30 + "测试定时任务")
+
+
+@register_job(scheduler, "interval", seconds=2 * 60 * 60, id='udesk')
+def udesk():
+    logger.info("==========【客服数据：开启】==========")
+    jobid = get_scrapyd_cli().schedule('spiders', 'udesk')
+    jobid = get_scrapyd_cli().schedule('spiders', 'customer_daily_report')
+    jobid = get_scrapyd_cli().schedule('spiders', 'wetool_daily_wechat')
+    logger.info("==========【客服数据：结束】==========")
