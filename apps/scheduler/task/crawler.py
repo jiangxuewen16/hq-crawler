@@ -71,7 +71,7 @@ def association():
 
 
 @register_job(scheduler, "interval", seconds=2 * 60 * 60, id='udesk')
-def association():
+def udesk():
     logger.info("==========【客服数据：开启】==========")
     jobid = get_scrapyd_cli().schedule('spiders', 'udesk')
     jobid = get_scrapyd_cli().schedule('spiders', 'customer_daily_report')
