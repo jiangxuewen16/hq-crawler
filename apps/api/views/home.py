@@ -38,6 +38,6 @@ class Home(BaseView):
 
     @Route.route(path='home')
     def home1(self):
-        print(self.request_param)
-        return self.success(self.request_param)
+        print(self.request.FILES.get('fafafa').name)
+        return self.success({})
 

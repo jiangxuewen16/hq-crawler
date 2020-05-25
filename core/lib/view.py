@@ -24,19 +24,21 @@ class BaseView(View):
     def __init(self):
         request = json.loads(self.request.body)
         logger.info('请求参数：' + str(self.request.body))
-        self._request_param = request['data']
+        self._request_param = request['data'] if request['data'] else ''
         # self._request_param = None
-        self.version = request['head']['version']
-        self.time = request['head']['time']
-        self.token = request['head']['token']
-        self.platform = request['head']['platform']
+        self.version = request['head']['version'] if request['head']['version'] else ''
+        self.time = request['head']['time'] if request['head']['time'] else ''
+        self.token = request['head']['token'] if request['head']['token'] else ''
+        self.platform = request['head']['platform'] if request['head']['platform'] else ''
 
     """
     post 处理
     """
 
     def post(self, request: WSGIRequest):
-        self.__init()
+        if len(request.FILES) <= 0:
+            self.__init()
+
         if request.path_info not in Route.routeList:
             pass
         # logger.info('='*20,request.path_info.lstrip('/').lstrip('crawler'))
