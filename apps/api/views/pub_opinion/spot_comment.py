@@ -3,7 +3,13 @@ import datetime
 import io
 import json
 import math
-import os
+import cgi, os
+import cgitb;
+
+from excel import OpenExcel
+
+cgitb.enable()
+
 import threading
 import time
 import operator
@@ -537,25 +543,33 @@ class PublicOpinion(BaseView):
             data[0]['now_broadcast_count'] = 0
         return self.success(data)
 
-
-
     # 抖音用户导入
     @Route.route(path='/import_excel')
     def Import_excel(self):
-        param = self.request_param
-        # condition = {
-        #     'file_name': Spot.get_param(param=param, in_name='file_name', default='')
-        # }
-        # if condition['file_name'] is None:
-        #     return self.success('没有上传任何文件')
+        f = self.request.FILES.get('filename')
+        if f.name is None:
+            return self.success('文件没有上传')
+        file_type = ['.xlsx', '.xls']
+        if f.name[-6:-1] not in file_type:
+            return self.success('上传文件类型有误')
+        now_time = datetime.datetime.now().strftime('%Y-%m-%d')  # 当前日期
+        path = 'upload'
+        file_name =now_time+f.name[-6:-1]
+        os.makedirs(path, 0o755, True)
+        with open('upload/'+file_name, 'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
 
-        from excel import OpenExcel
-        s = OpenExcel(r'D:\zhl\5月17日抖音大数据账号信息汇总.xlsx')
+        s = OpenExcel('upload/'+file_name)
         for i in range(len(s.data.sheets())):
-            f = OpenExcel(r'D:\zhl\5月17日抖音大数据账号信息汇总.xlsx', i)
+            f = OpenExcel('upload/'+file_name, i)
             if f:  # 循环excel子表
                 excel_rows = f.getRows()  # excel表行数
                 for j in range(3, excel_rows + 1):
+                    douyin_comment = douyin.DouYinUser.objects(name=f.read(j)[1]).first()
+                    # 存在不需要新增
+                    if douyin_comment:
+                        continue
                     media_detail = douyin.DouYinUser()
                     if f.read(2)[1] and f.read(2)[1] == '姓名':
                         media_detail.name = f.read(j)[1]
@@ -563,7 +577,9 @@ class PublicOpinion(BaseView):
                         media_detail.team_name = f.read(j)[2]
                     if f.read(j)[3][:5] == 'https':
                         media_detail.url = f.read(j)[3]
-                    media_detail.team_group_id = str(int(f.read(j)[4]))
+                    media_detail.team_group_id = ''
+                    if f.read(j)[4] and isinstance(f.read(j)[4],float):
+                        media_detail.team_group_id = str(int(f.read(j)[4]))
                     media_detail.remarks = ''
                     if len(f.read(j)) >= 6:
                         media_detail.remarks = f.read(j)[5]
