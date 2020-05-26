@@ -546,7 +546,7 @@ class PublicOpinion(BaseView):
     # 抖音用户导入
     @Route.route(path='/import_excel')
     def Import_excel(self):
-        f = self.request.FILES.get('filename')
+        f = self.request.FILES.get('file')
         if f.name is None:
             return self.success('文件没有上传')
         file_type = ['.xlsx', '.xls']
@@ -554,35 +554,35 @@ class PublicOpinion(BaseView):
             return self.success('上传文件类型有误')
         now_time = datetime.datetime.now().strftime('%Y-%m-%d')  # 当前日期
         path = 'upload'
-        file_name =now_time+f.name[-6:-1]
+        file_name = now_time + f.name[-6:-1]
         os.makedirs(path, 0o755, True)
-        with open('upload/'+file_name, 'wb+') as destination:
+        with open('upload/' + file_name, 'wb+') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
 
-        s = OpenExcel('upload/'+file_name)
+        s = OpenExcel('upload/' + file_name)
         for i in range(len(s.data.sheets())):
-            f = OpenExcel('upload/'+file_name, i)
+            f = OpenExcel('upload/' + file_name, i)
             if f:  # 循环excel子表
                 excel_rows = f.getRows()  # excel表行数
                 for j in range(3, excel_rows + 1):
-                    douyin_comment = douyin.DouYinUser.objects(name=f.read(j)[1]).first()
+                    douyin_comment = douyin.DouYinUser.objects(name=f.read(j)[1].strip()).first()
                     # 存在不需要新增
                     if douyin_comment:
                         continue
                     media_detail = douyin.DouYinUser()
-                    if f.read(2)[1] and f.read(2)[1] == '姓名':
-                        media_detail.name = f.read(j)[1]
-                    if f.read(2)[2] and f.read(2)[2] == '部门':
-                        media_detail.team_name = f.read(j)[2]
-                    if f.read(j)[3][:5] == 'https':
-                        media_detail.url = f.read(j)[3]
+                    if f.read(2)[1] and str(f.read(2)[1]).strip() == '姓名':
+                        media_detail.name = f.read(j)[1].strip()
+                    if f.read(2)[2] and str(f.read(2)[2]).strip() == '部门':
+                        media_detail.team_name = f.read(j)[2].strip()
+                    if str(f.read(j)[3]) and str(f.read(j)[3]).strip()[:5] == 'https':
+                        media_detail.url = f.read(j)[3].strip()
                     media_detail.team_group_id = ''
-                    if f.read(j)[4] and isinstance(f.read(j)[4],float):
-                        media_detail.team_group_id = str(int(f.read(j)[4]))
+                    if f.read(j)[4] is not None and isinstance(f.read(j)[4], float):
+                        media_detail.team_group_id = str(int(f.read(j)[4])).strip()
                     media_detail.remarks = ''
                     if len(f.read(j)) >= 6:
-                        media_detail.remarks = f.read(j)[5]
+                        media_detail.remarks = str(f.read(j)[5]).strip()
                     media_detail.save()
             else:
                 continue
