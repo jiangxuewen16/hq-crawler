@@ -8,6 +8,7 @@ class MediaDetail(BaseItem, mongoengine.Document):
     id = ObjectId()  # 必须定义
     team_group_id = mongoengine.StringField()  # 团长群编码id
     account_id = mongoengine.StringField()  # 抖音id
+    uid = mongoengine.StringField()  # 抖音唯一标识
     account = mongoengine.StringField()  # 抖音账号
     name = mongoengine.StringField()  # 姓名/官方账号名
     city = mongoengine.StringField()  # 所在城市
@@ -50,3 +51,14 @@ class DouYinUser(BaseItem, mongoengine.Document):
 
     create_at = mongoengine.StringField()  # 创建时间
     update_at = mongoengine.StringField()  # 更新时间
+
+
+# 抖音错误表
+class MediaError(BaseItem, mongoengine.Document):
+    pk = 1  # 必须定义
+    id = ObjectId()  # 必须定义
+    name = mongoengine.StringField()  # 姓名
+    department = mongoengine.StringField()  # 部门
+    url = mongoengine.StringField()  # url
+    team_group_id = mongoengine.StringField()  # 群编码
+    create_at = mongoengine.StringField()  # 创建时间

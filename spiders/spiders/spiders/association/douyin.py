@@ -11,7 +11,7 @@ from fontTools.ttLib import TTFont
 from scrapy.http import HtmlResponse
 
 from spiders.items.association import douyin
-from spiders.items.association.douyin import MediaDetail
+from spiders.items.association.douyin import MediaDetail, MediaError
 
 
 class DYSpider(scrapy.Spider):
@@ -103,19 +103,29 @@ class DYPageSpider(scrapy.Spider):
         print('let me see see.....................................')
         print(response.url)
         print(response.meta['info'])
-
-        url_code = re.search(r'(?<=user\/).*(?=\?)', response.url).group(0)
-
         info = response.meta['info']
-        info['url_code'] = url_code
-        line = response.body.decode('utf-8')
-        like_all = self.get_count(line)
-        info['like_all'] = like_all
-        # url = 'http://192.168.18.243:5000/data?uid=' + url_code
-        url = 'http://172.18.113.141:5000/data?uid=' + url_code
+        try:
+            url_code = re.search(r'(?<=user\/).*(?=\?)', response.url).group(0)
+            info = response.meta['info']
+            info['url_code'] = url_code
+            line = response.body.decode('utf-8')
+            like_all = self.get_count(line)
+            info['like_all'] = like_all
+            # url = 'http://192.168.18.243:5000/data?uid=' + url_code
+            url = 'http://172.18.113.141:5000/data?uid=' + url_code
 
-        yield scrapy.FormRequest(url=url, method='GET',
-                                 callback=self.second_parse, meta={'info': info}, dont_filter=True)
+            yield scrapy.FormRequest(url=url, method='GET',
+                                     callback=self.second_parse, meta={'info': info}, dont_filter=True)
+        except Exception as e:
+            create_at = time.strftime("%Y-%m-%d", time.localtime())
+            MediaError.objects(url=info['url']).update_one(  # 团长群编码
+                set__name=info['name'],
+                set__department=info['department'],
+                set__team_group_id=info['team_group_id'],
+                set__url=info['url'],
+                set__create_at=create_at,  # 创建时间
+                upsert=True)
+            print(e)
 
     def second_parse(self, response: HtmlResponse):
         # str = response.body.decode('gb18030')
@@ -130,6 +140,8 @@ class DYPageSpider(scrapy.Spider):
         if 'aweme_list' in json_data:
             for key, value in enumerate(json_data['aweme_list']):
                 unique_id = value['author']['unique_id']  # 抖音id
+                short_id = value['author']['short_id']  # 抖音short_id
+                uid = value['author']['uid']  # 抖音short_id
                 enterprise_verify_reason = value['author']['enterprise_verify_reason']  # 官方与否
 
                 comment_count = comment_count + value['statistics']['comment_count']  # 评论数
@@ -140,13 +152,15 @@ class DYPageSpider(scrapy.Spider):
             is_official = 1
         else:
             is_official = 0
+        if not unique_id:
+            unique_id = short_id
         print(unique_id, is_official, comment_count, share_count)
         # 获取基本信息
         # line = response.body.decode('utf-8')
         # like_all = self.get_count(line)
         # print(like_all)
         create_at = time.strftime("%Y-%m-%d", time.localtime())
-        yield MediaDetail.objects(team_group_id=info['team_group_id'], create_at=create_at).update_one(  # 团长群编码
+        yield MediaDetail.objects(uid=info['url_code'], create_at=create_at).update_one(  # 团长群编码
             set__name=info['name'],
             set__department=info['department'],
             set__team_group_id=info['team_group_id'],
