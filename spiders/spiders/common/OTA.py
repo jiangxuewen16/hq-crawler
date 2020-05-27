@@ -20,6 +20,7 @@ class OtaCode(Enum):
     LVMAMA = ota('驴妈妈', 10005)
     QUNAR = ota('去哪儿', 10006)
     LY = ota('同程', 10007)
+    JD = ota('京东', 10008)
 
 
 """
@@ -162,6 +163,12 @@ class OtaSpotIdMap(Enum):
         sp_map(OtaCode.QUNAR, 63919496),
         sp_map(OtaCode.LY, 190966),
     ]
+
+    # 上海迪斯尼
+    DI_SI_NI = [
+        sp_map(OtaCode.JD, 15968),
+    ]
+
 
     @classmethod
     def get_ota_spot_id(cls, spot_name: str, ota_code: OtaCode) -> int:
