@@ -29,3 +29,4 @@ python-daemon==2.2.4
 
 pykafka==2.8.0
 topsdk==19.4.13.20
+filetype==1.0.7
