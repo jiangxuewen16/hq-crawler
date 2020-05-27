@@ -586,4 +586,4 @@ class PublicOpinion(BaseView):
                     media_detail.save()
             else:
                 continue
-        return self.success('导入成功')
+        return self.success('导入成功'+f.name)
