@@ -166,7 +166,7 @@ class OtaSpotIdMap(Enum):
 
     # 上海迪斯尼
     DI_SI_NI = [
-        sp_map(OtaCode.JD, 15968),
+        sp_map(OtaCode.FLIGGY, 15968),
     ]
 
 
