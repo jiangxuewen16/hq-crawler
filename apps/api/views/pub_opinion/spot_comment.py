@@ -551,7 +551,7 @@ class PublicOpinion(BaseView):
             return self.success('文件没有上传')
         file_type = ['xlsx"', 'xls"']
         if f.name.split('.')[-1] not in file_type:
-            return self.success('上传文件类型有误')
+            return self.success('上传文件类型有误'+f.name)
         now_time = datetime.datetime.now().strftime('%Y-%m-%d')  # 当前日期
         path = 'upload'
         file_name = now_time + f.name[-6:-1]
@@ -586,4 +586,4 @@ class PublicOpinion(BaseView):
                     media_detail.save()
             else:
                 continue
-        return self.success('导入成功'+f.name)
+        return self.success('导入成功')
