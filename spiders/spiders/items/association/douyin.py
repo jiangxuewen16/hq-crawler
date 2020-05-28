@@ -41,6 +41,7 @@ class MediaDetail(BaseItem, mongoengine.Document):
 class DouYinUser(BaseItem, mongoengine.Document):
     pk = 1  # 必须定义
     id = ObjectId()  # 必须定义
+    uid = mongoengine.StringField()  # 抖音唯一标识
     name = mongoengine.StringField()  # 姓名
     nick_name = mongoengine.StringField()  # 抖音昵称
     account = mongoengine.StringField()  # 抖音账号

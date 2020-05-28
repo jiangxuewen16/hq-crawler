@@ -94,7 +94,7 @@ class DYPageSpider(scrapy.Spider):
                 person_info = {'name': info['name'], 'department': info['team_name'], 'url': info['url'],
                                'team_group_id': info['team_group_id']}
                 yield scrapy.http.Request(url=info['url'], headers=headers, callback=self.parse,
-                                          meta={'info': person_info})
+                                          meta={'info': person_info, 'url': info['url']})
             # break
         # csvFile.close()
 
@@ -105,8 +105,15 @@ class DYPageSpider(scrapy.Spider):
         print(response.meta['info'])
         info = response.meta['info']
         try:
+
             url_code = re.search(r'(?<=user\/).*(?=\?)', response.url).group(0)
-            info = response.meta['info']
+            '''
+            url_code反填回去
+            '''
+            douyin.DouYinUser.objects(url=response.meta['url']).update_one(  # 团长群编码
+                set__uid=url_code,
+                upsert=True)
+
             info['url_code'] = url_code
             pre_line = response.body.decode('utf-8')
 
