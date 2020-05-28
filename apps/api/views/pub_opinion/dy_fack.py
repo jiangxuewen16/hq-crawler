@@ -82,8 +82,10 @@ class PublicOpinion(BaseView):
         with open("test.html", "r", encoding="utf-8") as f:
             # print(num_list)
             pre_line = f.read()
-            line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
-            print(line)
+            # line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
+            line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><',
+                                    (pre_line.count('>.<') - 1))
+            # print(line)
             # print('作品数、喜欢数-------------------------------------------------')
             like_all = re.findall('class="icon iconfont tab-num"> (.*?);', line)  # 怎么分开
             str_list['post_str'] = like_all[0:num_list['post_len']]  # post_len 作品数
@@ -105,9 +107,21 @@ class PublicOpinion(BaseView):
         num_list = {'post_len': 0, 'like_len': 0, 'focus_len': 0, 'follower_len': 0, 'liked_len': 0}
         with open("test.html", "r", encoding="utf-8") as f:
             pre_line = f.read()
-            line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
-
+            # line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
+            line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><',
+                                    (pre_line.count('>.<') - 1))
+            print('xxxxxxxxxxxxxxxxxxxx')
+            print(line)
+            '''
+            判断是否有干扰
+            '''
             soup = BeautifulSoup(line, "html.parser")
+            ss = soup.find("div", {"class": "tab-wrap"}).find("i", {"class": "icon iconfont follow-num"})
+            print('sssssssssssssssss')
+            print(ss)
+            # line = ss.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
+            # soup = BeautifulSoup(line, "html.parser")
+
             # print('作品数--------------------------------------')
             post_len = self.get_num_len(soup, 'user-tab active tab get-list', 'icon iconfont tab-num')
             num_list['post_len'] = post_len
@@ -131,6 +145,8 @@ class PublicOpinion(BaseView):
         liked_list = soup.find(class_=class_1)
         liked_len = liked_list.find_all(class_=class_2)
         return len(liked_len)
+
+
 
     # 尝试杀进程
     @Route.route(path='/get/pid')

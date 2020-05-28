@@ -116,8 +116,12 @@ class DYPageSpider(scrapy.Spider):
 
             info['url_code'] = url_code
             pre_line = response.body.decode('utf-8')
-
-            line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
+            is_ms = self.is_miss(pre_line)
+            if is_ms:
+                line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
+            else:
+                line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><',
+                                        (pre_line.count('>.<') - 1))
             like_all = self.get_count(line)
             info['like_all'] = like_all
             # url = 'http://192.168.18.243:5000/data?uid=' + url_code
@@ -156,13 +160,14 @@ class DYPageSpider(scrapy.Spider):
                 comment_count = comment_count + value['statistics']['comment_count']  # 评论数
                 digg_count = digg_count + value['statistics']['digg_count']  # 点赞数
                 share_count = share_count + value['statistics']['share_count']  # 分享数
+                if not unique_id:
+                    unique_id = short_id
 
         if enterprise_verify_reason:
             is_official = 1
         else:
             is_official = 0
-        if not unique_id:
-            unique_id = short_id
+
         print(unique_id, is_official, comment_count, share_count)
         # 获取基本信息
         # line = response.body.decode('utf-8')
@@ -294,6 +299,12 @@ class DYPageSpider(scrapy.Spider):
         liked_list = soup.find(class_=class_1)
         liked_len = liked_list.find_all(class_=class_2)
         return len(liked_len)
+
+    @staticmethod
+    def is_miss(line):
+        soup = BeautifulSoup(line, "html.parser")
+        is_miss = soup.find("div", {"class": "tab-wrap"}).find("i", {"class": "icon iconfont follow-num"})
+        return is_miss
 
 
 class DouYinUser:
