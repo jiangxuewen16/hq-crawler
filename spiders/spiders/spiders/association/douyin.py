@@ -118,10 +118,15 @@ class DYPageSpider(scrapy.Spider):
             pre_line = response.body.decode('utf-8')
             is_ms = self.is_miss(pre_line)
             if is_ms:
+                print(is_ms)
+                print('有-----------------------------------')
                 line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><',
                                         (pre_line.count('>.<') - 1))
             else:
+                print(is_ms)
+                print('没有--------------------------')
                 line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
+            # print(line)
             like_all = self.get_count(line)
             info['like_all'] = like_all
             # url = 'http://192.168.18.243:5000/data?uid=' + url_code
@@ -303,8 +308,10 @@ class DYPageSpider(scrapy.Spider):
     @staticmethod
     def is_miss(line):
         soup = BeautifulSoup(line, "html.parser")
-        is_miss = soup.find("div", {"class": "tab-wrap"}).find("i", {"class": "icon iconfont follow-num"})
-        return is_miss
+        # is_miss = soup.find("div", {"class": "tab-wrap"}).find("i", {"class": "icon iconfont follow-num"})
+        is_miss = soup.find("div", {"class": "like-tab tab get-list"})
+        ss = re.search(">\.<", str(is_miss))
+        return ss
 
 
 class DouYinUser:
