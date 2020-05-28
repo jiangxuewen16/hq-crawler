@@ -1,3 +1,5 @@
+# coding: utf-8
+import json
 import re
 import time
 
@@ -62,6 +64,52 @@ class JdSpiderPrice(scrapy.Spider):
                                     'ota_spot_id': response.meta['ota_spot_id']})
 
     def parse_inside(self, response: HtmlResponse):
+        response_str = response.body.decode('utf-8')
+
+        type_key = response.css('#choose-attr-1 > div.dd > div.item.selected > a > i::text').extract_first() \
+            .replace('\n', '').strip()
+        type_name = response.xpath('/html/body/div[6]/div/div[2]/div[1]/text()').extract_first() \
+            .replace('\n', '').strip()
+        match = re.search('venderId:(\\d+),', response_str)
+        seller_id = match.group(1)
+        match = re.search('cat: \\[(\\d+,\\d+,\\d+)\\]', response_str)
+        cat = match.group(1)
+        url = 'https://c0.3.cn/stock?skuId=' + response.meta['sku'] + '&area=18_1482_48937_0&venderId=' + seller_id + \
+              '&buyNum=1&choseSuitSkuIds=&cat=' + cat + '&extraParam={%22originid%22:%221%22}'
+        o_price_calendar = price.OPriceCalendar()
+        o_price_calendar.ota_id = OTA.OtaCode.JD.value.id
+        o_price_calendar.ota_spot_id = response.meta['ota_spot_id']
+        o_price_calendar.type_id = response.meta['sku']
+        o_price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
+        o_price_calendar.type_key = type_key
+        o_price_calendar.type_name = type_name
+        o_price_calendar.normal_price = 0
+
+        yield Request(url=url, callback=self.parse_price, dont_filter=True,
+                      meta={'type_key': type_key, 'type_name': type_name, 'sku': response.meta['sku'],
+                            'old_url': response.url, 'o_price_calendar': o_price_calendar,
+                            'ota_spot_id': response.meta['ota_spot_id']})
+
+    def parse_price(self, response):
+        response_str = json.loads(response.body.decode('gbk'))
+        ticket_price = response_str['stock']['jdPrice']['p']
+        tickets = {
+            'type_id': response.meta['sku'],
+            'type_key': response.meta['type_key'],
+            'type_name': response.meta['type_name'].replace('\n', '').strip(),
+            'normal_price': 0,
+            'tickets': [
+                {
+                    'price_id': response.meta['sku'],
+                    'title': response.meta['type_name'].replace('\n', '').strip(),
+                    'price': ticket_price,
+                    'cash_back': 0,
+                    'cut_price': 0,
+                    'sale_num': 0,
+                    'url': response.meta['old_url']
+                }
+            ]
+        }
         o_price = price.OPrice.objects(ota_id=OTA.OtaCode.JD.value.id, ota_spot_id=response.meta['ota_spot_id']).first()
         flag = False
         if not o_price:
@@ -76,47 +124,17 @@ class JdSpiderPrice(scrapy.Spider):
                     flag = True
                     break
         o_price.create_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
-        type_key = response.css('#choose-attr-1 > div.dd > div.item.selected > a > i::text').extract_first() \
-            .replace('\n', '').strip()
-        type_name = response.xpath('/html/body/div[6]/div/div[2]/div[1]/text()').extract_first() \
-            .replace('\n', '').strip()
-        ticket_price = response.css('.J-p-' + response.meta['sku'] + '::text').extract_first(),
-        tickets = {
-            'type_id': response.meta['sku'],
-            'type_key': type_key,
-            'type_name': type_name.replace('\n', '').strip(),
-            'normal_price': 0,
-            'tickets': [
-                {
-                    'price_id': response.meta['sku'],
-                    'title': type_name.replace('\n', '').strip(),
-                    'price': response.xpath('/html/body/div[6]/div/div[2]/div[3]/div/div[1]/div[2]/span[1]/span['
-                                            '2]/text()').extract_first(),
-                    'cash_back': 0,
-                    'cut_price': 0,
-                    'sale_num': 0,
-                    'url': response.url
-                }
-            ]
-        }
-        if flag:
+        o_price_calendar = response.meta['o_price_calendar']
+        if not flag:
             o_price.ota_product.append(tickets)
             yield o_price
         else:
+            new_product = [tickets]
             price.OPrice.objects(ota_id=OTA.OtaCode.JD.value.id,
-                                 ota_spot_id=response.meta['ota_spot_id'],
+                                 ota_spot_id=o_price.ota_spot_id,
                                  ota_product__type_id=response.meta['sku']).update_one(
-                set__ota_product=tickets,
+                set__ota_product=new_product,
                 set__update_at=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-        o_price_calendar = price.OPriceCalendar()
-        o_price_calendar.ota_id = response.meta['ota_spot_id']
-        o_price_calendar.ota_spot_id = response.meta['ota_spot_id']
         o_price_calendar.ota_spot_name = self.ota_spot_keywords[o_price.ota_spot_id]
-        o_price_calendar.type_id = response.meta['sku']
         o_price_calendar.pre_price = ticket_price
-        o_price_calendar.create_at = time.strftime("%Y-%m-%d", time.localtime()).format('')
-        o_price_calendar.type_key = type_key
-        o_price_calendar.type_name = type_name
-        o_price_calendar.normal_price = 0
         yield o_price_calendar
-
