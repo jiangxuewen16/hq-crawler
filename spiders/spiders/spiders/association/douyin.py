@@ -118,10 +118,10 @@ class DYPageSpider(scrapy.Spider):
             pre_line = response.body.decode('utf-8')
             is_ms = self.is_miss(pre_line)
             if is_ms:
-                line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
-            else:
                 line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><',
                                         (pre_line.count('>.<') - 1))
+            else:
+                line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
             like_all = self.get_count(line)
             info['like_all'] = like_all
             # url = 'http://192.168.18.243:5000/data?uid=' + url_code
