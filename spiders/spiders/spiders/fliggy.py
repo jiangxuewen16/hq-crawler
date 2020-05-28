@@ -215,7 +215,8 @@ class FliggySpotSpider(scrapy.Spider):
             191470: '九龙江',
             140626417: '天空之城',
             17165564: '侠天下',
-            33559796: '三翁花园'
+            33559796: '三翁花园',
+            15968: '迪斯尼',
         }
         return spot_name.get(ota_spot_id)
 
