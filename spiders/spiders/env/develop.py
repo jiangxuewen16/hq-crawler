@@ -1,3 +1,3 @@
 import mongoengine
 
-mongoengine.connect('hq_data_cloud', host='mongodb://11.75.1.124:27017')
+mongoengine.connect('hq_data_cloud', host='mongodb://192.168.18.243:27017')
