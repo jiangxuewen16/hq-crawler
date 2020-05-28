@@ -45,6 +45,7 @@ class PublicOpinion(BaseView):
         # pre_code_s = pre_code_s
         for pre_code in pre_code_s:
             input_code = pre_code.replace("&#", "0")
+
             glyphID = {
                 'x': '',
                 'num_': 1,
@@ -66,7 +67,13 @@ class PublicOpinion(BaseView):
                 if code == input_code:
                     name = link.get('name')
                     out_num = glyphID[name]
+                elif input_code == '.':
+                    out_num = '.'
             out_str = out_str + str(out_num)
+        print('out_str-----------------------------')
+        print(out_str)
+        if out_str.find('.') > 0:
+            out_str = float(out_str) * 10000
         return int(out_str)
 
     def get_str_list(self):
@@ -74,7 +81,9 @@ class PublicOpinion(BaseView):
         str_list = {'post_str': '', 'like_str': '', 'focus_str': '', 'follower_str': '', 'liked_str': ''}
         with open("test.html", "r", encoding="utf-8") as f:
             # print(num_list)
-            line = f.read()
+            pre_line = f.read()
+            line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
+            print(line)
             # print('作品数、喜欢数-------------------------------------------------')
             like_all = re.findall('class="icon iconfont tab-num"> (.*?);', line)  # 怎么分开
             str_list['post_str'] = like_all[0:num_list['post_len']]  # post_len 作品数
@@ -87,14 +96,18 @@ class PublicOpinion(BaseView):
             str_list['follower_str'] = flower_all[num_list['focus_len']:num_list['focus_len'] + num_list[
                 'follower_len']]  # follower_len 粉丝数
             str_list['liked_str'] = flower_all[-num_list['liked_len']:]  # liked_len 赞数
-            # print(flower_all)
+            print('flower_all--------------------------')
+            print(flower_all)
 
         return str_list
 
     def get_num_list(self):
         num_list = {'post_len': 0, 'like_len': 0, 'focus_len': 0, 'follower_len': 0, 'liked_len': 0}
         with open("test.html", "r", encoding="utf-8") as f:
-            soup = BeautifulSoup(f, "html.parser")
+            pre_line = f.read()
+            line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
+
+            soup = BeautifulSoup(line, "html.parser")
             # print('作品数--------------------------------------')
             post_len = self.get_num_len(soup, 'user-tab active tab get-list', 'icon iconfont tab-num')
             num_list['post_len'] = post_len

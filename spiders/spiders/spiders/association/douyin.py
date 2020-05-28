@@ -108,7 +108,9 @@ class DYPageSpider(scrapy.Spider):
             url_code = re.search(r'(?<=user\/).*(?=\?)', response.url).group(0)
             info = response.meta['info']
             info['url_code'] = url_code
-            line = response.body.decode('utf-8')
+            pre_line = response.body.decode('utf-8')
+
+            line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
             like_all = self.get_count(line)
             info['like_all'] = like_all
             # url = 'http://192.168.18.243:5000/data?uid=' + url_code
@@ -117,14 +119,14 @@ class DYPageSpider(scrapy.Spider):
             yield scrapy.FormRequest(url=url, method='GET',
                                      callback=self.second_parse, meta={'info': info}, dont_filter=True)
         except Exception as e:
-            create_at = time.strftime("%Y-%m-%d", time.localtime())
-            MediaError.objects(url=info['url']).update_one(  # 团长群编码
-                set__name=info['name'],
-                set__department=info['department'],
-                set__team_group_id=info['team_group_id'],
-                set__url=info['url'],
-                set__create_at=create_at,  # 创建时间
-                upsert=True)
+            # create_at = time.strftime("%Y-%m-%d", time.localtime())
+            # MediaError.objects(url=info['url']).update_one(  # 团长群编码
+            #     set__name=info['name'],
+            #     set__department=info['department'],
+            #     set__team_group_id=info['team_group_id'],
+            #     set__url=info['url'],
+            #     set__create_at=create_at,  # 创建时间
+            #     upsert=True)
             print(e)
 
     def second_parse(self, response: HtmlResponse):
@@ -219,7 +221,14 @@ class DYPageSpider(scrapy.Spider):
                 if code == input_code:
                     name = link.get('name')
                     out_num = glyphID[name]
+                elif input_code == '.':
+                    out_num = '.'
             out_str = out_str + str(out_num)
+
+        if out_str.find('.') > 0:
+            out_str = float(out_str) * 10000
+            print('out_str-----------------------------')
+            print(out_str)
         return int(out_str)
 
     def get_str_list(self, line):
