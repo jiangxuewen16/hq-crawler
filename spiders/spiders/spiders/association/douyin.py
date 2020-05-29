@@ -1,5 +1,6 @@
 import csv
 import json
+import random
 import re
 
 import requests
@@ -90,7 +91,8 @@ class DYPageSpider(scrapy.Spider):
         #     print(info['url'])
         #     print(info['team_group_id'])
         for info in all_user:
-            if 'url' in info:
+            if 'url' and 'name' in info:
+                # if info['name'] == '陈念雄':  # 李钰  陈念雄 张秀秀
                 person_info = {'name': info['name'], 'department': info['team_name'], 'url': info['url'],
                                'team_group_id': info['team_group_id']}
                 yield scrapy.http.Request(url=info['url'], headers=headers, callback=self.parse,
@@ -117,15 +119,15 @@ class DYPageSpider(scrapy.Spider):
             info['url_code'] = url_code
             pre_line = response.body.decode('utf-8')
             is_ms = self.is_miss(pre_line)
-            if is_ms:
-                print(is_ms)
-                print('有-----------------------------------')
-                line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><',
-                                        (pre_line.count('>.<') - 1))
-            else:
-                print(is_ms)
-                print('没有--------------------------')
-                line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
+            # if is_ms:
+            #     print(is_ms)
+            #     print('有-----------------------------------')
+            line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><',
+                                    (pre_line.count('>.<') - is_ms))
+            # else:
+            #     print(is_ms)
+            #     print('没有--------------------------')
+            #     line = pre_line.replace('>.<', '><i class="icon iconfont follow-num"> .; </i><')
             # print(line)
             like_all = self.get_count(line)
             info['like_all'] = like_all
@@ -308,10 +310,12 @@ class DYPageSpider(scrapy.Spider):
     @staticmethod
     def is_miss(line):
         soup = BeautifulSoup(line, "html.parser")
-        # is_miss = soup.find("div", {"class": "tab-wrap"}).find("i", {"class": "icon iconfont follow-num"})
-        is_miss = soup.find("div", {"class": "like-tab tab get-list"})
-        ss = re.search(">\.<", str(is_miss))
-        return ss
+        # is_miss = soup.find("div", {"class": "like-tab tab get-list"})
+        # ss = re.search(">\.<", str(is_miss))
+        is_miss = soup.find("div", {"class": "tab-wrap"})
+        ss = re.findall(">\.<", str(is_miss))
+        # ss = re.findall("iconfont", str(is_miss))
+        return len(ss)
 
 
 class DouYinUser:
