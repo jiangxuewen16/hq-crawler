@@ -51,7 +51,7 @@ class JdSpiderPrice(scrapy.Spider):
     @staticmethod
     def count_page(response):
         response_str = response.body.decode('utf-8')
-        match = re.search('SEARCH.adv_param={page:"1",page_count:"(\\d+)"', response_str)
+        match = re.search('SEARCH.adv_param=\\{page:"1",page_count:"(\\d+)"', response_str)
         page_count = match.group(1)
         return page_count
 
