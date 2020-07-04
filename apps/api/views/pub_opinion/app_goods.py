@@ -55,7 +55,9 @@ class PublicOpinion(BaseView):
                 return self.success(result)
             return self.success()
         else:
-            return self.failure(r.json())
+            if r.status_code:
+                return self.failure(r.status_code)
+            return self.failure(r.headers.values())
             # return self.success("接口错误！请检查参数或联系惠趣云相关技术人员！！")
 
     @Route.route(path='/test')
