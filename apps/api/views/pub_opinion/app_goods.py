@@ -12,13 +12,13 @@ class PublicOpinion(BaseView):
 
     @Route.route(path='/index')
     def index(self):
-        # login_url = "https://api-saas.huiquyun.com/api/account/login"  # 正式
-        login_url = "http://192.168.18.241:8030/api/account/login" #测试
+        login_url = "https://api-saas.huiquyun.com/api/account/login"  # 正式
+        # login_url = "http://192.168.18.241:8030/api/account/login" #测试
         login_headers = {
             "Content-Type": "application/json"
         }
-        # login_payload = {'userName': "ztyyzx", "password": "1q2w3E*"}  # 正式
-        login_payload = {'userName': "admin", "password": "1q2w3E*"}  #测试
+        login_payload = {'userName': "ztyyzx", "password": "1q2w3E*"}  # 正式
+        # login_payload = {'userName': "admin", "password": "1q2w3E*"}  #测试
 
         r = requests.post(url=login_url, headers=login_headers, data=json.dumps(login_payload))
         result = r.json()
