@@ -116,7 +116,17 @@ class CommentSpider(scrapy.Spider):
                 print("+" * 30)
                 # headers = {'content-type': 'application/json'}
                 data = requests.get(url, headers=headers)
-                comment = data.json()
+                try:
+                    comment = data.json()
+                except Exception:
+                    try:
+                        data = requests.get(url, headers=headers)
+                        comment = data.json()
+                    except Exception:
+                        print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+
+
+
                 print(ota_spot_id, " 第", page_num, "页: ", "共", page_size, "条 ", "*" * 20)
                 if 'data' in comment and 'commentList' in comment['data']:
                     for key, value in enumerate(comment['data']['commentList']):

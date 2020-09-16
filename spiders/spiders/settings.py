@@ -116,8 +116,8 @@ COOKIES_ENABLES = False
 # 代理ip列表
 PROXIES = ['118.126.105.239:8008', '106.15.39.21:8008', '193.112.181.35:8008']
 RETRY_ENABLED = True  # 打开重试开关
-RETRY_TIMES = 3  # 重试次数
-DOWNLOAD_TIMEOUT = 3  # 超时
+RETRY_TIMES = 10  # 重试次数
+DOWNLOAD_TIMEOUT = 10  # 超时
 RETRY_HTTP_CODES = [403]  # 重试
 
 HTTPERROR_ALLOWED_CODES = [403]  # 上面报的是403，就把403加入。
@@ -132,7 +132,8 @@ HTTPERROR_ALLOWED_CODES = [403]  # 上面报的是403，就把403加入。
 #     from .env.develop import *
 #     # raise Exception('环境不存在')
 
-from .env.production import *
+# from .env.production import *
+from .env.develop import *
 
 SCRAPYD_DEPLOY = 'http://172.18.113.141:6800/'
 
