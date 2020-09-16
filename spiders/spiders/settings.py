@@ -86,7 +86,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'spiders.pipelines.MongoDBPipeline': 300,
-    #'spiders.pipelines.SpidersPipeline': 300,
+    # 'spiders.pipelines.SpidersPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -115,7 +115,12 @@ COOKIES_ENABLES = False
 
 # 代理ip列表
 PROXIES = ['118.126.105.239:8008', '106.15.39.21:8008', '193.112.181.35:8008']
+RETRY_ENABLED = True  # 打开重试开关
+RETRY_TIMES = 3  # 重试次数
+DOWNLOAD_TIMEOUT = 3  # 超时
+RETRY_HTTP_CODES = [403]  # 重试
 
+HTTPERROR_ALLOWED_CODES = [403]  # 上面报的是403，就把403加入。
 # APP_ENV = os.getenv('APP_ENV')
 # if APP_ENV == 'production':
 #     print('+' * 40, '正式环境', '+' * 40)
